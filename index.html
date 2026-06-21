@@ -817,6 +817,36 @@
     </div>
 </div>
 
+<!-- ===== SCANNER MODAL ===== -->
+<div class="modal-overlay" id="scannerModal">
+    <div class="modal-sheet" style="padding:0;overflow:hidden;border-radius:var(--r-xl) var(--r-xl) 0 0;">
+        <div style="position:relative;background:#000;height:60vh;display:flex;align-items:center;justify-content:center;">
+            <!-- Simulated Camera Feed -->
+            <video id="scannerVideo" style="width:100%;height:100%;object-fit:cover;opacity:0.5;" autoplay muted loop>
+                <!-- Add a placeholder or just leave dark if video isn't available -->
+            </video>
+            
+            <!-- Scanner UI Overlay -->
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div style="font-family:var(--font-display);font-weight:800;color:white;margin-bottom:20px;text-shadow:0 2px 4px rgba(0,0,0,0.8);">ALIGN QR CODE</div>
+                
+                <div style="width:200px;height:200px;border:2px solid rgba(255,255,255,0.2);position:relative;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.5);">
+                    <!-- Corner markers -->
+                    <div style="position:absolute;top:-2px;left:-2px;width:30px;height:30px;border-top:4px solid var(--neon-green);border-left:4px solid var(--neon-green);border-radius:12px 0 0 0;"></div>
+                    <div style="position:absolute;top:-2px;right:-2px;width:30px;height:30px;border-top:4px solid var(--neon-green);border-right:4px solid var(--neon-green);border-radius:0 12px 0 0;"></div>
+                    <div style="position:absolute;bottom:-2px;left:-2px;width:30px;height:30px;border-bottom:4px solid var(--neon-green);border-left:4px solid var(--neon-green);border-radius:0 0 0 12px;"></div>
+                    <div style="position:absolute;bottom:-2px;right:-2px;width:30px;height:30px;border-bottom:4px solid var(--neon-green);border-right:4px solid var(--neon-green);border-radius:0 0 12px 0;"></div>
+                    
+                    <!-- Scan Line -->
+                    <div class="scan-line" style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--neon-green);box-shadow:0 0 10px var(--neon-green);animation:scan-move 2s linear infinite;"></div>
+                </div>
+                
+                <button class="btn btn-ghost" id="closeScannerModal" style="margin-top:30px;background:rgba(255,255,255,0.2);color:white;border-radius:var(--r-pill);padding:8px 24px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

@@ -922,10 +922,68 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         });
     });
 
-    // Scanner Widget
+    // Scanner Widget (Realistic Simulation)
     document.getElementById('scannerWidget').addEventListener('click', () => {
-        showToast('Camera scanner opening... (Demo Mode)', 'info');
-        setTimeout(() => showToast('Scanned: Order RQ-1085 found!', 'success'), 1200);
+        const modal = document.getElementById('scannerModal');
+        modal.classList.add('open');
+        
+        // Simulate Camera Access & Scanning
+        setTimeout(() => {
+            if(!modal.classList.contains('open')) return; // if user canceled
+            
+            // Randomly decide if it's picking up an existing order or getting a new one
+            const isPickup = Math.random() > 0.3 && orders.length > 0;
+            
+            if (isPickup) {
+                // Find a ready or preparing order
+                const validOrders = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+                if (validOrders.length > 0) {
+                    const o = validOrders[0];
+                    showToast(`Scanned Ticket: ${o.id} found!`, 'success');
+                    modal.classList.remove('open');
+                    setTimeout(() => openOrderModal(o.id), 500);
+                } else {
+                    simulateNewScan(modal);
+                }
+            } else {
+                simulateNewScan(modal);
+            }
+        }, 2500);
+    });
+
+    function simulateNewScan(modal) {
+        showToast('Scanned new counter order!', 'success');
+        modal.classList.remove('open');
+        
+        // Add a new instant counter order
+        const newOrder = {
+            id: `RQ-C${1000 + Math.floor(Math.random() * 900)}`,
+            trainNo: "WALK-IN",
+            trainName: "Platform Counter",
+            fromTo: "Local",
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 60, // Quick
+            prepTimeMinutes: 1,
+            items: [
+                { name: "Water Bottle 1L", qty: 2, packed: false },
+                { name: "Biscuit Pack", qty: 1, packed: false }
+            ],
+            status: "Pending",
+            source: "QR Scan",
+            reallocated: false,
+            otp: genOTP(),
+            amount: 55,
+            coach: "N/A"
+        };
+        orders.push(newOrder);
+        renderOrders();
+        logToConsole(`> QR SCANNER: Instant counter order ${newOrder.id} logged.`, 'success');
+    }
+
+    // Close Scanner Modal manually
+    document.getElementById('closeScannerModal').addEventListener('click', () => {
+        document.getElementById('scannerModal').classList.remove('open');
     });
 
     // ==========================================================================
