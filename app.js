@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================================
     // SIDEBAR NAVIGATION SYSTEM
     // ==========================================================================
-    const navItems = document.querySelectorAll(".sidebar-nav .nav-item");
+    const navItems = document.querySelectorAll(".app-bottom-nav .nav-item");
     const tabViews = document.querySelectorAll(".tab-view");
 
     navItems.forEach(item => {
@@ -1117,45 +1117,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // NOTION DAILY SUMMARY REPORT DRAWER
+    // NOTION DAILY SUMMARY REPORT HANDLERS
     // ==========================================================================
-    const btnToggleAiDrawer = document.getElementById("btnToggleAiDrawer");
     const btnNotionAI = document.getElementById("btnNotionAI");
     const btnOneTapReport = document.getElementById("btnOneTapReport");
-    const aiDrawerOverlay = document.getElementById("aiDrawerOverlay");
-    const btnCloseAiDrawer = document.getElementById("btnCloseAiDrawer");
     const btnTriggerDailyReport = document.getElementById("btnTriggerDailyReport");
     const btnPushReportToNotion = document.getElementById("btnPushReportToNotion");
     const editorContent = document.getElementById("editorContent");
     const btnCopyNote = document.getElementById("btnCopyNote");
 
-    function openAiDrawer() {
+    function navigateToAiTab() {
         playSynthSound('click');
-        if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
+        const aiNavItem = document.querySelector('.app-bottom-nav .nav-item[data-tab="ai"]');
+        if (aiNavItem) {
+            aiNavItem.click();
+        }
     }
 
-    function closeAiDrawer() {
-        playSynthSound('click');
-        if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
-    }
-
-    if (btnToggleAiDrawer) btnToggleAiDrawer.addEventListener("click", openAiDrawer);
-    if (btnNotionAI) btnNotionAI.addEventListener("click", openAiDrawer);
+    if (btnNotionAI) btnNotionAI.addEventListener("click", navigateToAiTab);
 
     if (btnOneTapReport) {
         btnOneTapReport.addEventListener("click", () => {
-            openAiDrawer();
+            navigateToAiTab();
             generateOneTapDailyReport();
-        });
-    }
-
-    if (btnCloseAiDrawer) btnCloseAiDrawer.addEventListener("click", closeAiDrawer);
-
-    if (aiDrawerOverlay) {
-        aiDrawerOverlay.addEventListener("click", (e) => {
-            if (e.target === aiDrawerOverlay) {
-                closeAiDrawer();
-            }
         });
     }
 
@@ -1396,6 +1380,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         recognition.onstart = () => {
             btnVoiceMic.classList.add("listening");
+            const waveContainer = document.getElementById("audioWaveContainer");
+            if (waveContainer) waveContainer.classList.add("active");
             voiceStatus.textContent = "Listening to voice command...";
             voiceTranscript.textContent = "Asking AI...";
             playSynthSound('click');
@@ -1404,11 +1390,15 @@ document.addEventListener("DOMContentLoaded", () => {
         recognition.onerror = (e) => {
             console.error("Speech Recognition Error:", e);
             btnVoiceMic.classList.remove("listening");
+            const waveContainer = document.getElementById("audioWaveContainer");
+            if (waveContainer) waveContainer.classList.remove("active");
             voiceStatus.textContent = "Voice error or permission denied.";
         };
 
         recognition.onend = () => {
             btnVoiceMic.classList.remove("listening");
+            const waveContainer = document.getElementById("audioWaveContainer");
+            if (waveContainer) waveContainer.classList.remove("active");
         };
 
         recognition.onresult = (event) => {
@@ -1473,12 +1463,35 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log("Recognition already running", e);
                 }
             } else {
+                const waveContainer = document.getElementById("audioWaveContainer");
+                if (waveContainer) waveContainer.classList.add("active");
                 const query = prompt("Speak to AI Agent (Enter voice command text):\n- 'prioritize orders' (Pehle konsa banaye?)\n- 'check trains' (Timetable update)\n- 'stock status' (Inventory levels)");
                 if (query) {
                     voiceTranscript.textContent = `"${query}"`;
                     processVoiceQuery(query);
                 }
+                setTimeout(() => {
+                    if (waveContainer) waveContainer.classList.remove("active");
+                }, 2000);
             }
+        });
+    }
+
+    // Floating voice shortcut button (FAB)
+    const btnVoiceShortcut = document.getElementById("btnVoiceShortcut");
+    if (btnVoiceShortcut) {
+        btnVoiceShortcut.addEventListener("click", () => {
+            playSynthSound('click');
+            // Navigate to the AI Assistant tab
+            const aiNavItem = document.querySelector('.app-bottom-nav .nav-item[data-tab="ai"]');
+            if (aiNavItem) {
+                aiNavItem.click();
+            }
+            // Trigger mic listening
+            setTimeout(() => {
+                const voiceMic = document.getElementById("btnVoiceMic");
+                if (voiceMic) voiceMic.click();
+            }, 300);
         });
     }
 

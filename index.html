@@ -11,99 +11,83 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <aside class="app-sidebar">
-        <div class="sidebar-header">
+    <div class="app-container">
+        <!-- Mobile Top Header -->
+        <header class="app-header-mobile">
             <h1 class="app-brand">RailQuick</h1>
-            <span class="stall-badge">Platform 3 Express</span>
-        </div>
-        <nav class="sidebar-nav">
-            <button class="nav-item active" data-tab="orders">
-                <span class="nav-label">Active Orders</span>
-            </button>
-            <button class="nav-item" data-tab="inventory">
-                <span class="nav-label">Inventory</span>
-            </button>
-            <button class="nav-item" data-tab="sync">
-                <span class="nav-label">Notion Sync</span>
-            </button>
-        </nav>
-        <div class="sidebar-footer">
-            <button class="action-btn secondary-btn" id="btnToggleAiDrawer" style="width: 100%; border: 1px solid rgba(255,255,255,0.15); height: 38px; display: flex; align-items: center; justify-content: center;">AI Assistant</button>
-            <div class="header-status" style="margin-top: 15px; justify-content: center; gap: 8px;">
+            <div class="header-right-meta">
+                <span class="stall-badge">P3 Express</span>
                 <span class="status-indicator online"></span>
-                <span class="status-lbl">Synced</span>
             </div>
-        </div>
-    </aside>
+        </header>
 
-    <div class="main-canvas">
-        <!-- Live Marquee alert banner -->
-        <div class="live-alert-marquee">
-            <span class="marquee-icon">SYSTEM SIGNAL</span>
-            <div class="marquee-text-container">
-                <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
+        <!-- Main Content Area -->
+        <div class="main-canvas">
+            <!-- Live Marquee alert banner -->
+            <div class="live-alert-marquee">
+                <span class="marquee-icon">SYSTEM SIGNAL</span>
+                <div class="marquee-text-container">
+                    <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Dynamic Rush Hour Mode Banner -->
-        <div class="rush-hour-banner" id="rushHourBanner">
-            <span>RUSH MODE ACTIVATED</span>
-            <span>•</span>
-            <span id="rushModeOrders">Pending: 3 orders</span>
-            <span>•</span>
-            <span>Avg Pack: 32 sec</span>
-            <span>•</span>
-            <span>Staff Required: 3</span>
-        </div>
+            <!-- Dynamic Rush Hour Mode Banner -->
+            <div class="rush-hour-banner" id="rushHourBanner">
+                <span>RUSH MODE ACTIVATED</span>
+                <span>•</span>
+                <span id="rushModeOrders">Pending: 3 orders</span>
+                <span>•</span>
+                <span>Avg Pack: 32 sec</span>
+                <span>•</span>
+                <span>Staff Required: 3</span>
+            </div>
 
-        <!-- Main Content Scroll Area -->
-        <main class="app-viewport">
-            
-            <!-- ================= TAB 1: ACTIVE ORDERS ================= -->
-            <section id="tab-orders" class="tab-view active">
-                
-                <!-- Horizontal summary bar for kiosk -->
-                <div class="horizontal-summary-bar">
-                    <!-- Revenue & Analytics Block -->
-                    <div class="summary-stats-block">
-                        <div class="summary-stat">
-                            <span class="summary-lbl">Daily Sales</span>
-                            <span class="summary-val" id="salesTotalRevenue">₹2,840.00</span>
+            <!-- Scroll Area for Views -->
+            <main class="app-viewport">
+                <!-- ================= TAB 1: ACTIVE ORDERS ================= -->
+                <section id="tab-orders" class="tab-view active">
+                    <!-- Horizontal summary bar for mobile -->
+                    <div class="horizontal-summary-bar">
+                        <!-- Revenue & Analytics Block -->
+                        <div class="summary-stats-block">
+                            <div class="summary-stat">
+                                <span class="summary-lbl">Daily Sales</span>
+                                <span class="summary-val" id="salesTotalRevenue">₹2,840.00</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="summary-lbl">Filled</span>
+                                <span class="summary-val" id="salesOrdersFilled">18</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="summary-lbl">AI Relocated</span>
+                                <span class="summary-val" id="salesAiCommissions">4</span>
+                            </div>
                         </div>
-                        <div class="summary-stat">
-                            <span class="summary-lbl">Filled</span>
-                            <span class="summary-val" id="salesOrdersFilled">18</span>
-                        </div>
-                        <div class="summary-stat">
-                            <span class="summary-lbl">AI Relocated</span>
-                            <span class="summary-val" id="salesAiCommissions">4</span>
-                        </div>
-                    </div>
 
-                    <!-- Horizontally scrollable train arrivals ticker -->
-                    <div class="train-ticker-container">
-                        <span class="ticker-title">P3 Trains Arrivals:</span>
-                        <div class="train-ticker-feed" id="upcomingTrainsList">
-                            <!-- Dynamic horizontal train badges go here -->
+                        <!-- Horizontally scrollable train arrivals ticker -->
+                        <div class="train-ticker-container">
+                            <span class="ticker-title">P3 Arrivals:</span>
+                            <div class="train-ticker-feed" id="upcomingTrainsList">
+                                <!-- Dynamic horizontal train badges go here -->
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Active Orders Touch List -->
-                <div class="orders-section-header">
-                    <h2>Active Fulfillment Queue</h2>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 700;">Prioritize Queue</button>
-                        <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                    <!-- Active Orders Touch List -->
+                    <div class="orders-section-header">
+                        <h2>Active Fulfillment Queue</h2>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 700;">Prioritize Queue</button>
+                            <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="orders-touch-list" id="active-orders-container">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
+                    
+                    <div class="orders-touch-list" id="active-orders-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
 
-                <!-- ================= TAB 3: STALL INVENTORY ================= -->
+                <!-- ================= TAB 2: STALL INVENTORY ================= -->
                 <section id="tab-inventory" class="tab-view">
                     <!-- AI Stock Manager Alert Card -->
                     <div class="ai-stock-manager-card" id="aiStockManagerAlert">
@@ -146,7 +130,7 @@
                     </div>
                 </section>
 
-                                <!-- ================= TAB 4: NOTION SYNC DESK ================= -->
+                <!-- ================= TAB 3: NOTION SYNC DESK ================= -->
                 <section id="tab-sync" class="tab-view">
                     <div class="sync-grid">
                         <div class="sync-panel-left">
@@ -206,91 +190,98 @@
                     </div>
                 </section>
 
-            </main>
-
-            <!-- Floating AI Action Button (FAB) -->
-            <button class="floating-ai-fab" id="btnNotionAI" title="Notion AI Assistant">
-                <span>AI</span>
-            </button>
-
-            <!-- Slide-out AI Operations Drawer Sheet -->
-            <div class="ai-drawer-overlay" id="aiDrawerOverlay">
-                <div class="ai-drawer-sheet">
-                    <div class="ai-drawer-header">
-                        <div class="drag-bar"></div>
-                        <div class="ai-drawer-title">
-                            <span>AI Operations Assistant</span>
-                        </div>
-                        <button class="close-drawer-btn" id="btnCloseAiDrawer">&times;</button>
-                    </div>
-                    
-                    <div class="ai-drawer-body">
-                        <!-- AI Voice Desk -->
-                        <div class="ai-voice-section" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
-                            <h4 style="margin-bottom: 8px; font-weight:700; color: var(--text-main); font-size:12px; text-transform: uppercase; letter-spacing:0.5px;">AI Voice Desk</h4>
-                            <div class="voice-status-wrapper" style="display: flex; align-items: center; gap: 10px;">
-                                <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak" style="position: relative;">
-                                    <span class="mic-icon" style="font-weight: 700; font-size: 11px;">TALK</span>
+                <!-- ================= TAB 4: DEDICATED AI ASSISTANT TAB ================= -->
+                <section id="tab-ai" class="tab-view">
+                    <div class="ai-tab-container" style="padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+                        <!-- AI Voice Desk Card -->
+                        <div class="ai-voice-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
+                            <h3 style="margin-bottom: 12px; font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">AI Voice Desk</h3>
+                            
+                            <div class="voice-status-wrapper" style="display: flex; align-items: center; gap: 16px;">
+                                <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak" style="position: relative; width: 64px; height: 64px; background: var(--accent-purple-soft); color: var(--accent-purple); border: 2px solid var(--accent-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;">
+                                    <svg class="mic-svg" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                    </svg>
                                     <div class="mic-wave-pulse" id="micWavePulse"></div>
                                 </button>
-                                <div class="voice-texts">
-                                    <div class="voice-status" id="voiceStatus" style="font-size:10px; color: var(--text-muted);">Tap button to speak (Hinglish/English support)</div>
-                                    <div class="voice-transcript" id="voiceTranscript" style="font-size:12px; font-weight:500; font-style:italic; color:var(--text-secondary);">"e.g., Which order to prepare first?"</div>
+                                <div class="voice-texts" style="flex: 1;">
+                                    <div class="voice-status" id="voiceStatus" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Tap microphone to speak</div>
+                                    <div class="voice-transcript" id="voiceTranscript" style="font-size: 13px; font-weight: 500; font-style: italic; color: var(--text-secondary); margin-top: 4px;">"e.g., Which order to prepare first?"</div>
                                 </div>
                             </div>
-                            <div class="voice-output-bubble" id="voiceResponseBubble" style="display: none; background: rgba(0,0,0,0.1); border-left: 3px solid var(--accent-purple); padding: 8px 10px; border-radius: var(--r-sm); margin-top: 8px;">
-                                <span class="ai-response-lbl" style="font-weight:700; color: var(--accent-purple);">AI Agent:</span>
-                                <span class="ai-response-txt" id="voiceResponseText" style="color: var(--text-secondary);">...</span>
+
+                            <!-- Elegant visual sound wave container -->
+                            <div class="audio-wave-container" id="audioWaveContainer" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; margin: 16px 0; background: rgba(0, 0, 0, 0.02); border-radius: var(--r-sm); border: 1px dashed var(--border-color); padding: 4px;">
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
+                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
                             </div>
-                            <div class="voice-hints-row" style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">
-                                <span>Ask: <em>"Prioritize orders"</em> or <em>"Pehle konsa order banaye?"</em></span>
+
+                            <div class="voice-output-bubble" id="voiceResponseBubble" style="display: none; background: var(--bg-card); border-left: 3px solid var(--accent-purple); padding: 10px 12px; border-radius: var(--r-sm); margin-top: 12px;">
+                                <span class="ai-response-lbl" style="font-weight: 700; color: var(--accent-purple); font-size: 11px; display: block; text-transform: uppercase;">AI Agent Response</span>
+                                <span class="ai-response-txt" id="voiceResponseText" style="color: var(--text-secondary); font-size: 13px; display: block; margin-top: 4px; line-height: 1.4;">...</span>
+                            </div>
+
+                            <div class="voice-hints-row" style="font-size: 11px; color: var(--text-muted); margin-top: 10px; display: flex; flex-direction: column; gap: 4px; background: rgba(0,0,0,0.01); padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-color);">
+                                <span style="font-weight:700;">Suggested Commands:</span>
+                                <span>- "prioritize orders" (Pehle konsa banaye?)</span>
+                                <span>- "check trains" (Timetable schedules)</span>
+                                <span>- "stock status" (Inventory healthcheck)</span>
                             </div>
                         </div>
 
-                        <!-- Platform Map Schematic -->
-                        <div class="mobile-map-card" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px; background: transparent; border: none; padding: 0;">
-                            <div class="map-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h4 style="font-weight:700; color: var(--text-main); font-size:12px; text-transform: uppercase; letter-spacing:0.5px; margin: 0;">Platform Schematic Map</h4>
+                        <!-- Platform Map Schematic Card -->
+                        <div class="ai-map-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
+                            <div class="map-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Platform Schematic Map</h3>
                                 <span class="status-indicator online"></span>
                             </div>
-                            <div class="platforms-mini-grid" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
-                                <div class="mini-plat-row" id="mini-plat-1" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: var(--r-sm); font-size: 11px;">
+                            <div class="platforms-mini-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                                <div class="mini-plat-row" id="mini-plat-1" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P1</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #121212; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-1" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-1" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-2" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: var(--r-sm); font-size: 11px;">
+                                <div class="mini-plat-row" id="mini-plat-2" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P2</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #121212; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-2" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-2" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row active-stall" id="mini-plat-3" style="display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 10px; border-radius: var(--r-sm); font-size: 11px;">
+                                <div class="mini-plat-row active-stall" id="mini-plat-3" style="display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px;">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--accent-purple);">P3</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #121212; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-3" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-3" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--accent-purple); width:50px; text-align:right; font-weight: 700;">Us</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-4" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: var(--r-sm); font-size: 11px;">
+                                <div class="mini-plat-row" id="mini-plat-4" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P4</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #121212; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-4" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-4" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-5" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: var(--r-sm); font-size: 11px;">
+                                <div class="mini-plat-row" id="mini-plat-5" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P5</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #121212; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-5" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-5" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
                             </div>
+                            
                             <!-- Mini Logs -->
-                            <div class="mini-logs-box" id="relocationLogs" style="background: #121212; padding: 8px 10px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); max-height: 80px; overflow-y: auto;">
+                            <div class="mini-logs-box" id="relocationLogs" style="background: #1e2d24; padding: 10px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 11px; color: #a4bea8; max-height: 100px; overflow-y: auto; border: 1px solid var(--border-color);">
                                 <div class="mini-log system">Router ready. Listening to Station master...</div>
                             </div>
                         </div>
 
-                        <!-- Notion Daily operational summary report -->
-                        <div class="ai-report-section" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px;">
-                            <h4 style="margin-bottom: 8px; font-weight:700; color: var(--text-main); font-size:12px; text-transform: uppercase; letter-spacing:0.5px;">Notion Daily Report</h4>
-                            <button class="ai-preset-option" id="btnTriggerDailyReport" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); padding: 10px; display: flex; text-align: left; width: 100%; border-radius: var(--r-sm); margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(16,185,129,0.3);">
-                                <span class="p-icon" style="color:#10b981; font-weight: bold; margin-right: 10px;">[REPORT]</span>
+                        <!-- Notion Daily operational summary report Card -->
+                        <div class="ai-report-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
+                            <h3 style="margin-bottom: 12px; font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Notion Daily Report</h3>
+                            <button class="ai-preset-option" id="btnTriggerDailyReport" style="border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); padding: 12px; display: flex; text-align: left; width: 100%; border-radius: var(--r-sm); margin-bottom: 12px; cursor: pointer; align-items: center;">
+                                <span class="p-icon" style="color:#10b981; font-weight: bold; margin-right: 12px; font-size: 12px;">[REPORT]</span>
                                 <div class="p-meta">
                                     <span class="p-title" style="color:#10b981; font-weight: 700; display: block; font-size: 13px;">Generate One-Tap Daily Summary</span>
                                     <span class="p-desc" style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">Aggregates orders, sales total, lost revenues, and demand forecast</span>
@@ -298,21 +289,46 @@
                             </button>
 
                             <div class="ai-output-container" style="border: 1px solid var(--border-color); border-radius: var(--r-md); overflow: hidden; margin-top: 10px;">
-                                <div class="output-header" style="background: rgba(0,0,0,0.1); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+                                <div class="output-header" style="background: rgba(0,0,0,0.03); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color);">
                                     <span>Preview Report Markdown</span>
-                                    <button class="output-copy-btn" id="btnCopyNote" style="color: var(--accent-blue); cursor: pointer;">Copy</button>
+                                    <button class="output-copy-btn" id="btnCopyNote" style="color: var(--accent-blue); cursor: pointer; font-weight: 700;">Copy</button>
                                 </div>
-                                <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI report will stream here..." style="font-family: var(--font-ui); font-size: 12px; line-height: 1.5; min-height: 120px; max-height: 180px; overflow-y: auto; background: var(--bg-card); padding: 10px; color: var(--text-main);">
+                                <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI report will stream here..." style="font-family: var(--font-ui); font-size: 12px; line-height: 1.5; min-height: 120px; max-height: 180px; overflow-y: auto; background: var(--bg-card); padding: 12px; color: var(--text-main);">
                                     <h1>Daily Operations Summary - Platform 3</h1>
                                     <p>Tap the button above to compile today's live station logs into a structured Notion report.</p>
                                 </div>
                             </div>
 
-                            <button class="action-btn primary-btn block-btn" id="btnPushReportToNotion" style="margin-top: 12px; background: #10b981; color: #ffffff; width: 100%; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; height: 38px; border-radius: var(--r-sm); cursor: pointer;">Push Report to Notion</button>
+                            <button class="action-btn primary-btn block-btn" id="btnPushReportToNotion" style="margin-top: 12px; background: #10b981; color: #ffffff; width: 100%; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; height: 42px; border-radius: var(--r-sm); cursor: pointer;">Push Report to Notion</button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Floating Mic Shortcut Button (FAB) on Orders tab -->
+        <button class="floating-voice-fab" id="btnVoiceShortcut" title="Speak to AI Assistant">
+            <svg class="mic-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+            </svg>
+        </button>
+
+        <!-- Mobile Bottom Tab Bar Navigation -->
+        <nav class="app-bottom-nav">
+            <button class="nav-item active" data-tab="orders">
+                <span class="nav-lbl">Orders</span>
+            </button>
+            <button class="nav-item" data-tab="inventory">
+                <span class="nav-lbl">Inventory</span>
+            </button>
+            <button class="nav-item" data-tab="sync">
+                <span class="nav-lbl">Notion Sync</span>
+            </button>
+            <button class="nav-item" data-tab="ai">
+                <span class="nav-lbl">AI Agent</span>
+            </button>
+        </nav>
+    </div>
 
     <!-- Notification Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
