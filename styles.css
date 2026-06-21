@@ -1688,8 +1688,22 @@ input:checked + .toggle-track:before { transform: translateX(20px); background-c
 
 @media (max-width: 420px) {
   .kpi-row {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .kpi-card {
+    padding: 8px 4px;
+    gap: 4px;
+  }
+  .kpi-icon {
+    transform: scale(0.85);
+    margin-bottom: -2px;
+  }
+  .kpi-label {
+    font-size: 9px;
+  }
+  .kpi-value {
+    font-size: 13px;
   }
 }
 
