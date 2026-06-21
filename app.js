@@ -1704,6 +1704,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================================
     // INITIALIZATION RUNS
     // ==========================================================================
+    function updateClock() {
+        const statusBarClock = document.getElementById("statusBarClock");
+        if (statusBarClock) {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            statusBarClock.textContent = `${hours}:${minutes}`;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
     renderOrders();
     renderPlatformMap();
     renderInventoryHeader();

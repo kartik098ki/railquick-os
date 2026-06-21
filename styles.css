@@ -981,9 +981,10 @@ button, select, input {
 .notion-table td.editable-cell {
     position: relative;
     cursor: pointer;
+    transition: box-shadow 0.15s ease;
 }
 .notion-table td.editable-cell:hover {
-    box-shadow: inset 0 0 0 1px var(--accent-blue);
+    box-shadow: inset 0 0 0 2px var(--accent-purple) !important;
 }
 
 .cell-edit-input {
@@ -992,12 +993,14 @@ button, select, input {
     left: 0;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--accent-blue);
-    background: var(--bg-card);
-    color: #ffffff;
+    border: 2px solid var(--accent-purple) !important;
+    background: #090e0c !important;
+    color: #f0fdf4 !important;
     outline: none;
     padding: 0 10px;
     z-index: 10;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    font-weight: 700;
 }
 
 /* ==========================================================================
@@ -1962,6 +1965,81 @@ input:focus, select:focus, textarea:focus {
     overflow: hidden;
     border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 481px) {
+    .app-container {
+        max-width: 420px;
+        height: min(880px, 95vh);
+        border: 12px solid #111a15;
+        border-radius: 46px;
+        box-shadow: 0 30px 70px rgba(0,0,0,0.85), 
+                    0 0 0 2.5px rgba(16, 185, 129, 0.2), 
+                    0 0 40px rgba(16, 185, 129, 0.15);
+        margin: auto;
+    }
+}
+
+/* Simulated Smartphone Hardware Add-ons */
+.phone-status-bar {
+    height: 34px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border-bottom: 1px solid rgba(16, 185, 129, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 18px 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    user-select: none;
+    z-index: 120;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.status-bar-center {
+    width: 90px;
+    height: 18px;
+    background: #000000;
+    border-radius: var(--r-pill);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 6px;
+    box-shadow: inset 0 0 4px rgba(16, 185, 129, 0.25);
+    z-index: 130;
+}
+
+.status-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.phone-home-indicator {
+    height: 16px;
+    background: var(--bg-panel);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 120;
+    flex-shrink: 0;
+    padding-bottom: 6px;
+}
+
+.home-bar {
+    width: 120px;
+    height: 4.5px;
+    background: rgba(240, 253, 244, 0.35);
+    border-radius: var(--r-pill);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .app-header-mobile {
@@ -2348,48 +2426,55 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(16, 185, 129, 0.15);
     border-radius: var(--r-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
 }
 
+.checklist-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
 .checklist-row.checked {
-    background: rgba(16, 185, 129, 0.04);
-    border-color: rgba(16, 185, 129, 0.25);
-    color: var(--text-muted);
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
+    color: #34d399 !important;
 }
 
 .checklist-row.checked .checklist-text {
     text-decoration: line-through;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .checklist-row.checked .checkbox-box {
-    background: var(--accent-purple);
-    border-color: var(--accent-purple);
+    background: var(--accent-purple) !important;
+    border-color: var(--accent-purple) !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
 }
 
 .checkbox-box {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    border: 2px solid var(--border-strong);
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 2px solid rgba(240, 253, 244, 0.35);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .checkbox-box::after {
     content: "✓";
     color: #ffffff;
-    font-size: 10px;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 800;
     display: none;
 }
 

@@ -12,6 +12,28 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- iOS Status Bar Mockup -->
+        <div class="phone-status-bar">
+            <span id="statusBarClock">12:45</span>
+            <div class="status-bar-center"></div>
+            <div class="status-bar-right">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                    <rect x="2" y="16" width="3" height="5" rx="0.5"></rect>
+                    <rect x="7" y="12" width="3" height="9" rx="0.5"></rect>
+                    <rect x="12" y="8" width="3" height="13" rx="0.5"></rect>
+                    <rect x="17" y="3" width="3" height="18" rx="0.5"></rect>
+                </svg>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                    <path d="M12 21a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm-7.5-6.5a10.6 10.6 0 0 1 15 0Zm-3-3a14.8 14.8 0 0 1 21 0Z"></path>
+                </svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <rect x="1" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect>
+                    <rect x="4" y="9" width="10" height="6" rx="1"></rect>
+                    <path d="M21 9v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+            </div>
+        </div>
+
         <!-- Mobile Top Header -->
         <header class="app-header-mobile">
             <h1 class="app-brand">RailQuick</h1>
@@ -286,34 +308,33 @@
                             <div class="map-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
                                 <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Platform Schematic Map</h3>
                                 <span class="status-indicator online"></span>
-                            </div>
-                            <div class="platforms-mini-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-                                <div class="mini-plat-row" id="mini-plat-1" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
+                                                      <div class="platforms-mini-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                                <div class="mini-plat-row" id="mini-plat-1" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P1</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-1" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-1" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-2" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
+                                <div class="mini-plat-row" id="mini-plat-2" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P2</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-2" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-2" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row active-stall" id="mini-plat-3" style="display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px;">
+                                <div class="mini-plat-row active-stall" id="mini-plat-3" style="display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.09); border: 1px solid rgba(16, 185, 129, 0.45); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px;">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--accent-purple);">P3</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-3" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-3" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--accent-purple); width:50px; text-align:right; font-weight: 700;">Us</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-4" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
+                                <div class="mini-plat-row" id="mini-plat-4" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P4</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-4" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-4" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                                <div class="mini-plat-row" id="mini-plat-5" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
+                                <div class="mini-plat-row" id="mini-plat-5" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
                                     <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P5</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: #e2efe7; border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-5" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
+                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-5" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
                                     <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
                                 </div>
-                            </div>
+                            </div>    </div>
                             
                             <!-- Mini Logs -->
                             <div class="mini-logs-box" id="relocationLogs" style="background: #1e2d24; padding: 10px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 11px; color: #a4bea8; max-height: 100px; overflow-y: auto; border: 1px solid var(--border-color);">
@@ -417,18 +438,40 @@
         <!-- Mobile Bottom Tab Bar Navigation -->
         <nav class="app-bottom-nav">
             <button class="nav-item active" data-tab="orders">
+                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
                 <span class="nav-lbl">Orders</span>
             </button>
             <button class="nav-item" data-tab="inventory">
+                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="9"></rect>
+                    <rect x="14" y="3" width="7" height="5"></rect>
+                    <rect x="14" y="12" width="7" height="9"></rect>
+                    <rect x="3" y="16" width="7" height="5"></rect>
+                </svg>
                 <span class="nav-lbl">Inventory</span>
             </button>
             <button class="nav-item" data-tab="sync">
-                <span class="nav-lbl">Notion Sync</span>
+                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"></path>
+                </svg>
+                <span class="nav-lbl">Sync</span>
             </button>
             <button class="nav-item" data-tab="ai">
+                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2Z"></path>
+                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2Z"></path>
+                </svg>
                 <span class="nav-lbl">AI Agent</span>
             </button>
         </nav>
+        <!-- Home Indicator Bar -->
+        <div class="phone-home-indicator">
+            <div class="home-bar"></div>
+        </div>
     </div>
 
     <!-- Notification Toast Container -->
