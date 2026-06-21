@@ -279,7 +279,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const etaSec = order.etaSeconds % 60;
             const etaString = `${etaMin}m ${etaSec}s`;
 
-            const itemSummary = order.items.map(i => `${i.qty}x ${i.name}`).join(", ");
+            // Interactive Packing Checklist rendering
+            let itemsChecklist = `<div class="prep-item-checklist" data-order-id="${order.id}">`;
+            order.items.forEach((item, idx) => {
+                const isChecked = item.packed ? "checked" : "";
+                itemsChecklist += `
+                    <div class="checklist-row ${isChecked}" data-order-id="${order.id}" data-item-idx="${idx}">
+                        <div class="checkbox-box"></div>
+                        <span class="checklist-text" style="font-weight:600; color:var(--text-main); font-size:12.5px;">${item.qty}x ${item.name}</span>
+                    </div>
+                `;
+            });
+            itemsChecklist += `</div>`;
+
             let cardClass = isUrgent ? "critical" : "upcoming";
             if (prioritizedOrderId === order.id) {
                 cardClass += " prioritized-highlight";
@@ -310,6 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const priorityClass = isCritical ? "critical" : "normal";
             const priorityString = `<span class="priority-badge ${priorityClass}">${priorityText}</span>`;
 
+            // Dynamic glow on READY button when all packed
+            const allPacked = order.items.every(i => i.packed);
+            const packBtnText = allPacked ? "PACKED" : "PACK";
+            const packBtnStyle = allPacked ? "background: var(--accent-green-soft); color: var(--accent-green); border-color: rgba(16,185,129,0.25);" : "";
+            const readyBtnStyle = allPacked ? "background: var(--accent-purple) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);" : "";
+
             const card = document.createElement("div");
             card.className = `order-touch-card ${cardClass}`;
             card.setAttribute("data-id", order.id);
@@ -319,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${priorityString}
                 </div>
                 <div class="card-details-block">
-                    <div class="card-items-summary" style="font-weight:600; color:var(--text-main); font-size:12.5px;">${itemSummary}</div>
+                    ${itemsChecklist}
                     
                     <!-- Smart Packing Assistant Guide -->
                     <div class="packing-assistant-guide">
@@ -343,8 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
                 <div class="card-actions-row">
-                    <button class="card-btn pack" data-id="${order.id}">PACK</button>
-                    <button class="card-btn ready" data-id="${order.id}">READY</button>
+                    <button class="card-btn pack" data-id="${order.id}" style="${packBtnStyle}">${packBtnText}</button>
+                    <button class="card-btn ready" data-id="${order.id}" style="${readyBtnStyle}">READY</button>
                     <button class="card-btn reallocate" data-id="${order.id}">REALLOCATE</button>
                 </div>
             `;
@@ -357,12 +375,42 @@ document.addEventListener("DOMContentLoaded", () => {
         if (statsReallocatedCount) statsReallocatedCount.textContent = statsReallocatedCountVal;
         if (activeOrdersBadge) activeOrdersBadge.textContent = pendingCount;
 
+        // Bind checklist rows click
+        document.querySelectorAll(".checklist-row").forEach(row => {
+            row.addEventListener("click", (e) => {
+                e.stopPropagation();
+                playSynthSound('click');
+                const orderId = row.getAttribute("data-order-id");
+                const itemIdx = parseInt(row.getAttribute("data-item-idx"), 10);
+                
+                const targetOrder = orders.find(o => o.id === orderId);
+                if (targetOrder && targetOrder.items[itemIdx]) {
+                    targetOrder.items[itemIdx].packed = !targetOrder.items[itemIdx].packed;
+                    
+                    // If all packed now, play success chime
+                    const allPacked = targetOrder.items.every(i => i.packed);
+                    if (allPacked) {
+                        playSynthSound('success');
+                        showToast(`All items packed for ${orderId}! Tap READY to dispatch.`, "success");
+                    }
+                    
+                    renderOrders();
+                }
+            });
+        });
+
         // Card button actions
         document.querySelectorAll(".card-btn.pack").forEach(btn => {
             btn.addEventListener("click", () => {
                 playSynthSound('click');
                 const id = btn.getAttribute("data-id");
-                showToast(`Order ${id} packaging started`, "info");
+                const targetOrder = orders.find(o => o.id === id);
+                if (targetOrder) {
+                    targetOrder.items.forEach(item => item.packed = true);
+                    playSynthSound('success');
+                    showToast(`All items packed for ${id}! Tap READY to dispatch.`, "success");
+                    renderOrders();
+                }
             });
         });
 
@@ -384,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     dailyRevenue += orderSum;
                     ordersFilledCount++;
                     renderLedger();
+                    updatePerformanceChart();
                 }
 
                 showToast(`Order ${id} is ready for dispatch!`, "success");
@@ -460,6 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (rerender) {
             renderOrders();
             renderTimetable();
+            renderRadar();
         }
     }, 1000);
 
@@ -1496,6 +1546,71 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
+    // PREMIUM LIVE TRANSIT RADAR & METRICS ENGINE
+    // ==========================================================================
+    function renderRadar() {
+        const trainsToTrack = ["12423", "12056", "12952"];
+        trainsToTrack.forEach(no => {
+            const train = activeTrains.find(t => t.no === no);
+            const dot = document.getElementById(`radar-train-${no}`);
+            if (!dot || !train) return;
+            
+            if (train.eta <= 0) {
+                // Train has arrived
+                dot.style.left = "92%";
+                dot.style.background = "var(--accent-purple)";
+                dot.style.boxShadow = "0 0 12px var(--accent-purple)";
+            } else if (train.eta > 900) {
+                // Too far away
+                dot.style.left = "5%";
+                dot.style.opacity = "0.3";
+            } else {
+                // Within radar range
+                dot.style.opacity = "1";
+                const fraction = 1 - (train.eta / 900);
+                const percent = 5 + (fraction * 85);
+                dot.style.left = `${percent.toFixed(1)}%`;
+            }
+        });
+    }
+
+    function updatePerformanceChart() {
+        const avgPrepTimeVal = document.getElementById("avgPrepTimeVal");
+        if (avgPrepTimeVal) {
+            // Dynamic calculation: starts around 1m 45s, decreases/increases slightly
+            const totalSecs = Math.max(80, 105 - (ordersFilledCount - 18) * 3);
+            const min = Math.floor(totalSecs / 60);
+            const sec = totalSecs % 60;
+            avgPrepTimeVal.textContent = `${min}m ${sec}s`;
+        }
+        
+        const bar12 = document.getElementById("chart-bar-12");
+        if (bar12) {
+            // Increase bar 12 height dynamically as they fill more orders
+            const newHeight = Math.min(100, 45 + (ordersFilledCount - 18) * 10);
+            bar12.style.height = `${newHeight}%`;
+        }
+    }
+
+    // Bind Voice Command Quick-Chips
+    document.querySelectorAll(".voice-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+            const query = chip.getAttribute("data-query");
+            if (query) {
+                playSynthSound('click');
+                voiceTranscript.textContent = `"${chip.textContent}"`;
+                // Switch voice tab visualizer active
+                const waveContainer = document.getElementById("audioWaveContainer");
+                if (waveContainer) {
+                    waveContainer.classList.add("active");
+                    setTimeout(() => waveContainer.classList.remove("active"), 1500);
+                }
+                processVoiceQuery(query);
+            }
+        });
+    });
+
+    // ==========================================================================
     // INITIALIZATION RUNS
     // ==========================================================================
     renderOrders();
@@ -1504,4 +1619,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderInventory();
     renderTimetable();
     renderLedger();
+    renderRadar();
+    updatePerformanceChart();
 });
