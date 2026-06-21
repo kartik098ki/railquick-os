@@ -506,6 +506,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // Update Prioritizer Agent status based on active platform 3 orders
+        const topOrder = getTopPriorityOrder();
+        updateAgentStatus("prioritizer", topOrder ? "ACTIVE" : "IDLE");
+
         if (rerender) {
             renderOrders();
             renderTimetable();
@@ -521,8 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     setInterval(() => {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        if (simulationState === 0) {
+         if (simulationState === 0) {
             // Shift train Jan Shatabdi (12056) from Platform 3 to Platform 5
             const janShatabdi = activeTrains.find(t => t.no === "12056");
             if (janShatabdi) {
@@ -532,6 +535,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 playSynthSound('warning');
                 speakAlert("AI Alert. Platform rescheduled. Jan Shatabdi shifted to platform 5.");
                 addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 → 5.", "warning");
+                
+                // Activate AI Routing Agent
+                updateAgentStatus("router", "ACTIVE");
+                setTimeout(() => {
+                    updateAgentStatus("router", "IDLE");
+                }, 8000);
                 
                 // Auto-relocate Jan Shatabdi order
                 const orderIdx = orders.findIndex(o => o.trainNo === "12056");
@@ -548,7 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         dailyRevenue += 120.00;
                         aiCommissions += 18.00;
                         renderLedger();
-
+ 
                         orders.splice(orderIdx, 1);
                         renderOrders();
                         renderPlatformMap();
@@ -567,6 +576,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 playSynthSound('success');
                 speakAlert("Attention. New order assigned to you from Platform 1 partner.");
                 addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 → 3.", "warning");
+                
+                // Activate AI Routing Agent
+                updateAgentStatus("router", "ACTIVE");
+                setTimeout(() => {
+                    updateAgentStatus("router", "IDLE");
+                }, 8000);
                 
                 setTimeout(() => {
                     const newOrder = {
@@ -821,8 +836,10 @@ document.addEventListener("DOMContentLoaded", () => {
             restockRecommendation.style.display = "flex";
             const lowItems = inventory.filter(i => i.stock <= i.minStock).map(i => i.name).join(", ");
             document.getElementById("restockText").innerHTML = `AI predicts high passenger demand for <strong>${lowItems}</strong> due to delayed trains. Tap below to restock.`;
+            updateAgentStatus("stock", "ACTIVE");
         } else {
             restockRecommendation.style.display = "none";
+            updateAgentStatus("stock", "MONITORING");
         }
 
         document.querySelectorAll(".btn-stock-up").forEach(btn => {
@@ -1352,9 +1369,62 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAutoPrioritize = document.getElementById("btnAutoPrioritize");
     const btnVoiceMic = document.getElementById("btnVoiceMic");
     const voiceStatus = document.getElementById("voiceStatus");
-    const voiceTranscript = document.getElementById("voiceTranscript");
-    const voiceResponseBubble = document.getElementById("voiceResponseBubble");
-    const voiceResponseText = document.getElementById("voiceResponseText");
+    const voiceChatThread = document.getElementById("voiceChatThread");
+
+    // Unified helper to update agent status monitoring nodes dynamically
+    function updateAgentStatus(agent, status) {
+        const dot = document.getElementById(`agent-dot-${agent}`);
+        const badge = document.getElementById(`agent-status-${agent}`);
+        if (!dot || !badge) return;
+        
+        badge.textContent = status;
+        
+        if (status === "ACTIVE") {
+            dot.classList.add("active");
+            if (agent === "prioritizer") {
+                badge.style.color = "var(--accent-purple)";
+                badge.style.background = "var(--accent-purple-soft)";
+                badge.style.borderColor = "rgba(16, 185, 129, 0.2)";
+            } else if (agent === "router") {
+                badge.style.color = "var(--accent-orange)";
+                badge.style.background = "var(--accent-orange-soft)";
+                badge.style.borderColor = "rgba(245, 158, 11, 0.2)";
+            } else if (agent === "stock") {
+                badge.style.color = "var(--accent-blue)";
+                badge.style.background = "var(--accent-blue-soft)";
+                badge.style.borderColor = "rgba(14, 165, 233, 0.2)";
+            }
+        } else {
+            dot.classList.remove("active");
+            badge.style.color = "var(--text-muted)";
+            badge.style.background = "rgba(0,0,0,0.03)";
+            badge.style.borderColor = "var(--border-color)";
+        }
+    }
+
+    // Chat Bubble Appending Helper
+    function addChatMessage(sender, text) {
+        if (!voiceChatThread) return;
+        
+        const bubble = document.createElement("div");
+        const isUser = sender.toLowerCase() === "user";
+        bubble.className = `chat-bubble ${isUser ? 'user' : 'agent'}`;
+        
+        bubble.innerHTML = `
+            <span class="chat-sender" style="font-weight: 700; font-size: 10px; display: block; text-transform: uppercase; margin-bottom: 2px; color: ${isUser ? 'var(--text-main)' : 'var(--accent-purple)'};">
+                ${isUser ? 'Vendor' : 'AI Assistant'}
+            </span>
+            <span class="chat-text" style="font-size: 12px; display: block;">${text}</span>
+        `;
+        
+        voiceChatThread.appendChild(bubble);
+        voiceChatThread.scrollTop = voiceChatThread.scrollHeight;
+    }
+
+    // Initial welcome message
+    setTimeout(() => {
+        addChatMessage('agent', "Namaste! Main aapka RailQuick assistant hu. Ask me: 'prioritize orders' (Pehle konsa banaye?), 'check trains' (Timetable schedules), or 'stock status' (Inventory levels). Main madad ke liye tayyar hu!");
+    }, 500);
 
     // Helper to calculate top priority order based on countdown times
     function getTopPriorityOrder() {
@@ -1384,8 +1454,7 @@ document.addEventListener("DOMContentLoaded", () => {
             prioritizedOrderId = null;
             renderOrders();
             const reply = "You have no pending orders on Platform 3. All clear!";
-            voiceResponseText.textContent = reply;
-            voiceResponseBubble.style.display = "block";
+            addChatMessage('agent', reply);
             speakText(reply);
             showToast("No pending orders on Platform 3.", "info");
             return;
@@ -1397,8 +1466,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const etaMin = Math.floor(topOrder.etaSeconds / 60);
         const englishReply = `Order ${topOrder.id} for ${topOrder.trainName} is your top priority. The train arrives in ${etaMin} minutes. Kripya isey pehle tayyar karein!`;
         
-        voiceResponseText.textContent = englishReply;
-        voiceResponseBubble.style.display = "block";
+        addChatMessage('agent', englishReply);
         
         // Auto scroll to target card if needed
         setTimeout(() => {
@@ -1433,7 +1501,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const waveContainer = document.getElementById("audioWaveContainer");
             if (waveContainer) waveContainer.classList.add("active");
             voiceStatus.textContent = "Listening to voice command...";
-            voiceTranscript.textContent = "Asking AI...";
             playSynthSound('click');
         };
 
@@ -1453,7 +1520,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         recognition.onresult = (event) => {
             const resultText = event.results[0][0].transcript;
-            voiceTranscript.textContent = `"${resultText}"`;
+            addChatMessage('user', resultText);
             processVoiceQuery(resultText);
         };
     }
@@ -1467,39 +1534,33 @@ document.addEventListener("DOMContentLoaded", () => {
             const p3Trains = activeTrains.filter(t => t.platform === 3);
             if (p3Trains.length === 0) {
                 const reply = "No upcoming trains scheduled on Platform 3 right now.";
-                voiceResponseText.textContent = reply;
-                voiceResponseBubble.style.display = "block";
+                addChatMessage('agent', reply);
                 speakText(reply);
             } else {
                 const trainNames = p3Trains.map(t => `${t.name} in ${Math.floor(t.eta / 60)} minutes`).join(", and ");
                 const reply = `Platform 3 upcoming schedules are: ${trainNames}.`;
-                voiceResponseText.textContent = reply;
-                voiceResponseBubble.style.display = "block";
+                addChatMessage('agent', reply);
                 speakText(reply);
             }
         } else if (text.includes("stock") || text.includes("inventory") || text.includes("maal") || text.includes("shortage") || text.includes("kam")) {
             const lowStockItems = inventory.filter(i => i.stock <= i.minStock);
             if (lowStockItems.length === 0) {
                 const reply = "All stock levels are optimal. Koee shortage nahi hai.";
-                voiceResponseText.textContent = reply;
-                voiceResponseBubble.style.display = "block";
+                addChatMessage('agent', reply);
                 speakText(reply);
             } else {
                 const itemNames = lowStockItems.map(i => i.name).join(", ");
                 const reply = `Stock alert. Items ${itemNames} are below safety limits. Please restock soon.`;
-                voiceResponseText.textContent = reply;
-                voiceResponseBubble.style.display = "block";
+                addChatMessage('agent', reply);
                 speakText(reply);
             }
         } else if (text.includes("hello") || text.includes("namaste") || text.includes("hi ") || text.includes("help") || text.includes("sunona")) {
             const reply = "Hello! Main aapka RailQuick assistant hu. Ask me: 'prioritize orders' or 'stock update'. Main madad ke liye tayyar hu!";
-            voiceResponseText.textContent = reply;
-            voiceResponseBubble.style.display = "block";
+            addChatMessage('agent', reply);
             speakText(reply);
         } else {
             const reply = `Heard: "${query}". Try asking "prioritize orders" or "pehle konsa order banaye?" to check train timings.`;
-            voiceResponseText.textContent = reply;
-            voiceResponseBubble.style.display = "block";
+            addChatMessage('agent', reply);
             speakText(reply);
         }
     }
@@ -1517,7 +1578,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (waveContainer) waveContainer.classList.add("active");
                 const query = prompt("Speak to AI Agent (Enter voice command text):\n- 'prioritize orders' (Pehle konsa banaye?)\n- 'check trains' (Timetable update)\n- 'stock status' (Inventory levels)");
                 if (query) {
-                    voiceTranscript.textContent = `"${query}"`;
+                    addChatMessage('user', query);
                     processVoiceQuery(query);
                 }
                 setTimeout(() => {
@@ -1598,7 +1659,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const query = chip.getAttribute("data-query");
             if (query) {
                 playSynthSound('click');
-                voiceTranscript.textContent = `"${chip.textContent}"`;
+                addChatMessage('user', chip.textContent);
                 // Switch voice tab visualizer active
                 const waveContainer = document.getElementById("audioWaveContainer");
                 if (waveContainer) {

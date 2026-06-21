@@ -2357,4 +2357,79 @@ button, select, input {
     display: block;
 }
 
+/* AI Agent Conversational Chat Thread */
+.voice-chat-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 180px;
+    min-height: 130px;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--r-sm);
+    padding: 12px;
+    margin-bottom: 12px;
+    scroll-behavior: smooth;
+}
+
+.chat-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 85%;
+    font-size: 12px;
+    line-height: 1.4;
+    animation: slide-in-bubble 0.2s ease-out forwards;
+}
+
+.chat-bubble.user {
+    align-self: flex-end;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--text-main);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-bottom-right-radius: 2px;
+}
+
+.chat-bubble.agent {
+    align-self: flex-start;
+    background: var(--bg-panel);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: 2px;
+    border-left: 3px solid var(--accent-purple);
+}
+
+/* Pulsing Agent Node Indicators */
+.agent-pulse-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.agent-pulse-dot.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    animation: agent-pulse 1.5s infinite ease-in-out;
+    opacity: 0.6;
+}
+
+@keyframes agent-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(3.5);
+        opacity: 0;
+    }
+}
+
+
 
