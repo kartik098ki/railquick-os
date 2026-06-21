@@ -133,6 +133,10 @@
                 <div class="orders-section-header" style="padding-top:16px;">
                     <h2>Active Queue</h2>
                     <div class="section-actions">
+                        <button class="btn btn-solid-cyan" id="btnLiveDemoOrder" style="padding:6px 12px;font-size:11px;border-radius:var(--r-pill);display:flex;align-items:center;gap:4px;box-shadow:var(--shadow-glow-cyan);">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                            Live Order
+                        </button>
                         <button class="btn btn-prioritize" id="btnAutoPrioritize">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                             Prioritize
@@ -505,10 +509,26 @@
                         <div class="report-output" id="editorContent">
                             <p style="color:var(--text-muted);font-style:italic;">Tap "Generate AI Summary" to compile today's data...</p>
                         </div>
-                        <button class="btn btn-solid-green btn-full" id="btnPushReportToNotion" style="margin-top:10px;">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"/></svg>
-                            Push to Notion
-                        </button>
+                        <div style="display:flex;gap:8px;margin-top:10px;">
+                            <button class="btn btn-ghost btn-full" id="btnDownloadCSV" style="flex:1;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download CSV
+                            </button>
+                            <button class="btn btn-solid-green btn-full" id="btnPushReportToNotion" style="flex:1;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"/></svg>
+                                Push to Notion
+                            </button>
+                        </div>
+                        
+                        <div class="ai-stock-alert-card" style="margin:16px 0 0;background:var(--neon-green-dim);border-color:var(--neon-green);">
+                            <div class="alert-header">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--neon-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                <span class="alert-title" style="color:var(--neon-green);">AI Sales Insight</span>
+                            </div>
+                            <div class="alert-body" id="aiInsightText">
+                                Increase Kamai (Earnings): Bundle "Water Bottle + Samosa" for incoming Jan Shatabdi. High probability of upselling!
+                            </div>
+                        </div>
                     </div>
 
                 </div>

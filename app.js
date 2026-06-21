@@ -745,7 +745,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // NOTION SYNC
+    // NOTION SYNC & REPORTS
     // ==========================================================================
     document.getElementById('notionIntegrationMode').addEventListener('change', (e) => {
         document.getElementById('realNotionFields').style.display = e.target.checked ? 'block' : 'none';
@@ -781,11 +781,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const report = `# Daily Operations Summary — Platform 3
 > Generated: ${new Date().toLocaleString('en-IN')}
 
-## Revenue
-- **Total Today**: ₹${state.totalRevenue.toLocaleString('en-IN')}
+## Sales & Earnings
+- **Aaj Ki Kamai (Total Revenue)**: ₹${state.totalRevenue.toLocaleString('en-IN')}
 - **Orders Filled**: ${state.ordersFilled}
+- **Stock Sold Today**: ${145 + Math.floor(Math.random() * 50)} items
 - **AI Assists**: ${state.aiAssists}
-- **Avg Prep Time**: 1:45 min
 
 ## Trains Served
 ${activeTrains.map(t => `- ${t.name} (#${t.no}) — Platform 3`).join('\n')}
@@ -793,12 +793,20 @@ ${activeTrains.map(t => `- ${t.name} (#${t.no}) — Platform 3`).join('\n')}
 ## Stock Alerts
 ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.name}: ${i.stock} units (Low)`).join('\n') || '- All stocks nominal'}
 
+## AI Strategy Insight
+> **Recommendation to earn more**: Bundle "Water Bottle + Snacks" for the incoming Jan Shatabdi. High probability of ₹20+ upselling per order!
+
 ## Performance Score: 98.4%
 `;
         const el = document.getElementById('editorContent');
         const el2 = document.getElementById('editorContent2');
         if (el) el.textContent = report;
         if (el2) el2.textContent = report;
+        
+        // Update AI Insight Card
+        const insightCard = document.getElementById('aiInsightText');
+        if (insightCard) insightCard.textContent = 'Increase Kamai (Earnings): Bundle "Water Bottle + Snacks" for incoming trains. High probability of ₹20+ upselling per order based on AI analysis!';
+        
         showToast('AI daily report generated!', 'success');
         logToConsole('> Daily report compiled. 340 words generated.', 'success');
     }
@@ -816,6 +824,24 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
     if (document.getElementById('btnPushReportToNotion2')) {
         document.getElementById('btnPushReportToNotion2').addEventListener('click', handlePushReport);
     }
+
+    // CSV Download Logic
+    document.getElementById('btnDownloadCSV').addEventListener('click', () => {
+        showToast('Compiling CSV Data...', 'info');
+        setTimeout(() => {
+            const csvContent = "data:text/csv;charset=utf-8,Date,Orders,Kamai(Revenue),StockSold\\n" + 
+                `${new Date().toLocaleDateString('en-IN')},${state.ordersFilled},₹${state.totalRevenue},145`;
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `RailQuick_Sales_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Sales CSV Downloaded!', 'success');
+            logToConsole('> CSV Sales Report successfully exported.', 'success');
+        }, 800);
+    });
 
     document.getElementById('btnClearTerminal').addEventListener('click', () => {
         document.getElementById('apiTerminalBody').innerHTML = '<span class="terminal-line system">Terminal cleared.</span>';
@@ -1058,7 +1084,7 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
     setInterval(rotateMarquee, 28000);
 
     // ==========================================================================
-    // SIMULATED INCOMING ORDER (every 45s)
+    // SIMULATED INCOMING ORDER
     // ==========================================================================
     const newOrderNames = [
         { trainName: "Shatabdi Express", trainNo: "12001", fromTo: "NDLS → CNB", coach: "C5", amount: 95 },
@@ -1066,7 +1092,8 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         { trainName: "Garib Rath", trainNo: "12203", fromTo: "PNBE → NDLS", coach: "S2", amount: 60 },
     ];
     let newOrderIdx = 0;
-    setInterval(() => {
+    
+    function triggerLiveOrder() {
         const template = newOrderNames[newOrderIdx % newOrderNames.length];
         newOrderIdx++;
         const newOrder = {
@@ -1076,8 +1103,8 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
             fromTo: template.fromTo,
             scheduledPlatform: 3,
             actualPlatform: 3,
-            etaSeconds: 180 + Math.floor(Math.random() * 600),
-            prepTimeMinutes: 2 + Math.floor(Math.random() * 3),
+            etaSeconds: 120 + Math.floor(Math.random() * 200),
+            prepTimeMinutes: 2,
             items: [
                 { name: "Chai (Flask)", qty: 1, packed: false },
                 { name: "Veg Cutlet", qty: 2, packed: false }
@@ -1091,9 +1118,28 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         };
         orders.push(newOrder);
         if (state.currentTab === 'orders') renderOrders();
-        showToast(`New order ${newOrder.id} from ${newOrder.trainName}!`, 'info');
-        logToConsole(`> NEW ORDER: ${newOrder.id} — ${newOrder.trainName} (Coach ${newOrder.coach})`, 'system');
-    }, 45000);
+        
+        // Sound and visual pop
+        showToast(`LIVE ORDER! ${newOrder.trainName} coming to Platform 3!`, 'warning', 5000);
+        logToConsole(`> LIVE ORDER RECEIVED: ${newOrder.id} — ${newOrder.trainName} (Coach ${newOrder.coach})`, 'system');
+        
+        // Brief rush mode activation
+        document.getElementById('rushHourBanner').classList.add('visible');
+        setTimeout(() => updateRushMode(), 3000);
+    }
+
+    // Auto trigger every 60s
+    setInterval(triggerLiveOrder, 60000);
+    
+    // Manual Live Demo Button
+    const liveDemoBtn = document.getElementById('btnLiveDemoOrder');
+    if (liveDemoBtn) {
+        liveDemoBtn.addEventListener('click', () => {
+            liveDemoBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => liveDemoBtn.style.transform = 'scale(1)', 150);
+            triggerLiveOrder();
+        });
+    }
 
     // ==========================================================================
     // INITIAL RENDER
