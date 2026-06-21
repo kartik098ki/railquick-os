@@ -87,6 +87,84 @@ document.addEventListener("DOMContentLoaded", () => {
             otp: genOTP(),
             amount: 135,
             coach: "C1"
+        },
+        {
+            id: "RQ-1090",
+            trainNo: "12001",
+            trainName: "Shatabdi Express",
+            fromTo: "NDLS → CNB",
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 450,
+            prepTimeMinutes: 2,
+            items: [
+                { name: "Water Bottle 1L", qty: 4, packed: false },
+                { name: "Veg Cutlet", qty: 2, packed: false }
+            ],
+            status: "Preparing",
+            source: "Platform 3 Express",
+            reallocated: false,
+            otp: genOTP(),
+            amount: 180,
+            coach: "C5"
+        },
+        {
+            id: "RQ-1091",
+            trainNo: "12213",
+            trainName: "Duronto Express",
+            fromTo: "HWH → NDLS",
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 610,
+            prepTimeMinutes: 5,
+            items: [
+                { name: "Paneer Tikka Roll", qty: 2, packed: false }
+            ],
+            status: "Pending",
+            source: "Platform 3 Express",
+            reallocated: false,
+            otp: genOTP(),
+            amount: 160,
+            coach: "A4"
+        },
+        {
+            id: "RQ-1092",
+            trainNo: "12203",
+            trainName: "Garib Rath",
+            fromTo: "PNBE → NDLS",
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 900,
+            prepTimeMinutes: 3,
+            items: [
+                { name: "Samosa Plate", qty: 1, packed: false },
+                { name: "Chai (Flask)", qty: 2, packed: false }
+            ],
+            status: "Pending",
+            source: "Platform 3 Express",
+            reallocated: false,
+            otp: genOTP(),
+            amount: 105,
+            coach: "S2"
+        },
+        {
+            id: "RQ-1093",
+            trainNo: "12424",
+            trainName: "Rajdhani Express",
+            fromTo: "NDLS → DBRT",
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 15,
+            prepTimeMinutes: 1,
+            items: [
+                { name: "Water Bottle 1L", qty: 1, packed: true }
+            ],
+            status: "Ready",
+            source: "Platform 3 Express",
+            reallocated: false,
+            otp: genOTP(),
+            amount: 20,
+            coach: "B1"
         }
     ];
 
