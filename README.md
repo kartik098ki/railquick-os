@@ -32,6 +32,43 @@ A premium, touch-optimized Mobile Platform Vendor POS and Dispatch App designed 
 
 ---
 
+## Notion Integration & Database Schemas
+
+RailQuick OS features deep Notion integration design, mimicking a true team workspace. This allows vendors to synchronize operational data with cloud databases in real-time.
+
+### 1. Synchronization Architecture (Dual Modes)
+- **Mock Sync (Interactive Terminal)**: Designed for offline staging. It aggregates database payloads and streams the raw JSON structures directly to the in-app **Notion Database Logs** terminal for easy debugging.
+- **Real Notion API Mode**: Uses live web requests (`POST https://api.notion.com/v1/pages`) using standard HTTP headers (e.g. `Authorization`, `Notion-Version: 2022-06-28`) to sync databases directly from the client.
+
+### 2. Orders Sync Database Schema
+Active orders are tracked and serialized to a Notion database with the following properties:
+- `Order ID` (Title property): Unique identifier (e.g., `RQ-1082`).
+- `Train No` (Rich Text property): Code representing the targeted train (e.g., `12423`).
+- `Status` (Select property): Active state of fulfillment (`Pending`, `Relocated`, `Delivered`).
+
+### 3. Inventory Sync Database Schema
+Stall stock records are maintained in a structured inventory grid matching Notion's database fields:
+- `Name` (Title property): Name of item (e.g., `Water Bottle 1L`).
+- `Category` (Select property): Product categorization (`Food`, `Beverage`, `Snack`, `Other`).
+- `Stock` (Number property): Current units remaining in safety stock.
+- `Price` (Number property): Price index in Indian Rupees (₹).
+- `Status` (Select property): Stock health alert state (`In Stock`, `Low Stock`, `Out of Stock`).
+
+### 4. Dynamic Column Creator (Schema Extension)
+Vendors can create custom database properties on the fly using the **+ Add Column** button in the Inventory tab:
+- **Text** (`Aa` property type)
+- **Number** (`#` property type)
+- **Select** (Tag property type)
+- Added properties are dynamically appended to both the HTML table structure and the outgoing Notion sync payload schema.
+
+### 5. Notion AI Daily Report (Block Children API)
+The shift summary generator compiles performance indicators and pushes them to a parent page ID as block children:
+- `heading_2`: Structured header showing report title and audit date.
+- `bulleted_list_item`: Nested lists containing operational aggregates (Orders Dispatched, Sales Revenue, Average Prep Times, Safety Stock levels).
+- Callout banner block: Houses demand forecast insights and AI suggestions (e.g., predicted stock shortages based on train delay models).
+
+---
+
 ## Project Credits and Stack
 
 This application was engineered with code design and implementation help from:

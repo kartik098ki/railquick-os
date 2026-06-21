@@ -233,16 +233,17 @@
                         <div class="ai-voice-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
                             <h3 style="margin-bottom: 12px; font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">AI Voice Desk</h3>
                             
-                            <div class="voice-status-wrapper" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak" style="position: relative; width: 48px; height: 48px; background: var(--accent-purple-soft); color: var(--accent-purple); border: 2px solid var(--accent-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0;">
-                                    <svg class="mic-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                                    </svg>
-                                    <div class="mic-wave-pulse" id="micWavePulse"></div>
-                                </button>
-                                <div class="voice-texts" style="flex: 1;">
-                                    <div class="voice-status" id="voiceStatus" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Tap microphone to speak</div>
-                                </div>
+                            <!-- Siri/Gemini Pulsing Orb Assistant -->
+                            <div class="ai-assistant-orb-container" id="aiAssistantOrbContainer">
+                                <div class="orb-pulse-ring-1"></div>
+                                <div class="orb-pulse-ring-2"></div>
+                                <div class="orb-ring-outer"></div>
+                                <div class="orb-ring-inner"></div>
+                                <div class="ai-assistant-orb" id="btnVoiceMic" title="Tap to speak"></div>
+                            </div>
+                            
+                            <div class="voice-status-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-bottom: 12px;">
+                                <div class="voice-status" id="voiceStatus" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Tap the Orb to Speak</div>
                             </div>
 
                             <!-- Visual sound wave container -->

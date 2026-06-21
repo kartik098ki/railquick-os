@@ -1370,6 +1370,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnVoiceMic = document.getElementById("btnVoiceMic");
     const voiceStatus = document.getElementById("voiceStatus");
     const voiceChatThread = document.getElementById("voiceChatThread");
+    const aiAssistantOrbContainer = document.getElementById("aiAssistantOrbContainer");
 
     // Unified helper to update agent status monitoring nodes dynamically
     function updateAgentStatus(agent, status) {
@@ -1443,6 +1444,25 @@ document.addEventListener("DOMContentLoaded", () => {
             utterance.lang = 'en-IN'; // Indian English accent fits Hinglish well
             utterance.pitch = 1.05;
             utterance.rate = 0.95;
+            
+            // Handle Speaking animation state on the Orb
+            utterance.onstart = () => {
+                if (aiAssistantOrbContainer) {
+                    aiAssistantOrbContainer.classList.add("speaking");
+                    aiAssistantOrbContainer.classList.remove("listening");
+                }
+            };
+            utterance.onend = () => {
+                if (aiAssistantOrbContainer) {
+                    aiAssistantOrbContainer.classList.remove("speaking");
+                }
+            };
+            utterance.onerror = () => {
+                if (aiAssistantOrbContainer) {
+                    aiAssistantOrbContainer.classList.remove("speaking");
+                }
+            };
+
             window.speechSynthesis.speak(utterance);
         }
     }
@@ -1497,6 +1517,10 @@ document.addEventListener("DOMContentLoaded", () => {
         recognition.lang = 'en-IN';
 
         recognition.onstart = () => {
+            if (aiAssistantOrbContainer) {
+                aiAssistantOrbContainer.classList.add("listening");
+                aiAssistantOrbContainer.classList.remove("speaking");
+            }
             btnVoiceMic.classList.add("listening");
             const waveContainer = document.getElementById("audioWaveContainer");
             if (waveContainer) waveContainer.classList.add("active");
@@ -1506,6 +1530,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         recognition.onerror = (e) => {
             console.error("Speech Recognition Error:", e);
+            if (aiAssistantOrbContainer) {
+                aiAssistantOrbContainer.classList.remove("listening");
+            }
             btnVoiceMic.classList.remove("listening");
             const waveContainer = document.getElementById("audioWaveContainer");
             if (waveContainer) waveContainer.classList.remove("active");
@@ -1513,6 +1540,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         recognition.onend = () => {
+            if (aiAssistantOrbContainer) {
+                aiAssistantOrbContainer.classList.remove("listening");
+            }
             btnVoiceMic.classList.remove("listening");
             const waveContainer = document.getElementById("audioWaveContainer");
             if (waveContainer) waveContainer.classList.remove("active");

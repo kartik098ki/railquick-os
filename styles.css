@@ -3,30 +3,30 @@
    ========================================================================== */
 
 :root {
-    /* Color Palette - Premium Zepto-like Light Mint Theme */
-    --bg-dark-gray: #f2f6f3; /* Soft light gray with a touch of mint */
-    --bg-panel: #ffffff;    /* Clean white panels */
-    --bg-card: #f9fbf9;     /* Very soft greenish-white card background */
-    --bg-hover: #e6eee9;    /* Clean mint-tinted hover color */
+    /* Color Palette - Premium Dark Glassmorphic Mint/Emerald Theme */
+    --bg-dark-gray: #050806;             /* Almost black deep forest base */
+    --bg-panel: rgba(15, 25, 20, 0.65);  /* Semi-transparent panel with glass backdrop filter */
+    --bg-card: rgba(25, 40, 32, 0.45);   /* Lighter translucent card background */
+    --bg-hover: rgba(16, 185, 129, 0.15); /* Sleek emerald hover highlight */
     
-    --border-color: #dbe4df;    /* Soft greenish light borders */
-    --border-strong: #a4bea8;
+    --border-color: rgba(16, 185, 129, 0.18); /* Translucent emerald border */
+    --border-strong: rgba(16, 185, 129, 0.35); /* Glow-ready emerald border */
     
-    --text-main: #13221b;      /* Dark green-slate for primary readability */
-    --text-secondary: #314b3d; /* Mid-tone green-slate for subtitles */
-    --text-muted: #657e72;     /* Muted green-gray for labels */
+    --text-main: #f0fdf4;       /* Mint white for readability */
+    --text-secondary: #bbf7d0;  /* Pastel sage for details */
+    --text-muted: #86efac;      /* Vibrant mint-gray for labels */
     
-    /* Accents - Main highlight is Emerald/Mint Green (Zepto style) */
+    /* Accents - Sleek Neon Emerald and Cyan Highlights */
     --accent-purple: #10b981; 
-    --accent-purple-soft: rgba(16, 185, 129, 0.1);
-    --accent-blue: #0ea5e9;
-    --accent-blue-soft: rgba(14, 165, 233, 0.15);
-    --accent-green: #059669;
-    --accent-green-soft: rgba(5, 150, 105, 0.15);
-    --accent-red: #ef4444;
-    --accent-red-soft: rgba(239, 68, 68, 0.12);
-    --accent-orange: #f59e0b;
-    --accent-orange-soft: rgba(245, 158, 11, 0.12);
+    --accent-purple-soft: rgba(16, 185, 129, 0.15);
+    --accent-blue: #06b6d4;
+    --accent-blue-soft: rgba(6, 182, 212, 0.2);
+    --accent-green: #34d399;
+    --accent-green-soft: rgba(52, 211, 153, 0.2);
+    --accent-red: #f87171;
+    --accent-red-soft: rgba(248, 113, 113, 0.18);
+    --accent-orange: #fbbf24;
+    --accent-orange-soft: rgba(251, 191, 36, 0.18);
 
     /* Fonts */
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -34,14 +34,15 @@
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Radii */
-    --r-sm: 6px;
-    --r-md: 12px;
-    --r-lg: 18px;
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 20px;
     --r-pill: 99px;
     
-    /* Shadows */
-    --shadow-md: 0 4px 14px rgba(16, 185, 129, 0.08), 0 2px 5px rgba(0,0,0,0.03);
-    --shadow-lg: 0 10px 30px rgba(16, 185, 129, 0.12), 0 5px 15px rgba(0,0,0,0.05);
+    /* Shadows & Effects */
+    --shadow-md: 0 4px 20px rgba(16, 185, 129, 0.15), 0 2px 10px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 40px rgba(16, 185, 129, 0.25), 0 5px 25px rgba(0, 0, 0, 0.3);
+    --backdrop-blur: blur(18px);
     
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -56,7 +57,7 @@
 }
 
 body {
-    background: #e1eae4;
+    background: radial-gradient(circle at 30% 20%, #15221b 0%, #060a08 100%);
     color: var(--text-main);
     font-family: var(--font-ui);
     font-size: 14px;
@@ -231,19 +232,34 @@ button, select, input {
 
 .tab-view {
     display: none;
+    opacity: 0;
+    transform: translateY(10px);
 }
 
 .tab-view.active {
     display: block;
-    animation: fadeIn 0.25s ease-out;
+    animation: tabFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ==========================================================================
    TAB 1: LEDGER CARD & TIMETABLE CARD
    ========================================================================== */
 .ledger-card {
-    background: linear-gradient(135deg, #e6f4ea 0%, #ffffff 100%);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
     border-radius: var(--r-md);
     padding: 12px 14px;
     margin-bottom: 14px;
@@ -1398,13 +1414,22 @@ button, select, input {
 }
 
 .modal-content {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-color);
+    background: rgba(15, 25, 20, 0.85);
+    border: 1px solid var(--border-strong);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
     border-radius: var(--r-lg);
     width: calc(100% - 32px);
     max-width: 340px;
-    padding: 16px;
-    box-shadow: var(--shadow-lg);
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+/* Form Input Focus outlines */
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-purple) !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3) !important;
+    background: rgba(10, 18, 14, 0.9) !important;
 }
 
 .modal-header {
@@ -1551,10 +1576,12 @@ button, select, input {
    AI TALK AGENT & PRIORITIZE STYLES
    ========================================================================== */
 .ai-voice-card {
-    background: linear-gradient(135deg, #e6f4ea 0%, #ffffff 100%);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
     border-radius: var(--r-md);
-    padding: 12px 14px;
+    padding: 18px;
     margin-bottom: 14px;
     box-shadow: var(--shadow-md);
     position: relative;
@@ -1752,29 +1779,31 @@ button, select, input {
 
 /* AI STOCK ALERT CARD */
 .ai-stock-manager-card {
-    background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
-    border: 1px solid #fbd38d;
+    background: rgba(251, 191, 36, 0.07);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
     border-radius: var(--r-md);
-    padding: 12px 14px;
+    padding: 14px;
     margin-bottom: 14px;
     box-shadow: var(--shadow-md);
-    color: #c05621;
+    color: #fde047;
 }
 
 .ai-stock-manager-card h4 {
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #9c4221;
+    color: #fbbf24;
     margin-bottom: 4px;
 }
 
 .ai-stock-manager-card p {
     font-size: 11px;
     line-height: 1.4;
-    color: #7b341e;
+    color: var(--text-secondary);
     margin-bottom: 8px;
 }
 
@@ -1929,19 +1958,24 @@ button, select, input {
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 40px rgba(16, 185, 129, 0.06), 0 0 4px rgba(0,0,0,0.05);
+    box-shadow: 0 0 50px rgba(16, 185, 129, 0.15), 0 0 10px rgba(0,0,0,0.4);
     overflow: hidden;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
 }
 
 .app-header-mobile {
     height: 60px;
     background: var(--bg-panel);
     border-bottom: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 16px;
     flex-shrink: 0;
+    z-index: 100;
 }
 
 .app-header-mobile .app-brand {
@@ -1949,6 +1983,10 @@ button, select, input {
     font-weight: 800;
     color: var(--text-main);
     font-family: var(--font-heading);
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text-main) 0%, var(--accent-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .app-header-mobile .header-right-meta {
@@ -1959,8 +1997,10 @@ button, select, input {
 
 .app-bottom-nav {
     height: 64px;
-    background: var(--bg-panel);
+    background: var(--bg-panel) !important;
     border-top: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur) !important;
+    -webkit-backdrop-filter: var(--backdrop-blur) !important;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -1984,7 +2024,7 @@ button, select, input {
 }
 
 .app-bottom-nav .nav-item.active {
-    color: var(--accent-purple);
+    color: var(--text-main);
     border-top-color: var(--accent-purple);
     background: var(--accent-purple-soft);
 }
@@ -2427,6 +2467,168 @@ button, select, input {
     }
     100% {
         transform: scale(3.5);
+        opacity: 0;
+    }
+}
+
+/* ==========================================================================
+   SIRI/GEMINI PULSING ORB ASSISTANT STYLE
+   ========================================================================== */
+.ai-assistant-orb-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ai-assistant-orb {
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #10b981 0%, #06b6d4 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    animation: orbGradient 6s ease infinite, orbFloat 4s ease-in-out infinite;
+    box-shadow: 0 0 35px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.35);
+    z-index: 10;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Outer rotating rings */
+.orb-ring-outer {
+    position: absolute;
+    width: 124px;
+    height: 124px;
+    border: 2px dashed rgba(6, 182, 212, 0.3);
+    border-radius: 50%;
+    animation: rotateCW 18s linear infinite;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+.orb-ring-inner {
+    position: absolute;
+    width: 104px;
+    height: 104px;
+    border: 1.5px dotted rgba(139, 92, 246, 0.35);
+    border-radius: 50%;
+    animation: rotateCCW 12s linear infinite;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+/* Pulsing aura rings */
+.orb-pulse-ring-1 {
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: rgba(6, 182, 212, 0.15);
+    animation: orbPulse 3s infinite linear;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+.orb-pulse-ring-2 {
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.12);
+    animation: orbPulse 3s infinite linear;
+    animation-delay: 1.5s;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+/* Listening State: Warp animation, warm neon gradients */
+.ai-assistant-orb-container.listening .ai-assistant-orb {
+    background: radial-gradient(circle at 30% 30%, #ef4444 0%, #ec4899 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    box-shadow: 0 0 45px rgba(236, 72, 153, 0.75), inset 0 0 15px rgba(255, 255, 255, 0.45);
+    transform: scale(1.1);
+    animation: orbGradient 3s ease infinite, orbFloat 2s ease-in-out infinite;
+}
+
+.ai-assistant-orb-container.listening .orb-pulse-ring-1 {
+    background: rgba(236, 72, 153, 0.28);
+    animation-duration: 1.5s;
+}
+
+.ai-assistant-orb-container.listening .orb-pulse-ring-2 {
+    background: rgba(239, 68, 68, 0.2);
+    animation-duration: 1.5s;
+}
+
+.ai-assistant-orb-container.listening .orb-ring-outer {
+    border-color: rgba(236, 72, 153, 0.5);
+    animation-duration: 6s;
+}
+
+/* Speaking State: Expansion animation, vibrant cool gradients */
+.ai-assistant-orb-container.speaking .ai-assistant-orb {
+    background: radial-gradient(circle at 30% 30%, #10b981 0%, #34d399 50%, #06b6d4 100%);
+    background-size: 200% 200%;
+    box-shadow: 0 0 45px rgba(16, 185, 129, 0.75), inset 0 0 15px rgba(255, 255, 255, 0.45);
+    transform: scale(1.06);
+    animation: orbGradient 4s ease infinite, orbFloat 3s ease-in-out infinite;
+}
+
+.ai-assistant-orb-container.speaking .orb-pulse-ring-1 {
+    background: rgba(16, 185, 129, 0.22);
+    animation: orbPulseExpand 2s infinite ease-out;
+}
+
+.ai-assistant-orb-container.speaking .orb-pulse-ring-2 {
+    background: rgba(6, 182, 212, 0.22);
+    animation: orbPulseExpand 2s infinite ease-out;
+    animation-delay: 1s;
+}
+
+@keyframes orbGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes orbFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes rotateCW {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCCW {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes orbPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+@keyframes orbPulseExpand {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(2.5);
         opacity: 0;
     }
 }
