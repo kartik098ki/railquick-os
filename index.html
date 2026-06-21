@@ -32,6 +32,17 @@
                 </div>
             </header>
 
+            <!-- Dynamic Rush Hour Mode Banner -->
+            <div class="rush-hour-banner" id="rushHourBanner">
+                <span>🚨 RUSH MODE ACTIVATED</span>
+                <span>•</span>
+                <span id="rushModeOrders">Pending: 3 orders</span>
+                <span>•</span>
+                <span>Avg Pack: 32 sec</span>
+                <span>•</span>
+                <span>Staff Required: 3</span>
+            </div>
+
             <!-- Main Content Scroll Area -->
             <main class="app-viewport">
                 
@@ -224,14 +235,16 @@
 
                 <!-- ================= TAB 3: STALL INVENTORY ================= -->
                 <section id="tab-inventory" class="tab-view">
-                    <!-- AI recommendation box -->
-                    <div class="ai-restock-card" id="restockRecommendation">
-                        <div class="restock-icon">💡</div>
-                        <div class="restock-info">
-                            <h4>AI Stock Warning</h4>
-                            <p id="restockText">Water Bottles and Soda Can stock levels are low. heatwave warning active.</p>
-                            <button class="action-btn secondary-btn compact-btn" id="btnRestockAll" style="margin-top: 8px;">Restock All</button>
+                    <!-- AI Stock Manager Alert Card -->
+                    <div class="ai-stock-manager-card" id="aiStockManagerAlert">
+                        <h4>🚨 AI Stock Alert: Expected Shortage</h4>
+                        <p>Water Bottles stock is low. High demand is expected due to upcoming train arrivals.</p>
+                        <div class="stock-stats-row">
+                            <span>Current Stock: <strong id="aiCurrentBottlesStock">18</strong></span>
+                            <span>•</span>
+                            <span>Expected Demand: <strong>64</strong></span>
                         </div>
+                        <button class="action-btn primary-btn compact-btn" id="btnAiRefill" style="margin-top: 6px; background: #10b981; color: #ffffff; padding: 4px 10px; border-radius: var(--r-sm); font-size: 11px; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15);">Refill 50 Bottles</button>
                     </div>
 
                     <!-- Search and Add controls -->
@@ -301,6 +314,7 @@
                         <div class="sync-actions-mobile">
                             <button class="action-btn primary-btn block-btn" id="saveSettingsBtn">Save Keys</button>
                             <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">Push Sync to Notion</button>
+                            <button class="action-btn block-btn" id="btnOneTapReport" style="margin-top: 10px; background: #10b981; color: #ffffff; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 6px;">📈 One-Tap Daily Report</button>
                         </div>
                     </div>
 
@@ -323,59 +337,43 @@
                 <span>✨</span>
             </button>
 
-            <!-- Slide-up Notion AI Drawer Sheet -->
+            <!-- Slide-up Notion AI Drawer Sheet (One-Tap Report) -->
             <div class="ai-drawer-overlay" id="aiDrawerOverlay">
                 <div class="ai-drawer-sheet">
                     <div class="ai-drawer-header">
                         <div class="drag-bar"></div>
                         <div class="ai-drawer-title">
-                            <span>Notion AI Assistant</span>
-                            <span class="ai-badge">V2</span>
+                            <span>📈 Notion Daily Report</span>
+                            <span class="ai-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">NOTION AI</span>
                         </div>
                         <button class="close-drawer-btn" id="btnCloseAiDrawer">×</button>
                     </div>
                     <div class="ai-drawer-body">
-                        <p class="ai-drawer-intro">Draft operational handovers or stock alerts directly from platform states.</p>
+                        <p class="ai-drawer-intro">Generate and sync your platform's daily summary directly to your cloud Notion workspace.</p>
                         
-                        <div class="ai-drawer-input-row">
-                            <input type="text" id="aiCustomPrompt" placeholder="Ask AI to write note drafts...">
-                            <button id="btnSubmitAiPrompt">➔</button>
-                        </div>
-
-                        <div class="ai-presets-grid">
-                            <button class="ai-preset-option" data-action="summary">
-                                <span class="p-icon">📝</span>
+                        <div class="ai-presets-grid" style="margin-bottom: 12px; grid-template-columns: 1fr;">
+                            <button class="ai-preset-option" id="btnTriggerDailyReport" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); padding: 10px; display: flex; text-align: left; width: 100%;">
+                                <span class="p-icon" style="color:#10b981; font-size: 20px; margin-right: 10px;">📊</span>
                                 <div class="p-meta">
-                                    <span class="p-title">Draft Shift Handoff Log</span>
-                                    <span class="p-desc">Summarize live sales totals and orders</span>
-                                </div>
-                            </button>
-                            <button class="ai-preset-option" data-action="shortage">
-                                <span class="p-icon">📦</span>
-                                <div class="p-meta">
-                                    <span class="p-title">Draft Stock Reorder Form</span>
-                                    <span class="p-desc">Create restock list from low stock database</span>
-                                </div>
-                            </button>
-                            <button class="ai-preset-option" data-action="incident">
-                                <span class="p-icon">🚨</span>
-                                <div class="p-meta">
-                                    <span class="p-title">Log Platform Shift Memo</span>
-                                    <span class="p-desc">Write detail notes for auto-reallocations</span>
+                                    <span class="p-title" style="color:#10b981; font-weight: 700; display: block; font-size: 13px;">Generate One-Tap Daily Summary</span>
+                                    <span class="p-desc" style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">Aggregates orders, sales total, lost revenues, and tomorrow's demand forecast</span>
                                 </div>
                             </button>
                         </div>
 
                         <!-- Notes Output block inside AI drawer -->
-                        <div class="ai-output-container">
+                        <div class="ai-output-container" style="margin-top: 10px;">
                             <div class="output-header">
-                                <span>Active Note Output Draft</span>
+                                <span>Preview Report Markdown</span>
                                 <button class="output-copy-btn" id="btnCopyNote">Copy</button>
                             </div>
-                            <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI drafts will stream here...">
-                                <h1>Shift Handover Log - Platform 3 Express</h1><p><strong>Date:</strong> June 21, 2026</p><p><strong>Shift:</strong> Morning (06:00 - 14:00)</p><hr><h2>General Updates</h2><ul><li>Water bottle supplies were low at 09:00, ordered partial restock. Ensure to verify supplier drop at 14:30.</li><li>The POS machine near platform entry is lagging. Please use backup terminal if response time is slow.</li></ul><h2>AI Rerouting Operations</h2><ul><li>Faced 3 rerouting events today. Train 12424 rescheduled to Platform 5. Orders successfully reallocated to Partner Vendor. Total preparation savings: 8 mins.</li><li>Ensure that runners wear active GPS trackers so AI can predict exact running times to different platforms.</li></ul>
+                            <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI report will stream here..." style="font-family: var(--font-ui); font-size: 12px; line-height: 1.5; min-height: 180px; max-height: 250px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--r-sm); padding: 10px; color: var(--text-main);">
+                                <h1>Daily Operations Summary - Platform 3</h1>
+                                <p>Tap the button above to compile today's live station logs into a structured Notion report.</p>
                             </div>
                         </div>
+
+                        <button class="action-btn primary-btn block-btn" id="btnPushReportToNotion" style="margin-top: 12px; background: #10b981; color: #ffffff; width: 100%; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; height: 38px; border-radius: var(--r-sm); cursor: pointer;">Push Report to Notion</button>
                     </div>
                 </div>
             </div>

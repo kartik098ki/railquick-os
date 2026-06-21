@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let inventory = [
-        { id: 1, name: "Water Bottle 1L", category: "Beverage", stock: 8, minStock: 15, price: 20 },
+        { id: 1, name: "Water Bottle 1L", category: "Beverage", stock: 18, minStock: 15, price: 20 },
         { id: 2, name: "Veg Cutlet", category: "Food", stock: 42, minStock: 10, price: 40 },
         { id: 3, name: "Chai (Flask)", category: "Beverage", stock: 3, minStock: 5, price: 30 },
         { id: 4, name: "Paneer Tikka Roll", category: "Food", stock: 25, minStock: 8, price: 120 },
@@ -287,18 +287,61 @@ document.addEventListener("DOMContentLoaded", () => {
                 cardClass += " prioritized-highlight";
             }
 
+            // Smart Packing Assistant Logic
+            let totalQty = 0;
+            let hasChai = false;
+            order.items.forEach(i => {
+                totalQty += i.qty;
+                if (i.name.includes("Chai")) hasChai = true;
+            });
+            
+            let packType = "Small";
+            let packTime = "20s";
+            if (totalQty >= 5) {
+                packType = "Large";
+                packTime = "55s";
+            } else if (totalQty >= 3) {
+                packType = "Medium";
+                packTime = "35s";
+            }
+            const fragileItems = hasChai ? "Chai Flask" : "None";
+
+            // Smart Order Priority Engine Badges
+            const isCritical = order.etaSeconds <= 480; // 8 minutes threshold
+            const priorityText = isCritical ? "Critical" : "Normal";
+            const priorityClass = isCritical ? "critical" : "normal";
+            const priorityString = `<span class="priority-badge ${priorityClass}">${isCritical ? "🔴" : "🟡"} ${priorityText}</span>`;
+
             const card = document.createElement("div");
             card.className = `order-touch-card ${cardClass}`;
+            card.setAttribute("data-id", order.id);
             card.innerHTML = `
                 <div class="card-header-row">
                     <span class="order-id-lbl">${order.id}</span>
-                    <span class="train-badge-lbl">${order.trainNo} - ${order.trainName}</span>
+                    ${priorityString}
                 </div>
                 <div class="card-details-block">
-                    <div class="card-items-summary">${itemSummary}</div>
+                    <div class="card-items-summary" style="font-weight:600; color:var(--text-main); font-size:12.5px;">${itemSummary}</div>
+                    
+                    <!-- Smart Packing Assistant Guide -->
+                    <div class="packing-assistant-guide">
+                        <div class="guide-item">
+                            <span class="guide-lbl">Pack Type</span>
+                            <span class="guide-val">${packType}</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-lbl">Est. Pack</span>
+                            <span class="guide-val">${packTime}</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-lbl">Fragile</span>
+                            <span class="guide-val ${fragileItems !== "None" ? "urgent-pack" : ""}">${fragileItems}</span>
+                        </div>
+                    </div>
+
                     <div class="runner-meta-row">
                         <span>Platform ${order.actualPlatform}</span>
-                        <span>ETA: ${etaString}</span>
+                        <span>ETA: ${etaString} (Train ${order.trainNo})</span>
                     </div>
                 </div>
                 <div class="card-actions-row">
@@ -399,6 +442,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+
+        // Check for Rush Hour Mode
+        const rushHourBanner = document.getElementById("rushHourBanner");
+        const rushModeOrders = document.getElementById("rushModeOrders");
+        if (rushHourBanner) {
+            const isRushActive = activeTrains.some(t => t.platform === 3 && t.eta > 0 && t.eta <= 360) || 
+                                 orders.some(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated" && o.etaSeconds > 0 && o.etaSeconds <= 360);
+            
+            if (isRushActive) {
+                rushHourBanner.classList.add("active");
+                const pendingCount = orders.filter(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated").length;
+                if (rushModeOrders) rushModeOrders.textContent = `Pending: ${pendingCount} orders`;
+            } else {
+                rushHourBanner.classList.remove("active");
+            }
+        }
 
         if (rerender) {
             renderOrders();
@@ -518,6 +577,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     source: "Platform 3 Express (Us)",
                     reallocated: false
                 });
+            }
+
+            // Reset water bottles alert
+            const water = inventory.find(i => i.name.includes("Water"));
+            if (water) {
+                water.stock = 18;
+                renderInventory();
+                const btnAiRefill = document.getElementById("btnAiRefill");
+                const aiCurrentBottlesStock = document.getElementById("aiCurrentBottlesStock");
+                if (btnAiRefill) btnAiRefill.style.display = "inline-block";
+                if (aiCurrentBottlesStock) aiCurrentBottlesStock.textContent = 18;
+                const cardParagraph = document.querySelector("#aiStockManagerAlert p");
+                if (cardParagraph) cardParagraph.textContent = "Water Bottles stock is low. High demand is expected due to upcoming train arrivals.";
             }
 
             playSynthSound('click');
@@ -933,6 +1005,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const btnAiRefill = document.getElementById("btnAiRefill");
+    const aiCurrentBottlesStock = document.getElementById("aiCurrentBottlesStock");
+    if (btnAiRefill) {
+        btnAiRefill.addEventListener("click", () => {
+            playSynthSound('success');
+            const water = inventory.find(i => i.name.includes("Water"));
+            if (water) {
+                water.stock += 50;
+                renderInventory();
+                
+                if (aiCurrentBottlesStock) {
+                    aiCurrentBottlesStock.textContent = water.stock;
+                }
+                
+                btnAiRefill.style.display = "none";
+                const cardParagraph = document.querySelector("#aiStockManagerAlert p");
+                if (cardParagraph) {
+                    cardParagraph.innerHTML = "✨ Stock levels are now optimal. Refill completed successfully!";
+                }
+                
+                speakText("Stock warning resolved. Refilled 50 bottles of water.");
+                showToast("Water Bottles refilled by 50 units!", "success");
+            }
+        });
+    }
+
     if (inventorySearchInput) inventorySearchInput.addEventListener("input", renderInventory);
 
     if (btnAddNewItem) btnAddNewItem.addEventListener("click", () => addItemModal.classList.add("active"));
@@ -1168,27 +1266,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // NOTION AI ASSISTANT DRAWER SHEET
+    // NOTION DAILY SUMMARY REPORT DRAWER
     // ==========================================================================
     const btnNotionAI = document.getElementById("btnNotionAI");
+    const btnOneTapReport = document.getElementById("btnOneTapReport");
     const aiDrawerOverlay = document.getElementById("aiDrawerOverlay");
     const btnCloseAiDrawer = document.getElementById("btnCloseAiDrawer");
-    const aiCustomPrompt = document.getElementById("aiCustomPrompt");
-    const btnSubmitAiPrompt = document.getElementById("btnSubmitAiPrompt");
+    const btnTriggerDailyReport = document.getElementById("btnTriggerDailyReport");
+    const btnPushReportToNotion = document.getElementById("btnPushReportToNotion");
     const editorContent = document.getElementById("editorContent");
     const btnCopyNote = document.getElementById("btnCopyNote");
 
     if (btnNotionAI) {
         btnNotionAI.addEventListener("click", () => {
             playSynthSound('click');
-            aiDrawerOverlay.classList.add("active");
+            if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
+        });
+    }
+
+    if (btnOneTapReport) {
+        btnOneTapReport.addEventListener("click", () => {
+            playSynthSound('click');
+            if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
+            generateOneTapDailyReport();
         });
     }
 
     if (btnCloseAiDrawer) {
         btnCloseAiDrawer.addEventListener("click", () => {
             playSynthSound('click');
-            aiDrawerOverlay.classList.remove("active");
+            if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
         });
     }
 
@@ -1201,81 +1308,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    document.querySelectorAll(".ai-preset-option").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const action = btn.getAttribute("data-action");
-            runNotionAI(action);
-        });
-    });
-
-    if (aiCustomPrompt) {
-        aiCustomPrompt.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                const prompt = aiCustomPrompt.value.trim();
-                if (prompt) runNotionAI("custom", prompt);
-            }
+    if (btnTriggerDailyReport) {
+        btnTriggerDailyReport.addEventListener("click", () => {
+            generateOneTapDailyReport();
         });
     }
 
-    if (btnSubmitAiPrompt) {
-        btnSubmitAiPrompt.addEventListener("click", () => {
-            const prompt = aiCustomPrompt.value.trim();
-            if (prompt) runNotionAI("custom", prompt);
-        });
-    }
-
-    function runNotionAI(action, customPrompt) {
+    function generateOneTapDailyReport() {
         playSynthSound('click');
-        showToast("Notion AI generating text...", "info");
-        let htmlBlock = "";
-
-        if (action === "summary") {
-            const itemsSummary = orders.map(o => `<li><strong>Order ${o.id}</strong> (Train: ${o.trainNo}) is ${o.status}.</li>`).join("");
-            htmlBlock = `
-                <h2>Operational Shift Handover summary</h2>
-                <hr>
-                <p><strong>Notion AI Summary:</strong> Daily Sales Total: ₹${dailyRevenue.toFixed(2)} across ${ordersFilledCount} deliveries. AI Commissions: ₹${aiCommissions.toFixed(2)}.</p>
-                <ul>
-                    ${itemsSummary || "<li>No active orders currently.</li>"}
-                </ul>
-            `;
-        } else if (action === "shortage") {
-            const lowStocks = inventory.filter(i => i.stock <= i.minStock);
-            const itemsSummary = lowStocks.map(i => `<li><strong>${i.name}</strong>: Current stock ${i.stock} (Min: ${i.minStock}).</li>`).join("");
-            htmlBlock = `
-                <h2>Stall Procurement Restock List</h2>
-                <hr>
-                <p>Safety limit warning. Please order:</p>
-                <ul>
-                    ${itemsSummary || "<li>All stocks are above threshold levels.</li>"}
-                </ul>
-            `;
-        } else if (action === "incident") {
-            htmlBlock = `
-                <h2>Incident Log: Platform Shift Rerouting</h2>
-                <hr>
-                <p><strong>AI routing memo:</strong> Platform rescheduled. Train Jan Shatabdi shifted Platform 3 ➔ 5. Auto-shifted orders to partner stall. Refunding credited.</p>
-            `;
-        } else if (action === "custom") {
-            htmlBlock = `
-                <p><strong>AI Draft output for prompt: "${customPrompt}"</strong></p>
-                <p>Platform stall 3 is running at peak capacity. Daily Sales: ₹${dailyRevenue.toFixed(2)}. Inventory checks matched successfully. All runners online.</p>
-            `;
-        }
-
-        aiCustomPrompt.value = "";
-        streamHtml(htmlBlock);
+        showToast("Notion AI compiling daily summary...", "info");
+        
+        const htmlBlock = `
+            <h2>📈 Daily Operations Summary - Platform 3</h2>
+            <hr style="border:0; border-top:1px solid var(--border-color); margin:8px 0;">
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Shift Audit:</strong> Active Vendor Queue Sync</p>
+            <ul style="margin-top:8px; padding-left:20px; line-height:1.6;">
+                <li><strong>Total Orders Dispatched:</strong> 156</li>
+                <li><strong>Daily Sales Revenue:</strong> ₹12,740.00</li>
+                <li><strong>Top Selling Product:</strong> Water Bottle 1L</li>
+                <li><strong>Missed Orders Count:</strong> 3</li>
+                <li><strong>Estimated Lost Revenue:</strong> ₹420.00</li>
+                <li><strong>Tomorrow's Forecasted Demand:</strong> ₹15,300.00</li>
+                <li><strong>AI Relocations Commission Saved:</strong> ₹${(statsReallocatedCountVal * 18).toFixed(2)}</li>
+            </ul>
+            <p style="margin-top:8px; background:rgba(16,185,129,0.06); padding:6px 10px; border-radius:4px; border-left:3px solid #10b981;">
+                <strong>AI Note:</strong> Demand forecast is high for tomorrow. Ensure Water Bottles inventory is stocked at 60+ units prior to the 08:30 shift.
+            </p>
+        `;
+        
+        typewriterStreamReport(htmlBlock);
     }
 
-    function streamHtml(html) {
+    function typewriterStreamReport(html) {
         if (!editorContent) return;
         editorContent.innerHTML = "";
         
         const tempSpan = document.createElement("span");
-        tempSpan.className = "ai-streaming-text";
         editorContent.appendChild(tempSpan);
-
+        
         const words = html.trim().split(/\s+/);
         let idx = 0;
         
@@ -1290,9 +1361,83 @@ document.addEventListener("DOMContentLoaded", () => {
                 editorContent.innerHTML = html;
                 
                 playSynthSound('success');
-                showToast("Notion AI draft completed!", "success");
+                showToast("Notion AI report generated successfully!", "success");
             }
-        }, 50);
+        }, 30);
+    }
+
+    if (btnPushReportToNotion) {
+        btnPushReportToNotion.addEventListener("click", () => {
+            playSynthSound('click');
+            
+            const notionSyncModal = document.getElementById("notionSyncModal");
+            const syncModalText = document.getElementById("syncModalText");
+            const syncProgressFill = document.getElementById("syncProgressFill");
+            
+            if (notionSyncModal) {
+                notionSyncModal.classList.add("active");
+                if (syncProgressFill) syncProgressFill.style.width = "0%";
+                if (syncModalText) syncModalText.textContent = "Writing block children to parent page ID...";
+                
+                let progress = 0;
+                const timer = setInterval(() => {
+                    progress += 20;
+                    if (syncProgressFill) syncProgressFill.style.width = `${progress}%`;
+                    
+                    if (progress === 40) {
+                        if (syncModalText) syncModalText.textContent = "Syncing operations statistics metrics...";
+                    }
+                    if (progress === 80) {
+                        if (syncModalText) syncModalText.textContent = "Uploading bullet structures to cloud databases...";
+                    }
+                    
+                    if (progress >= 100) {
+                        clearInterval(timer);
+                        notionSyncModal.classList.remove("active");
+                        
+                        const time = new Date().toLocaleTimeString();
+                        const headersStr = JSON.stringify({
+                            "Authorization": "Bearer secret_notion_key_xxxxxxxx",
+                            "Notion-Version": "2022-06-28",
+                            "Content-Type": "application/json"
+                        }, null, 2);
+                        
+                        const payloadStr = JSON.stringify({
+                            "parent": { "page_id": notionConfig.parentPageId || "notion_parent_page_id" },
+                            "properties": {
+                                "title": [{ "text": { "content": "Daily Summary Operations Report" } }]
+                            },
+                            "children": [
+                                {
+                                    "object": "block",
+                                    "type": "heading_2",
+                                    "heading_2": {
+                                        "rich_text": [{ "text": { "content": "Daily Summary Operations Report" } }]
+                                    }
+                                },
+                                {
+                                    "object": "block",
+                                    "type": "bulleted_list_item",
+                                    "bulleted_list_item": {
+                                        "rich_text": [{ "text": { "content": "Orders Dispatched: 156 | Revenue: ₹12,740" } }]
+                                    }
+                                }
+                            ]
+                        }, null, 2);
+                        
+                        logApi("POST https://api.notion.com/v1/pages", "request");
+                        logApi(`Headers:\n${headersStr}`, "system");
+                        logApi(`Payload:\n${payloadStr}`, "payload");
+                        
+                        if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
+                        
+                        playSynthSound('success');
+                        speakText("Daily summary synced to Notion cloud.");
+                        showToast("Daily summary synced to Notion!", "success");
+                    }
+                }, 300);
+            }
+        });
     }
 
     if (btnCopyNote) {
@@ -1304,7 +1449,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.getSelection().addRange(range);
             document.execCommand("copy");
             window.getSelection().removeAllRanges();
-            showToast("Note content copied to clipboard!", "success");
+            showToast("Report content copied to clipboard!", "success");
         });
     }
 
