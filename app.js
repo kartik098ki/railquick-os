@@ -1,16 +1,31 @@
 /* ==========================================================================
-   RAILQUICK VENDOR MOBILE OS - STALL ENGINE LOGIC (AUTONOMOUS AI EDITION)
+   RAILQUICK VENDOR OS v4 — FULL ENGINE (ULTRA EDITION)
+   Features: Smart ETA countdown, AI voice desk, live radar, handoff timer,
+   5-tab navigation, advanced inventory, analytics charts, staff roster,
+   order filtering, pack tracking, toast system, AI report generation
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ==========================================================================
-    // INITIAL SYSTEM STATES
-    // ==========================================================================
 
-    // Generate OTP helper
-    function generateOTP() {
-        return Math.floor(1000 + Math.random() * 9000).toString();
-    }
+    // ==========================================================================
+    // STATE
+    // ==========================================================================
+    let state = {
+        orderFilter: 'all',
+        inventoryFilter: 'All',
+        inventorySearch: '',
+        currentTab: 'orders',
+        rushMode: false,
+        isListening: false,
+        totalRevenue: 2840,
+        ordersFilled: 18,
+        aiAssists: 4,
+    };
+
+    // ==========================================================================
+    // DATA
+    // ==========================================================================
+    function genOTP() { return Math.floor(1000 + Math.random() * 9000).toString(); }
 
     let orders = [
         {
@@ -27,9 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 { name: "Veg Cutlet", qty: 2, packed: false }
             ],
             status: "Pending",
-            source: "Platform 3 Express (Us)",
+            source: "Platform 3 Express",
             reallocated: false,
-            otp: generateOTP()
+            otp: genOTP(),
+            amount: 140,
+            coach: "A1-A3"
         },
         {
             id: "RQ-1085",
@@ -44,10 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 { name: "Paneer Tikka Roll", qty: 1, packed: false },
                 { name: "Water Bottle 1L", qty: 1, packed: false }
             ],
-            status: "Pending",
-            source: "Platform 3 Express (Us)",
+            status: "Preparing",
+            source: "Platform 3 Express",
             reallocated: false,
-            otp: generateOTP()
+            otp: genOTP(),
+            amount: 140,
+            coach: "B2"
         },
         {
             id: "RQ-1089",
@@ -63,1841 +82,984 @@ document.addEventListener("DOMContentLoaded", () => {
                 { name: "Chai (Flask)", qty: 1, packed: false }
             ],
             status: "Pending",
-            source: "Platform 3 Express (Us)",
+            source: "Platform 3 Express",
             reallocated: false,
-            otp: generateOTP()
+            otp: genOTP(),
+            amount: 135,
+            coach: "C1"
         }
     ];
 
+    const svgIcons = {
+        Food: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/><path d="M6 20h12"/></svg>`,
+        Beverage: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22v-3"/><path d="M16 22v-3"/><path d="M12 22v-4"/><path d="M12 18H8"/><path d="M12 18h4"/><path d="M5 4h14l-1.5 14h-11Z"/><path d="M12 4v4"/></svg>`,
+        Snack: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`, // simplified placeholder
+        Other: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>`
+    };
+
     let inventory = [
-        { id: 1, name: "Water Bottle 1L", category: "Beverage", stock: 18, minStock: 15, price: 20 },
-        { id: 2, name: "Veg Cutlet", category: "Food", stock: 42, minStock: 10, price: 40 },
-        { id: 3, name: "Chai (Flask)", category: "Beverage", stock: 3, minStock: 5, price: 30 },
-        { id: 4, name: "Paneer Tikka Roll", category: "Food", stock: 25, minStock: 8, price: 120 },
-        { id: 5, name: "Samosa Plate", category: "Snack", stock: 0, minStock: 12, price: 35 }
+        { id: 1, name: "Water Bottle 1L", category: "Beverage", stock: 18, minStock: 15, price: 20, icon: svgIcons.Beverage },
+        { id: 2, name: "Veg Cutlet", category: "Food", stock: 42, minStock: 10, price: 40, icon: svgIcons.Food },
+        { id: 3, name: "Chai (Flask)", category: "Beverage", stock: 3, minStock: 5, price: 30, icon: svgIcons.Beverage },
+        { id: 4, name: "Paneer Tikka Roll", category: "Food", stock: 25, minStock: 8, price: 120, icon: svgIcons.Food },
+        { id: 5, name: "Samosa Plate", category: "Snack", stock: 0, minStock: 12, price: 35, icon: svgIcons.Snack },
+        { id: 6, name: "Biscuit Pack", category: "Snack", stock: 60, minStock: 20, price: 15, icon: svgIcons.Snack },
+        { id: 7, name: "Cold Drink 500ml", category: "Beverage", stock: 8, minStock: 20, price: 35, icon: svgIcons.Beverage },
+        { id: 8, name: "Veg Thali", category: "Food", stock: 12, minStock: 5, price: 150, icon: svgIcons.Food },
     ];
 
     let activeTrains = [
-        { no: "12423", name: "Rajdhani Exp", platform: 3, eta: 120, status: "On Time" },
-        { no: "12260", name: "Duronto Express", platform: 1, eta: 240, status: "On Time" },
-        { no: "12056", name: "Jan Shatabdi", platform: 3, eta: 340, status: "On Time" },
-        { no: "22416", name: "Vande Bharat", platform: 4, eta: 600, status: "On Time" },
-        { no: "12952", name: "Mumbai Rajdhani", platform: 3, eta: 820, status: "On Time" }
+        { no: "12423", name: "Rajdhani Express", etaSeconds: 120, platform: 3, color: "urgent" },
+        { no: "12056", name: "Jan Shatabdi", etaSeconds: 340, platform: 3, color: "warning" },
+        { no: "12952", name: "Mumbai Rajdhani", etaSeconds: 820, platform: 3, color: "normal" },
     ];
 
-    // Stall Earnings Ledger Model
-    let dailyRevenue = 2840.00;
-    let ordersFilledCount = 18;
-    let aiCommissions = 360.00;
+    const hourlyData = [
+        { hour: "09", orders: 4, revenue: 320 },
+        { hour: "10", orders: 7, revenue: 580 },
+        { hour: "11", orders: 12, revenue: 940 },
+        { hour: "12", orders: 6, revenue: 480 },
+        { hour: "13", orders: 9, revenue: 720 },
+        { hour: "14", orders: 5, revenue: 400 },
+    ];
 
-    let statsReallocatedCountVal = 4;
-    let customColumns = [];
-    let prioritizedOrderId = null;
+    // AI Response Matrix (Hindi + English)
+    const aiResponses = {
+        "prioritize orders": [
+            "Priority Analysis:\n1st: RQ-1082 (Rajdhani - 2min!)\n2nd: RQ-1085 (Shatabdi - 5min)\n3rd: RQ-1089 (Mumbai Raj - 13min)\n\nSabse pehle Chai aur Cutlet pack karo!",
+            "Queue sorted! Rajdhani arrives FIRST. RQ-1082 pack karo abhi — sirf 2 minute hain!"
+        ],
+        "check trains": [
+            "Train Schedule:\n• Rajdhani #12423 → Platform 3, ETA 2min (URGENT!)\n• Jan Shatabdi #12056 → Platform 3, ETA ~5min\n• Mumbai Raj #12952 → Platform 3, ETA ~13min\n\nTeen train ek saath aa rahi hain!",
+            "Live Radar:\n1. Train 1 (P3) — 2 min away [CRITICAL]\n2. Train 2 (P3) — 5 min away [WARNING]\n3. Train 3 (P3) — 13 min away [NORMAL]"
+        ],
+        "stock status": [
+            "Stock Report:\n[CRITICAL] Samosa Plate: 0 units (OUT!)\n[WARNING] Chai Flask: 3 units (LOW)\n[WARNING] Water Bottle: 18 units (LOW)\n[OK] Veg Cutlet: 42 units\n\nSamosa aur Chai refill karo jaldi!",
+            "Critical items: Samosa 0 units, Chai 3 units. Refill urgent hai!"
+        ],
+        "daily revenue": [
+            "Aaj ki report:\nTotal: ₹2,840\nOrders: 18 filled\nAI Assists: 4\nBest Hour: 11:00 (₹940)\n\nKal se bhi zyada ho sakta hai!",
+            "Revenue ₹2,840 today! 18 orders filled. Target was ₹2,500 — 13.6% above target!"
+        ],
+        "rush mode": [
+            "Rush Mode ACTIVATED!\nSab staff alert kar do!\nOrder queue prioritized.\nPackaging speed: MAX",
+            "Rush Mode ON! Teen trains ek saath. Haath badhao, sabko ek-ek order de do!"
+        ],
+        "hello": [
+            "Namaste! Main RailQuick AI hoon.\nAaj Platform 3 pe:\n• 3 active orders\n• 3 trains incoming\n• Revenue ₹2,840\n\nKya help chahiye?",
+            "Namaste! Sab theek hai. 3 orders ready hain, pehle Rajdhani Express ka order pack karo!"
+        ],
+        "default": [
+            "Samajh gaya! Order queue check karo aur sabse urgent item pehle pack karo.",
+            "AI suggest karta hai: Train arrival ke basis pe orders sort kiye gaye hain. Pehle wala order sabse urgent hai!"
+        ]
+    };
 
     // ==========================================================================
-    // AUDIO SYNTHESIS ENGINE
+    // CLOCK
     // ==========================================================================
-    let audioCtx = null;
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+    function updateClock() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('headerClock').textContent = `${hh}:${mm}`;
     }
-
-    function playSynthSound(type) {
-        initAudio();
-        if (!audioCtx) return;
-        
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        const now = audioCtx.currentTime;
-        
-        if (type === 'click') {
-            osc.frequency.setValueAtTime(800, now);
-            gain.gain.setValueAtTime(0.04, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-            osc.start(now);
-            osc.stop(now + 0.04);
-        } else if (type === 'typewriter') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, now);
-            gain.gain.setValueAtTime(0.015, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
-            osc.start(now);
-            osc.stop(now + 0.015);
-        } else if (type === 'success') {
-            osc.frequency.setValueAtTime(523.25, now); // C5
-            osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-            osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
-            osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
-            gain.gain.setValueAtTime(0.06, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-            osc.start(now);
-            osc.stop(now + 0.45);
-        } else if (type === 'warning') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(261.63, now); // C4
-            osc.frequency.exponentialRampToValueAtTime(130.81, now + 0.35); // C3
-            gain.gain.setValueAtTime(0.04, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-            osc.start(now);
-            osc.stop(now + 0.35);
-        } else if (type === 'critical') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(987.77, now); // B5
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.setValueAtTime(0, now + 0.08);
-            gain.gain.setValueAtTime(0.05, now + 0.16);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-            osc.start(now);
-            osc.stop(now + 0.35);
-        }
-    }
-
-    function speakAlert(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.05;
-            window.speechSynthesis.speak(utterance);
-        }
-    }
+    updateClock();
+    setInterval(updateClock, 30000);
 
     // ==========================================================================
-    // TOAST NOTIFICATIONS
+    // TOAST SYSTEM
     // ==========================================================================
-    const toastContainer = document.getElementById("toastContainer");
-    function showToast(message, type = "info") {
-        const toast = document.createElement("div");
+    function showToast(message, type = 'info', duration = 3500) {
+        const container = document.getElementById('toastContainer');
+        const icons = {
+            success: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            error: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+            warning: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+            info: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+        };
+        const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        
-        let label = "INFO";
-        if (type === "success") label = "OK";
-        if (type === "warning") label = "WARN";
-        if (type === "danger") label = "ALERT";
-        
-        toast.innerHTML = `<span class="toast-label">${label}</span> <span>${message}</span>`;
-        toastContainer.appendChild(toast);
-        
+        toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${message}</span>`;
+        container.appendChild(toast);
         setTimeout(() => {
-            toast.style.animation = "toastSlideUp 0.3s ease-in reverse forwards";
-            setTimeout(() => { toast.remove(); }, 300);
-        }, 4000);
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
     }
 
     // ==========================================================================
-    // STALL LEDGER RENDERER
+    // TAB NAVIGATION
     // ==========================================================================
-    const salesTotalRevenue = document.getElementById("salesTotalRevenue");
-    const salesOrdersFilled = document.getElementById("salesOrdersFilled");
-    const salesAiCommissions = document.getElementById("salesAiCommissions");
+    const navItems = document.querySelectorAll('.nav-item[data-tab]');
+    const tabViews = document.querySelectorAll('.tab-view');
 
-    function renderLedger() {
-        if (salesTotalRevenue) salesTotalRevenue.textContent = `₹${dailyRevenue.toFixed(2)}`;
-        if (salesOrdersFilled) salesOrdersFilled.textContent = ordersFilledCount;
-        if (salesAiCommissions) salesAiCommissions.textContent = statsReallocatedCountVal;
+    function switchTab(tabId) {
+        state.currentTab = tabId;
+        navItems.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+        tabViews.forEach(view => view.classList.toggle('active', view.id === `tab-${tabId}`));
+        if (tabId === 'analytics') renderAnalyticsCharts();
     }
 
-    // ==========================================================================
-    // SIDEBAR NAVIGATION SYSTEM
-    // ==========================================================================
-    const navItems = document.querySelectorAll(".app-bottom-nav .nav-item");
-    const tabViews = document.querySelectorAll(".tab-view");
-
-    navItems.forEach(item => {
-        item.addEventListener("click", () => {
-            playSynthSound('click');
-            const targetTab = item.getAttribute("data-tab");
-            
-            navItems.forEach(nav => nav.classList.remove("active"));
-            item.classList.add("active");
-            
-            tabViews.forEach(view => {
-                view.classList.remove("active");
-                if (view.id === `tab-${targetTab}`) {
-                    view.classList.add("active");
-                }
-            });
-        });
+    navItems.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
     // ==========================================================================
-    // TIMETABLE TIMELINES RENDERER
+    // ETA COUNTDOWN ENGINE
     // ==========================================================================
-    const upcomingTrainsList = document.getElementById("upcomingTrainsList");
-
-    function renderTimetable() {
-        if (!upcomingTrainsList) return;
-        upcomingTrainsList.innerHTML = "";
-
-        activeTrains.forEach(train => {
-            // ONLY SHOW OUR STALL'S PLATFORM (PLATFORM 3)
-            if (train.platform !== 3) return;
-
-            const isRescheduled = train.status === "Rescheduled";
-            const badgeClass = isRescheduled ? "ticker-train-badge rescheduled-badge" : "ticker-train-badge";
-            
-            let etaString = "Arrived";
-            if (train.eta > 0) {
-                const min = Math.floor(train.eta / 60);
-                const sec = train.eta % 60;
-                etaString = `${min}m ${sec}s`;
-            }
-
-            const badge = document.createElement("div");
-            badge.className = badgeClass;
-            badge.innerHTML = `
-                <span style="font-weight: 700; color: var(--text-main);">${train.no}</span>
-                <span style="color: var(--text-muted); font-size:10px;">ETA ${etaString}</span>
-                <span style="font-size: 8px; font-weight:700; padding: 2px 5px; border-radius:3px; background: ${isRescheduled ? 'var(--accent-orange-soft)' : 'var(--accent-green-soft)'}; color: ${isRescheduled ? 'var(--accent-orange)' : 'var(--accent-green)'}; border: 1px solid ${isRescheduled ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; text-transform: uppercase;">${train.status}</span>
-            `;
-            upcomingTrainsList.appendChild(badge);
-        });
+    function formatETA(seconds) {
+        if (seconds <= 0) return "00:00";
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
-    // ==========================================================================
-    // ORDERS QUEUE LOGIC
-    // ==========================================================================
-    const statsPendingCount = document.getElementById("statsPendingCount");
-    const statsUrgentCount = document.getElementById("statsUrgentCount");
-    const statsReallocatedCount = document.getElementById("statsReallocatedCount");
-    const activeOrdersBadge = document.getElementById("activeOrdersBadge");
-    const activeOrdersContainer = document.getElementById("active-orders-container");
-
-    function renderOrders() {
-        if (!activeOrdersContainer) return;
-        activeOrdersContainer.innerHTML = "";
-        
-        let pendingCount = 0;
-        let urgentCount = 0;
-
-        orders.forEach(order => {
-            if (order.status === "Delivered" || order.status === "Relocated") return;
-            // ONLY SHOW ORDERS SCHEDULED FOR OUR PLATFORM (PLATFORM 3)
-            if (order.actualPlatform !== 3) return;
-            
-            pendingCount++;
-            const isUrgent = order.etaSeconds <= 300; 
-            if (isUrgent) urgentCount++;
-
-            const etaMin = Math.floor(order.etaSeconds / 60);
-            const etaSec = order.etaSeconds % 60;
-            const etaString = `${etaMin}m ${etaSec}s`;
-
-            // Interactive Packing Checklist rendering
-            let itemsChecklist = `<div class="prep-item-checklist" data-order-id="${order.id}">`;
-            order.items.forEach((item, idx) => {
-                const isChecked = item.packed ? "checked" : "";
-                itemsChecklist += `
-                    <div class="checklist-row ${isChecked}" data-order-id="${order.id}" data-item-idx="${idx}">
-                        <div class="checkbox-box"></div>
-                        <span class="checklist-text" style="font-weight:600; color:var(--text-main); font-size:12.5px;">${item.qty}x ${item.name}</span>
-                    </div>
-                `;
-            });
-            itemsChecklist += `</div>`;
-
-            let cardClass = isUrgent ? "critical" : "upcoming";
-            if (prioritizedOrderId === order.id) {
-                cardClass += " prioritized-highlight";
-            }
-
-            // Smart Packing Assistant Logic
-            let totalQty = 0;
-            let hasChai = false;
-            order.items.forEach(i => {
-                totalQty += i.qty;
-                if (i.name.includes("Chai")) hasChai = true;
-            });
-            
-            let packType = "Small";
-            let packTime = "20s";
-            if (totalQty >= 5) {
-                packType = "Large";
-                packTime = "55s";
-            } else if (totalQty >= 3) {
-                packType = "Medium";
-                packTime = "35s";
-            }
-            const fragileItems = hasChai ? "Chai Flask" : "None";
-
-            // Smart Order Priority Engine Badges
-            const isCritical = order.etaSeconds <= 480; // 8 minutes threshold
-            const priorityText = isCritical ? "Critical" : "Normal";
-            const priorityClass = isCritical ? "critical" : "normal";
-            const priorityString = `<span class="priority-badge ${priorityClass}">${priorityText}</span>`;
-
-            // Dynamic glow on READY button when all packed
-            const allPacked = order.items.every(i => i.packed);
-            const packBtnText = allPacked ? "PACKED" : "PACK";
-            const packBtnStyle = allPacked ? "background: var(--accent-green-soft); color: var(--accent-green); border-color: rgba(16,185,129,0.25);" : "";
-            const readyBtnStyle = allPacked ? "background: var(--accent-purple) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);" : "";
-
-            const card = document.createElement("div");
-            card.className = `order-touch-card ${cardClass}`;
-            card.setAttribute("data-id", order.id);
-            card.innerHTML = `
-                <div class="card-header-row">
-                    <span class="order-id-lbl">${order.id}</span>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <span class="otp-badge" style="font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent-purple); background: var(--accent-purple-soft); padding: 2px 6px; border: 1px dashed var(--accent-purple); border-radius: var(--r-sm);">OTP: ${order.otp}</span>
-                        ${priorityString}
-                    </div>
-                </div>
-                <div class="card-details-block">
-                    ${itemsChecklist}
-                    
-                    <!-- Smart Packing Assistant Guide -->
-                    <div class="packing-assistant-guide">
-                        <div class="guide-item">
-                            <span class="guide-lbl">Pack Type</span>
-                            <span class="guide-val">${packType}</span>
-                        </div>
-                        <div class="guide-item">
-                            <span class="guide-lbl">Est. Pack</span>
-                            <span class="guide-val">${packTime}</span>
-                        </div>
-                        <div class="guide-item">
-                            <span class="guide-lbl">Fragile</span>
-                            <span class="guide-val ${fragileItems !== "None" ? "urgent-pack" : ""}">${fragileItems}</span>
-                        </div>
-                    </div>
-
-                    <div class="runner-meta-row">
-                        <span>Platform ${order.actualPlatform}</span>
-                        <span>ETA: ${etaString} (Train ${order.trainNo})</span>
-                    </div>
-                </div>
-                <div class="card-actions-row">
-                    <button class="card-btn pack" data-id="${order.id}" style="${packBtnStyle}">${packBtnText}</button>
-                    <button class="card-btn ready" data-id="${order.id}" style="${readyBtnStyle}">READY</button>
-                    <button class="card-btn reallocate" data-id="${order.id}">REALLOCATE</button>
-                </div>
-            `;
-            activeOrdersContainer.appendChild(card);
-        });
-
-        // Update stats
-        if (statsPendingCount) statsPendingCount.textContent = pendingCount;
-        if (statsUrgentCount) statsUrgentCount.textContent = urgentCount;
-        if (statsReallocatedCount) statsReallocatedCount.textContent = statsReallocatedCountVal;
-        if (activeOrdersBadge) activeOrdersBadge.textContent = pendingCount;
-
-        // Bind checklist rows click
-        document.querySelectorAll(".checklist-row").forEach(row => {
-            row.addEventListener("click", (e) => {
-                e.stopPropagation();
-                playSynthSound('click');
-                const orderId = row.getAttribute("data-order-id");
-                const itemIdx = parseInt(row.getAttribute("data-item-idx"), 10);
-                
-                const targetOrder = orders.find(o => o.id === orderId);
-                if (targetOrder && targetOrder.items[itemIdx]) {
-                    targetOrder.items[itemIdx].packed = !targetOrder.items[itemIdx].packed;
-                    
-                    // If all packed now, play success chime
-                    const allPacked = targetOrder.items.every(i => i.packed);
-                    if (allPacked) {
-                        playSynthSound('success');
-                        showToast(`All items packed for ${orderId}! Tap READY to dispatch.`, "success");
-                    }
-                    
-                    renderOrders();
-                }
-            });
-        });
-
-        // Card button actions
-        document.querySelectorAll(".card-btn.pack").forEach(btn => {
-            btn.addEventListener("click", () => {
-                playSynthSound('click');
-                const id = btn.getAttribute("data-id");
-                const targetOrder = orders.find(o => o.id === id);
-                if (targetOrder) {
-                    targetOrder.items.forEach(item => item.packed = true);
-                    playSynthSound('success');
-                    showToast(`All items packed for ${id}! Tap READY to dispatch.`, "success");
-                    renderOrders();
-                }
-            });
-        });
-
-        document.querySelectorAll(".card-btn.ready").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const id = btn.getAttribute("data-id");
-                const order = orders.find(o => o.id === id);
-                if (!order) return;
-                
-                // Open OTP Verification Modal
-                playSynthSound('click');
-                const otpModal = document.getElementById("otpVerificationModal");
-                const otpModalOrderId = document.getElementById("otpModalOrderId");
-                const otpInput = document.getElementById("otpInput");
-                const otpErrorMsg = document.getElementById("otpErrorMsg");
-                
-                if (otpModal && otpModalOrderId && otpInput && otpErrorMsg) {
-                    otpModalOrderId.textContent = order.id;
-                    otpInput.value = "";
-                    otpErrorMsg.style.display = "none";
-                    otpModal.classList.add("active");
-                    otpModal.setAttribute("data-verifying-id", order.id);
-                    setTimeout(() => otpInput.focus(), 100);
-                }
-            });
-        });
-
-        document.querySelectorAll(".card-btn.reallocate").forEach(btn => {
-            btn.addEventListener("click", () => {
-                playSynthSound('warning');
-                const id = btn.getAttribute("data-id");
-                orders = orders.filter(o => o.id !== id);
-                statsReallocatedCountVal++;
-                
-                // Earn reallocated commission refund
-                dailyRevenue += 120.00;
-                aiCommissions += 18.00;
-                renderLedger();
-
-                showToast(`AI REALLOCATION: Order ${id} shifted to partner stall.`, "warning");
-                renderOrders();
-            });
-        });
+    function getUrgencyClass(seconds) {
+        if (seconds <= 90) return 'critical';
+        if (seconds <= 300) return 'warning';
+        return 'normal';
     }
 
-    // Active counts loops
+    function getUrgencyPriority(seconds) {
+        if (seconds <= 90) return 'priority-critical';
+        if (seconds <= 300) return 'priority-warning';
+        return 'priority-normal';
+    }
+
+    // Tick ETAs every second
     setInterval(() => {
-        let rerender = false;
-        
-        // Countdown train arrivals
-        activeTrains.forEach(train => {
-            if (train.eta > 0) {
-                train.eta--;
-                rerender = true;
-            }
-        });
-
-        // Countdown orders ETA
         orders.forEach(order => {
-            if (order.status !== "Delivered" && order.status !== "Relocated" && order.etaSeconds > 0) {
+            if (order.etaSeconds > 0 && order.status !== 'Delivered') {
                 order.etaSeconds--;
-                rerender = true;
+            }
+        });
+        activeTrains.forEach(train => {
+            if (train.etaSeconds > 0) train.etaSeconds--;
+        });
 
-                if (order.etaSeconds === 300) {
-                    playSynthSound('critical');
-                    speakAlert(`Train ${order.trainNo} arriving in 5 minutes.`);
-                    showToast(`Urgent: Train ${order.trainNo} arriving in 5 mins!`, "danger");
-                }
-                
-                if (order.etaSeconds === 0) {
-                    order.status = "Relocated";
-                    playSynthSound('warning');
-                    showToast(`Order ${order.id} expired.`, "danger");
-                }
+        // Update all visible ETA elements
+        orders.forEach(order => {
+            const el = document.getElementById(`eta-${order.id}`);
+            if (el) {
+                el.textContent = formatETA(order.etaSeconds);
+                el.className = `eta-countdown ${getUrgencyClass(order.etaSeconds)}`;
             }
         });
 
-        // Check for Rush Hour Mode
-        const rushHourBanner = document.getElementById("rushHourBanner");
-        const rushModeOrders = document.getElementById("rushModeOrders");
-        if (rushHourBanner) {
-            const isRushActive = activeTrains.some(t => t.platform === 3 && t.eta > 0 && t.eta <= 360) || 
-                                 orders.some(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated" && o.etaSeconds > 0 && o.etaSeconds <= 360);
-            
-            if (isRushActive) {
-                rushHourBanner.classList.add("active");
-                const pendingCount = orders.filter(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated").length;
-                if (rushModeOrders) rushModeOrders.textContent = `Pending: ${pendingCount} orders`;
-            } else {
-                rushHourBanner.classList.remove("active");
+        // Update train ticker
+        activeTrains.forEach(train => {
+            const el = document.getElementById(`badge-${train.no}`);
+            if (el) {
+                const cls = train.etaSeconds <= 90 ? 'urgent' : train.etaSeconds <= 300 ? 'warning' : 'normal';
+                train.color = cls;
+                el.className = `train-arrival-badge ${cls}`;
+                el.querySelector('.badge-eta').textContent = formatETA(train.etaSeconds);
             }
-        }
+        });
 
-        // Update Prioritizer Agent status based on active platform 3 orders
-        const topOrder = getTopPriorityOrder();
-        updateAgentStatus("prioritizer", topOrder ? "ACTIVE" : "IDLE");
-
-        if (rerender) {
-            renderOrders();
-            renderTimetable();
-            renderRadar();
-        }
+        updateHandoffTimer();
+        updateNextTrainStrip();
+        updateRushMode();
+        updateRadar();
     }, 1000);
 
     // ==========================================================================
-    // NEW ORDER ARRIVAL POPUP MODAL
+    // TRAIN TICKER
     // ==========================================================================
-    function showIncomingOrderPopup(newOrder) {
-        playSynthSound('critical');
-        speakAlert(`New order re-routing request ${newOrder.id} received.`);
-        
-        const modal = document.getElementById("orderArrivalModal");
-        const popupOrderId = document.getElementById("popupOrderId");
-        const popupOrderTrain = document.getElementById("popupOrderTrain");
-        const popupOrderItems = document.getElementById("popupOrderItems");
-        const popupOrderEta = document.getElementById("popupOrderEta");
-        
-        if (modal && popupOrderId && popupOrderTrain && popupOrderItems && popupOrderEta) {
-            popupOrderId.textContent = newOrder.id;
-            popupOrderTrain.textContent = `${newOrder.trainName} (${newOrder.trainNo}) • Platform ${newOrder.actualPlatform}`;
-            
-            let itemsHtml = "";
-            newOrder.items.forEach(item => {
-                itemsHtml += `<div style="padding: 2px 0;">• ${item.qty}x ${item.name}</div>`;
-            });
-            popupOrderItems.innerHTML = itemsHtml;
-            
-            const etaMin = Math.floor(newOrder.etaSeconds / 60);
-            const etaSec = newOrder.etaSeconds % 60;
-            popupOrderEta.textContent = `ETA: ${etaMin}m ${etaSec}s`;
-            
-            modal.classList.add("active");
-            
-            // Countdown timer inside the popup
-            let popupTimerSeconds = newOrder.etaSeconds;
-            const countdownInterval = setInterval(() => {
-                popupTimerSeconds--;
-                if (popupTimerSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    modal.classList.remove("active");
-                } else {
-                    const min = Math.floor(popupTimerSeconds / 60);
-                    const sec = popupTimerSeconds % 60;
-                    popupOrderEta.textContent = `ETA: ${min}m ${sec}s`;
-                }
-            }, 1000);
-            
-            const btnAccept = document.getElementById("btnAcceptOrder");
-            const btnReject = document.getElementById("btnRejectOrder");
-            
-            function closePopup() {
-                modal.classList.remove("active");
-                clearInterval(countdownInterval);
-            }
-            
-            btnAccept.onclick = () => {
-                playSynthSound('success');
-                closePopup();
-                
-                // Add order to list
-                orders.push(newOrder);
-                showToast(`Order ${newOrder.id} accepted! Added to active queue.`, "success");
-                
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                addLogEntry(time, `AI AUTO-ROUTER: Accepted Order ${newOrder.id} assigned to Platform 3 Express (Us).`, "success");
-                
-                renderOrders();
-                renderPlatformMap();
-                renderTimetable();
-            };
-            
-            btnReject.onclick = () => {
-                playSynthSound('warning');
-                closePopup();
-                
-                // Divert to partner
-                statsReallocatedCountVal++;
-                dailyRevenue += 120.00;
-                aiCommissions += 18.00;
-                renderLedger();
-                
-                showToast(`Reassigned: Order ${newOrder.id} reallocated to partner vendor.`, "warning");
-                
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                addLogEntry(time, `AI AUTO-ROUTER: Order ${newOrder.id} rejected and shifted back to partner vendor.`, "warning");
-                
-                renderOrders();
-                renderPlatformMap();
-                renderTimetable();
-            };
-        }
-    }
-
-    // ==========================================================================
-    // AUTONOMOUS AI RELOCATION SIMULATOR
-    // ==========================================================================
-    // AI autonomously reschedules platforms and reallocates orders every 32 seconds!
-    let simulationState = 0;
-    
-    setInterval(() => {
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-         if (simulationState === 0) {
-            // Shift train Jan Shatabdi (12056) from Platform 3 to Platform 5
-            const janShatabdi = activeTrains.find(t => t.no === "12056");
-            if (janShatabdi) {
-                janShatabdi.platform = 5;
-                janShatabdi.status = "Rescheduled";
-                
-                playSynthSound('warning');
-                speakAlert("AI Alert. Platform rescheduled. Jan Shatabdi shifted to platform 5.");
-                addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 → 5.", "warning");
-                
-                // Activate AI Routing Agent
-                updateAgentStatus("router", "ACTIVE");
-                setTimeout(() => {
-                    updateAgentStatus("router", "IDLE");
-                }, 8000);
-                
-                // Auto-relocate Jan Shatabdi order
-                const orderIdx = orders.findIndex(o => o.trainNo === "12056");
-                if (orderIdx !== -1) {
-                    const order = orders[orderIdx];
-                    order.status = "Relocated";
-                    
-                    setTimeout(() => {
-                        addLogEntry(time, `AI AUTO-ROUTER: Order ${order.id} reallocated to Platform 5 partner vendor due to proximity delay risk.`, "danger");
-                        showToast(`AI ROUTING: Order ${order.id} transferred to P5 partner.`, "warning");
-                        
-                        statsReallocatedCountVal++;
-                        // Credit commission to ledger
-                        dailyRevenue += 120.00;
-                        aiCommissions += 18.00;
-                        renderLedger();
- 
-                        orders.splice(orderIdx, 1);
-                        renderOrders();
-                        renderPlatformMap();
-                        renderTimetable();
-                    }, 1500);
-                }
-            }
-            simulationState = 1;
-        } else if (simulationState === 1) {
-            // Shift train Duronto Express (12260) from Platform 1 to Platform 3 (Us!)
-            const duronto = activeTrains.find(t => t.no === "12260");
-            if (duronto) {
-                duronto.platform = 3;
-                duronto.status = "Rescheduled";
-                
-                playSynthSound('success');
-                speakAlert("Attention. New order assigned to you from Platform 1 partner.");
-                addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 → 3.", "warning");
-                
-                // Activate AI Routing Agent
-                updateAgentStatus("router", "ACTIVE");
-                setTimeout(() => {
-                    updateAgentStatus("router", "IDLE");
-                }, 8000);
-                
-                setTimeout(() => {
-                    const newOrder = {
-                        id: "RQ-1095",
-                        trainNo: "12260",
-                        trainName: "Duronto Express",
-                        fromTo: "NDLS → Seat A2-10",
-                        scheduledPlatform: 1,
-                        actualPlatform: 3,
-                        etaSeconds: 240, // 4 mins
-                        prepTimeMinutes: 2,
-                        items: [{ name: "Veg Cutlet", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 2, packed: false }],
-                        status: "Pending",
-                        source: "Platform 1 Partner",
-                        reallocated: true,
-                        otp: generateOTP()
-                    };
-                    showIncomingOrderPopup(newOrder);
-                }, 1500);
-            }
-            simulationState = 2;
-        } else {
-            // Reset simulation states back to default schedules
-            const janShatabdi = activeTrains.find(t => t.no === "12056");
-            if (janShatabdi) {
-                janShatabdi.platform = 3;
-                janShatabdi.status = "On Time";
-                janShatabdi.eta = 340;
-            }
-            const duronto = activeTrains.find(t => t.no === "12260");
-            if (duronto) {
-                duronto.platform = 1;
-                duronto.status = "On Time";
-                duronto.eta = 240;
-            }
-            
-            orders = orders.filter(o => o.id !== "RQ-1095");
-            if (!orders.some(o => o.trainNo === "12056")) {
-                orders.push({
-                    id: "RQ-1085",
-                    trainNo: "12056",
-                    trainName: "Jan Shatabdi Express",
-                    fromTo: "DDN → NDLS",
-                    scheduledPlatform: 3,
-                    actualPlatform: 3,
-                    etaSeconds: 340,
-                    prepTimeMinutes: 4,
-                    items: [{ name: "Paneer Tikka Roll", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 1, packed: false }],
-                    status: "Pending",
-                    source: "Platform 3 Express (Us)",
-                    reallocated: false,
-                    otp: generateOTP()
-                });
-            }
-
-            // Reset water bottles alert
-            const water = inventory.find(i => i.name.includes("Water"));
-            if (water) {
-                water.stock = 18;
-                renderInventory();
-                const btnAiRefill = document.getElementById("btnAiRefill");
-                const aiCurrentBottlesStock = document.getElementById("aiCurrentBottlesStock");
-                if (btnAiRefill) btnAiRefill.style.display = "inline-block";
-                if (aiCurrentBottlesStock) aiCurrentBottlesStock.textContent = 18;
-                const cardParagraph = document.querySelector("#aiStockManagerAlert p");
-                if (cardParagraph) cardParagraph.textContent = "Water Bottles stock is low. High demand is expected due to upcoming train arrivals.";
-            }
-
-            playSynthSound('click');
-            addLogEntry(time, "Simulator loop restarted. Tracks reset to initial schedule.", "system");
-            
-            renderOrders();
-            renderPlatformMap();
-            renderTimetable();
-            simulationState = 0;
-        }
-    }, 32000);
-
-    // Helper trigger simulator button link mapping (leaves click triggers mapping)
-    if (btnSimulatePlatChange) {
-        btnSimulatePlatChange.addEventListener("click", () => {
-            playSynthSound('click');
-            showToast("Force triggering next AI relocation event...", "info");
-        });
-    }
-
-
-    // PLATFORM MAP SCHEMATIC
-    // ==========================================================================
-    function renderPlatformMap() {
-        for (let i = 1; i <= 5; i++) {
-            const slot = document.getElementById(`train-slot-${i}`);
-            if (slot) {
-                slot.innerHTML = "";
-                slot.className = "mini-train-slot";
-            }
-        }
-
-        activeTrains.forEach(train => {
-            const slot = document.getElementById(`train-slot-${train.platform}`);
-            if (slot) {
-                slot.className = "mini-train-slot active";
-                slot.innerHTML = `<span style="color:#ffffff; font-size:8px; display:block; padding:1px 4px;">${train.no}</span>`;
-            }
-        });
-    }
-
-    function addLogEntry(time, text, type) {
-        const logsBox = document.getElementById("relocationLogs");
-        if (!logsBox) return;
-        const entry = document.createElement("div");
-        entry.className = `mini-log ${type}`;
-        entry.innerHTML = `<strong>[${time}]</strong> ${text}`;
-        logsBox.prepend(entry);
-    }
-
-    // ==========================================================================
-    // STALL INVENTORY LOGIC
-    // ==========================================================================
-    const inventoryTableBody = document.getElementById("inventoryTableBody");
-    const inventorySearchInput = document.getElementById("inventorySearch");
-    const btnRestockAll = document.getElementById("btnRestockAll");
-    const restockRecommendation = document.getElementById("restockRecommendation");
-    
-    const btnAddNewItem = document.getElementById("btnAddNewItem");
-    const addItemModal = document.getElementById("addItemModal");
-    const closeItemModal = document.getElementById("closeItemModal");
-    const cancelAddItem = document.getElementById("cancelAddItem");
-    const addItemForm = document.getElementById("addItemForm");
-
-    function renderInventoryHeader() {
-        const headerRow = document.getElementById("inventoryTableHeaderRow");
-        if (!headerRow) return;
-        
-        let html = `
-            <th data-prop="name">Name</th>
-            <th data-prop="category">Category</th>
-            <th data-prop="stock">Stock Level</th>
-            <th data-prop="price">Price</th>
-            <th data-prop="status">Status</th>
-        `;
-        
-        customColumns.forEach((col, idx) => {
-            html += `
-                <th data-prop="${col.name}" class="custom-column-th" style="position: relative;">
-                    ${col.name}
-                    <span class="delete-col-btn" style="margin-left: 6px; cursor: pointer; opacity: 0.6;" data-index="${idx}">×</span>
-                </th>
+    function renderTrainTicker() {
+        const container = document.getElementById('upcomingTrainsList');
+        container.innerHTML = '';
+        activeTrains.slice().sort((a, b) => a.etaSeconds - b.etaSeconds).forEach(train => {
+            const badge = document.createElement('div');
+            badge.className = `train-arrival-badge ${train.color}`;
+            badge.id = `badge-${train.no}`;
+            badge.innerHTML = `
+                <span class="badge-dot"></span>
+                <span>${train.name.split(' ')[0]}</span>
+                <span class="badge-eta" style="font-family:var(--font-mono);font-size:10px;">${formatETA(train.etaSeconds)}</span>
             `;
+            container.appendChild(badge);
         });
-        
-        html += `
-            <th id="thAddColumn" class="add-column-header">+ Add Column</th>
-            <th>Actions</th>
-        `;
-        headerRow.innerHTML = html;
-        
-        const thAddCol = document.getElementById("thAddColumn");
-        if (thAddCol) {
-            thAddCol.addEventListener("click", (e) => {
-                e.stopPropagation();
-                playSynthSound('click');
-                const rect = thAddCol.getBoundingClientRect();
-                const popover = document.getElementById("addColumnPopover");
-                popover.style.display = "block";
-                popover.style.top = `${rect.bottom + window.scrollY + 6}px`;
-                popover.style.left = `${rect.left + window.scrollX - 100}px`;
-            });
+    }
+    renderTrainTicker();
+
+    // ==========================================================================
+    // NEXT TRAIN STRIP + HANDOFF TIMER
+    // ==========================================================================
+    function updateNextTrainStrip() {
+        const next = activeTrains.slice().sort((a, b) => a.etaSeconds - b.etaSeconds)[0];
+        if (!next) return;
+        const nameEl = document.getElementById('stripTrainName');
+        const etaEl = document.getElementById('stripEtaDisplay');
+        if (nameEl) nameEl.textContent = next.name;
+        if (etaEl) {
+            etaEl.textContent = formatETA(next.etaSeconds);
+            etaEl.className = `strip-eta ${getUrgencyClass(next.etaSeconds)}`;
         }
-        
-        headerRow.querySelectorAll(".delete-col-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const idx = parseInt(btn.getAttribute("data-index"));
-                const name = customColumns[idx].name;
-                customColumns.splice(idx, 1);
-                inventory.forEach(item => delete item[name]);
-                
-                playSynthSound('click');
-                showToast(`Removed database property "${name}"`, "warning");
-                renderInventoryHeader();
-                renderInventory();
-            });
-        });
     }
 
-    function renderInventory() {
-        if (!inventoryTableBody) return;
-        inventoryTableBody.innerHTML = "";
-        const query = inventorySearchInput.value.toLowerCase();
-        let lowStockCount = 0;
-
-        inventory.forEach(item => {
-            if (query && !item.name.toLowerCase().includes(query) && !item.category.toLowerCase().includes(query)) return;
-
-            let statusClass = "in-stock";
-            let statusText = "In Stock";
-            let fillClass = "";
-            const fillPct = Math.min(100, Math.round((item.stock / item.minStock) * 100));
-
-            if (item.stock === 0) {
-                statusClass = "out-of-stock";
-                statusText = "Out of Stock";
-                fillClass = "out";
-                lowStockCount++;
-            } else if (item.stock <= item.minStock) {
-                statusClass = "low-stock";
-                statusText = "Low Stock";
-                fillClass = "low";
-                lowStockCount++;
-            }
-
-            let customColsHtml = "";
-            customColumns.forEach(col => {
-                const val = item[col.name] !== undefined ? item[col.name] : "";
-                customColsHtml += `
-                    <td class="editable-cell" data-item-id="${item.id}" data-prop="${col.name}" data-type="${col.type}">
-                        ${col.type === 'select' && val ? `<span class="notion-tag pink">${val}</span>` : val}
-                    </td>
-                `;
-            });
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td class="editable-cell" data-item-id="${item.id}" data-prop="name" data-type="text" style="font-weight: 600;">${item.name}</td>
-                <td class="editable-cell" data-item-id="${item.id}" data-prop="category" data-type="text" style="color: var(--text-muted);">${item.category}</td>
-                <td>
-                    <div class="stock-indicator-wrapper">
-                        <span class="editable-cell" data-item-id="${item.id}" data-prop="stock" data-type="number" style="font-weight:700; width:24px; text-align:right; border-bottom: 1px dashed var(--border-strong); padding: 0 4px;">${item.stock}</span>
-                        <div class="stock-bar-bg">
-                            <div class="stock-bar-fill ${fillClass}" style="width: ${fillPct}%"></div>
-                        </div>
-                        <span style="font-size:10px; color:var(--text-muted)">Min: ${item.minStock}</span>
-                    </div>
-                </td>
-                <td class="editable-cell" data-item-id="${item.id}" data-prop="price" data-type="number" style="font-weight: 500;">₹${item.price}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                ${customColsHtml}
-                <td>
-                    <button class="action-btn secondary-btn compact-btn btn-stock-up" data-item-id="${item.id}" style="font-size:10px; padding:2px 8px; font-weight:700;" title="Restock +10">+10</button>
-                </td>
-            `;
-            inventoryTableBody.appendChild(tr);
-        });
-
-        if (lowStockCount > 0) {
-            restockRecommendation.style.display = "flex";
-            const lowItems = inventory.filter(i => i.stock <= i.minStock).map(i => i.name).join(", ");
-            document.getElementById("restockText").innerHTML = `AI predicts high passenger demand for <strong>${lowItems}</strong> due to delayed trains. Tap below to restock.`;
-            updateAgentStatus("stock", "ACTIVE");
-        } else {
-            restockRecommendation.style.display = "none";
-            updateAgentStatus("stock", "MONITORING");
+    let handoffInitialEta = orders[0]?.etaSeconds || 120;
+    function updateHandoffTimer() {
+        const urgentOrder = orders.filter(o => o.status !== 'Delivered').sort((a, b) => a.etaSeconds - b.etaSeconds)[0];
+        if (!urgentOrder) return;
+        const timerEl = document.getElementById('handoffTimer');
+        const nameEl = document.getElementById('handoffTrainName');
+        const fillEl = document.getElementById('handoffFill');
+        if (timerEl) {
+            timerEl.textContent = formatETA(urgentOrder.etaSeconds);
+            timerEl.className = `handoff-countdown ${urgentOrder.etaSeconds <= 60 ? 'urgent' : ''}`;
         }
-
-        document.querySelectorAll(".btn-stock-up").forEach(btn => {
-            btn.addEventListener("click", () => {
-                playSynthSound('click');
-                const id = parseInt(btn.getAttribute("data-item-id"));
-                const item = inventory.find(i => i.id === id);
-                if (item) {
-                    item.stock += 10;
-                    showToast(`Restocked 10 units of ${item.name}`, "success");
-                    renderInventory();
-                }
-            });
-        });
-    }
-
-    // Double click inline cell edit
-    if (inventoryTableBody) {
-        inventoryTableBody.addEventListener("dblclick", (e) => {
-            const cell = e.target.closest(".editable-cell");
-            if (!cell) return;
-            if (cell.querySelector(".cell-edit-input")) return;
-            
-            const itemId = parseInt(cell.getAttribute("data-item-id"));
-            const prop = cell.getAttribute("data-prop");
-            const type = cell.getAttribute("data-type") || "text";
-            const item = inventory.find(i => i.id === itemId);
-            if (!item) return;
-            
-            playSynthSound('click');
-            const originalVal = item[prop] !== undefined ? item[prop] : "";
-            
-            const input = document.createElement("input");
-            input.className = "cell-edit-input";
-            input.value = originalVal;
-            if (type === "number") input.type = "number";
-            
-            cell.innerHTML = "";
-            cell.appendChild(input);
-            input.focus();
-            input.select();
-            
-            let hasSaved = false;
-            function saveCellVal() {
-                if (hasSaved) return;
-                hasSaved = true;
-                
-                let newVal = input.value.trim();
-                if (type === "number") {
-                    newVal = parseFloat(newVal) || 0;
-                }
-                
-                item[prop] = newVal;
-                playSynthSound('success');
-                showToast(`Saved database property "${prop}" as "${newVal}"`, "success");
-                renderInventory();
-            }
-
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    saveCellVal();
-                } else if (e.key === "Escape") {
-                    e.preventDefault();
-                    hasSaved = true;
-                    renderInventory();
-                }
-            });
-            input.addEventListener("blur", saveCellVal);
-        });
-    }
-
-    if (btnRestockAll) {
-        btnRestockAll.addEventListener("click", () => {
-            playSynthSound('success');
-            inventory.forEach(item => {
-                if (item.stock <= item.minStock) item.stock += 25;
-            });
-            showToast("AI Auto-Restock: Replenished safety stock levels!", "success");
-            renderInventory();
-        });
-    }
-
-    const btnAiRefill = document.getElementById("btnAiRefill");
-    const aiCurrentBottlesStock = document.getElementById("aiCurrentBottlesStock");
-    if (btnAiRefill) {
-        btnAiRefill.addEventListener("click", () => {
-            playSynthSound('success');
-            const water = inventory.find(i => i.name.includes("Water"));
-            if (water) {
-                water.stock += 50;
-                renderInventory();
-                
-                if (aiCurrentBottlesStock) {
-                    aiCurrentBottlesStock.textContent = water.stock;
-                }
-                
-                btnAiRefill.style.display = "none";
-                const cardParagraph = document.querySelector("#aiStockManagerAlert p");
-                if (cardParagraph) {
-                    cardParagraph.innerHTML = "Stock levels are now optimal. Refill completed successfully!";
-                }
-                
-                speakText("Stock warning resolved. Refilled 50 bottles of water.");
-                showToast("Water Bottles refilled by 50 units!", "success");
-            }
-        });
-    }
-
-    if (inventorySearchInput) inventorySearchInput.addEventListener("input", renderInventory);
-
-    if (btnAddNewItem) btnAddNewItem.addEventListener("click", () => addItemModal.classList.add("active"));
-    if (closeItemModal) closeItemModal.addEventListener("click", () => addItemModal.classList.remove("active"));
-    if (cancelAddItem) cancelAddItem.addEventListener("click", () => addItemModal.classList.remove("active"));
-
-    if (addItemForm) {
-        addItemForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const newItem = {
-                id: inventory.length + 1,
-                name: document.getElementById("itemName").value,
-                category: document.getElementById("itemCategory").value,
-                stock: parseInt(document.getElementById("itemStock").value),
-                minStock: parseInt(document.getElementById("itemMinStock").value),
-                price: parseFloat(document.getElementById("itemPrice").value)
-            };
-            inventory.push(newItem);
-            addItemModal.classList.remove("active");
-            addItemForm.reset();
-            
-            playSynthSound('success');
-            showToast(`Added ${newItem.name} to stocks database.`, "success");
-            renderInventory();
-        });
-    }
-
-    // Dynamic Columns Creator popover
-    const addColumnPopover = document.getElementById("addColumnPopover");
-    const btnCreateColumn = document.getElementById("btnCreateColumn");
-    const newColName = document.getElementById("newColName");
-    const newColType = document.getElementById("newColType");
-
-    if (btnCreateColumn) {
-        btnCreateColumn.addEventListener("click", () => {
-            const name = newColName.value.trim();
-            const type = newColType.value;
-            
-            if (!name) {
-                showToast("Please enter a column property name", "warning");
-                return;
-            }
-
-            customColumns.push({ name, type });
-            inventory.forEach(item => {
-                item[name] = type === 'number' ? 0 : type === 'select' ? '' : '—';
-            });
-
-            newColName.value = "";
-            addColumnPopover.style.display = "none";
-
-            playSynthSound('success');
-            showToast(`Added Database property "${name}"`, "success");
-            renderInventoryHeader();
-            renderInventory();
-        });
+        if (nameEl) nameEl.textContent = `${urgentOrder.trainName} · #${urgentOrder.trainNo}`;
+        if (fillEl) {
+            const pct = Math.max(5, Math.min(100, (urgentOrder.etaSeconds / handoffInitialEta) * 100));
+            fillEl.style.width = `${pct}%`;
+        }
     }
 
     // ==========================================================================
-    // NOTION SYNC DESK CONFIG & INTERACTIVE TERMINAL
+    // RUSH MODE
     // ==========================================================================
-    let notionConfig = {
-        mode: localStorage.getItem("notion_sync_mode") === "real",
-        apiKey: localStorage.getItem("notion_api_key") || "",
-        ordersDbId: localStorage.getItem("notion_orders_db_id") || "",
-        inventoryDbId: localStorage.getItem("notion_inventory_db_id") || "",
-        parentPageId: localStorage.getItem("notion_parent_page_id") || ""
-    };
-
-    const notionSyncBtn = document.getElementById("notionSyncBtn");
-    const notionSyncModal = document.getElementById("notionSyncModal");
-    const syncProgressFill = document.getElementById("syncProgressFill");
-    const syncModalText = document.getElementById("syncModalText");
-
-    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-    const notionIntegrationMode = document.getElementById("notionIntegrationMode");
-    const integrationModeLabel = document.getElementById("integrationModeLabel");
-    const realNotionFields = document.getElementById("realNotionFields");
-
-    const notionApiKeyInput = document.getElementById("notionApiKey");
-    const notionOrdersDbInput = document.getElementById("notionOrdersDbId");
-    const notionInventoryDbInput = document.getElementById("notionInventoryDbId");
-    const notionParentPageInput = document.getElementById("notionParentPageId");
-
-    const apiTerminalBody = document.getElementById("apiTerminalBody");
-    const btnClearTerminal = document.getElementById("btnClearTerminal");
-
-    function logApi(message, type = "system") {
-        if (!apiTerminalBody) return;
-        const line = document.createElement("div");
-        line.className = `terminal-line ${type}`;
-        
-        const now = new Date();
-        const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
-        
-        line.innerHTML = `<span style="color: #52525b;">[${timeStr}]</span> ${message}`;
-        apiTerminalBody.appendChild(line);
-        apiTerminalBody.scrollTop = apiTerminalBody.scrollHeight;
-    }
-
-    function loadConfigInputs() {
-        if (notionIntegrationMode) {
-            notionIntegrationMode.checked = notionConfig.mode;
-            integrationModeLabel.textContent = notionConfig.mode ? "Real Notion API Mode (Live Web Requests)" : "Mock Sync (Interactive Console)";
-            realNotionFields.style.display = notionConfig.mode ? "block" : "none";
-            
-            notionApiKeyInput.value = notionConfig.apiKey;
-            notionOrdersDbInput.value = notionConfig.ordersDbId;
-            notionInventoryDbInput.value = notionConfig.inventoryDbId;
-            notionParentPageInput.value = notionConfig.parentPageId;
+    function updateRushMode() {
+        const pending = orders.filter(o => o.status === 'Pending' || o.status === 'Preparing');
+        const hasUrgent = pending.some(o => o.etaSeconds <= 180);
+        const banner = document.getElementById('rushHourBanner');
+        if (hasUrgent && !state.rushMode) {
+            state.rushMode = true;
+            banner.classList.add('visible');
+            showToast('Rush Mode activated! Urgent deliveries approaching.', 'warning');
+        } else if (!hasUrgent && state.rushMode) {
+            state.rushMode = false;
+            banner.classList.remove('visible');
         }
-    }
-
-    loadConfigInputs();
-
-    if (notionIntegrationMode) {
-        notionIntegrationMode.addEventListener("change", () => {
-            playSynthSound('click');
-            const checked = notionIntegrationMode.checked;
-            integrationModeLabel.textContent = checked ? "Real Notion API Mode (Live Web Requests)" : "Mock Sync (Interactive Console)";
-            realNotionFields.style.display = checked ? "block" : "none";
-        });
-    }
-
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener("click", () => {
-            playSynthSound('success');
-            notionConfig.mode = notionIntegrationMode.checked;
-            notionConfig.apiKey = notionApiKeyInput.value.trim();
-            notionConfig.ordersDbId = notionOrdersDbInput.value.trim();
-            notionConfig.inventoryDbId = notionInventoryDbInput.value.trim();
-            notionConfig.parentPageId = notionParentPageInput.value.trim();
-            
-            localStorage.setItem("notion_sync_mode", notionConfig.mode ? "real" : "mock");
-            localStorage.setItem("notion_api_key", notionConfig.apiKey);
-            localStorage.setItem("notion_orders_db_id", notionConfig.ordersDbId);
-            localStorage.setItem("notion_inventory_db_id", notionConfig.inventoryDbId);
-            localStorage.setItem("notion_parent_page_id", notionConfig.parentPageId);
-            
-            showToast("Settings saved to local storage", "success");
-            logApi(`Configuration updated. Integration Mode: ${notionConfig.mode ? "REAL API" : "MOCK SYNC"}`, "system");
-        });
-    }
-
-    if (btnClearTerminal) {
-        btnClearTerminal.addEventListener("click", () => {
-            playSynthSound('click');
-            apiTerminalBody.innerHTML = '<div class="terminal-line system">Logs cleared.</div>';
-        });
-    }
-
-    if (notionSyncBtn) {
-        notionSyncBtn.addEventListener("click", () => {
-            playSynthSound('click');
-            notionSyncModal.classList.add("active");
-            syncProgressFill.style.width = "0%";
-            syncModalText.textContent = "Connecting to Notion databases...";
-            
-            logApi("Starting Notion Cloud Synchronization loop...", "system");
-            
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                syncProgressFill.style.width = `${progress}%`;
-                
-                if (progress === 20) {
-                    syncModalText.textContent = "Uploading Inventory database...";
-                    logApi("Uploading Inventory state database...", "system");
-                    const item = inventory[0];
-                    const payload = {
-                        parent: { database_id: notionConfig.inventoryDbId || "mock_inventory_db_id" },
-                        properties: {
-                            "Name": { title: [{ text: { content: item.name } }] },
-                            "Stock": { number: item.stock },
-                            "Price": { number: item.price }
-                        }
-                    };
-                    logApi("POST https://api.notion.com/v1/pages", "request");
-                    logApi(`Payload:\n${JSON.stringify(payload, null, 2)}`, "payload");
-                    
-                } else if (progress === 60) {
-                    syncModalText.textContent = "Pushing Live Order timeline logs...";
-                    logApi("Pushing active orders logs...", "system");
-                    const order = orders[0] || { id: "RQ-1082", trainNo: "12423", status: "Pending" };
-                    const payload = {
-                        parent: { database_id: notionConfig.ordersDbId || "mock_orders_db_id" },
-                        properties: {
-                            "Order ID": { title: [{ text: { content: order.id } }] },
-                            "Train No": { rich_text: [{ text: { content: order.trainNo } }] },
-                            "Status": { select: { name: order.status } }
-                        }
-                    };
-                    logApi("POST https://api.notion.com/v1/pages", "request");
-                    logApi(`Payload:\n${JSON.stringify(payload, null, 2)}`, "payload");
-                    
-                } else if (progress >= 100) {
-                    clearInterval(interval);
-                    
-                    if (notionConfig.mode && notionConfig.apiKey && notionConfig.inventoryDbId) {
-                        logApi("Querying live endpoint at Notion...", "system");
-                        fetch(`https://api.notion.com/v1/databases/${notionConfig.inventoryDbId}`, {
-                            method: "GET",
-                            headers: {
-                                "Authorization": `Bearer ${notionConfig.apiKey}`,
-                                "Notion-Version": "2022-06-28"
-                            }
-                        })
-                        .then(res => {
-                            logApi(`[Response] ${res.status} ${res.statusText}`, "response");
-                            finishSync();
-                        })
-                        .catch(() => {
-                            logApi(`[CORS Blocked] browser CORS restricted access direct. Payloads logged successfully.`, "error");
-                            finishSync();
-                        });
-                    } else {
-                        setTimeout(() => {
-                            logApi("[Response] 200 OK. Notion DB synced successfully.", "response");
-                            finishSync();
-                        }, 400);
-                    }
-                }
-            }, 250);
-
-            function finishSync() {
-                setTimeout(() => {
-                    notionSyncModal.classList.remove("active");
-                    playSynthSound('success');
-                    showToast("Workspace tables successfully synchronized with Notion!", "success");
-                }, 300);
-            }
-        });
+        const el = document.getElementById('rushModeOrders');
+        if (el) el.textContent = `${pending.length} Pending`;
     }
 
     // ==========================================================================
-    // NOTION DAILY SUMMARY REPORT HANDLERS
+    // ORDER RENDERING
     // ==========================================================================
-    const btnNotionAI = document.getElementById("btnNotionAI");
-    const btnOneTapReport = document.getElementById("btnOneTapReport");
-    const btnTriggerDailyReport = document.getElementById("btnTriggerDailyReport");
-    const btnPushReportToNotion = document.getElementById("btnPushReportToNotion");
-    const editorContent = document.getElementById("editorContent");
-    const btnCopyNote = document.getElementById("btnCopyNote");
+    function getPackedCount(order) {
+        return order.items.filter(i => i.packed).length;
+    }
 
-    function navigateToAiTab() {
-        playSynthSound('click');
-        const aiNavItem = document.querySelector('.app-bottom-nav .nav-item[data-tab="ai"]');
-        if (aiNavItem) {
-            aiNavItem.click();
+    function renderOrders() {
+        const container = document.getElementById('active-orders-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        let filtered = orders;
+        if (state.orderFilter !== 'all') {
+            filtered = orders.filter(o => o.status === state.orderFilter);
         }
-    }
 
-    if (btnNotionAI) btnNotionAI.addEventListener("click", navigateToAiTab);
-
-    if (btnOneTapReport) {
-        btnOneTapReport.addEventListener("click", () => {
-            navigateToAiTab();
-            generateOneTapDailyReport();
-        });
-    }
-
-    if (btnTriggerDailyReport) {
-        btnTriggerDailyReport.addEventListener("click", () => {
-            generateOneTapDailyReport();
-        });
-    }
-
-    function generateOneTapDailyReport() {
-        playSynthSound('click');
-        showToast("Notion AI compiling daily summary...", "info");
-        
-        const htmlBlock = `
-            <h2>Daily Operations Summary - Platform 3</h2>
-            <hr style="border:0; border-top:1px solid var(--border-color); margin:8px 0;">
-            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            <p><strong>Shift Audit:</strong> Active Vendor Queue Sync</p>
-            <ul style="margin-top:8px; padding-left:20px; line-height:1.6;">
-                <li><strong>Total Orders Dispatched:</strong> 156</li>
-                <li><strong>Daily Sales Revenue:</strong> ₹12,740.00</li>
-                <li><strong>Top Selling Product:</strong> Water Bottle 1L</li>
-                <li><strong>Missed Orders Count:</strong> 3</li>
-                <li><strong>Estimated Lost Revenue:</strong> ₹420.00</li>
-                <li><strong>Tomorrow's Forecasted Demand:</strong> ₹15,300.00</li>
-                <li><strong>AI Relocations Commission Saved:</strong> ₹${(statsReallocatedCountVal * 18).toFixed(2)}</li>
-            </ul>
-            <p style="margin-top:8px; background:rgba(16,185,129,0.06); padding:6px 10px; border-radius:4px; border-left:3px solid #10b981;">
-                <strong>AI Note:</strong> Demand forecast is high for tomorrow. Ensure Water Bottles inventory is stocked at 60+ units prior to the 08:30 shift.
-            </p>
-        `;
-        
-        typewriterStreamReport(htmlBlock);
-    }
-
-    function typewriterStreamReport(html) {
-        if (!editorContent) return;
-        editorContent.innerHTML = "";
-        
-        const tempSpan = document.createElement("span");
-        editorContent.appendChild(tempSpan);
-        
-        const words = html.trim().split(/\s+/);
-        let idx = 0;
-        
-        const timer = setInterval(() => {
-            if (idx < words.length) {
-                tempSpan.innerHTML += words[idx] + " ";
-                idx++;
-                playSynthSound('typewriter');
-            } else {
-                clearInterval(timer);
-                tempSpan.remove();
-                editorContent.innerHTML = html;
-                
-                playSynthSound('success');
-                showToast("Notion AI report generated successfully!", "success");
-            }
-        }, 30);
-    }
-
-    if (btnPushReportToNotion) {
-        btnPushReportToNotion.addEventListener("click", () => {
-            playSynthSound('click');
-            
-            const notionSyncModal = document.getElementById("notionSyncModal");
-            const syncModalText = document.getElementById("syncModalText");
-            const syncProgressFill = document.getElementById("syncProgressFill");
-            
-            if (notionSyncModal) {
-                notionSyncModal.classList.add("active");
-                if (syncProgressFill) syncProgressFill.style.width = "0%";
-                if (syncModalText) syncModalText.textContent = "Writing block children to parent page ID...";
-                
-                let progress = 0;
-                const timer = setInterval(() => {
-                    progress += 20;
-                    if (syncProgressFill) syncProgressFill.style.width = `${progress}%`;
-                    
-                    if (progress === 40) {
-                        if (syncModalText) syncModalText.textContent = "Syncing operations statistics metrics...";
-                    }
-                    if (progress === 80) {
-                        if (syncModalText) syncModalText.textContent = "Uploading bullet structures to cloud databases...";
-                    }
-                    
-                    if (progress >= 100) {
-                        clearInterval(timer);
-                        notionSyncModal.classList.remove("active");
-                        
-                        const time = new Date().toLocaleTimeString();
-                        const headersStr = JSON.stringify({
-                            "Authorization": "Bearer secret_notion_key_xxxxxxxx",
-                            "Notion-Version": "2022-06-28",
-                            "Content-Type": "application/json"
-                        }, null, 2);
-                        
-                        const payloadStr = JSON.stringify({
-                            "parent": { "page_id": notionConfig.parentPageId || "notion_parent_page_id" },
-                            "properties": {
-                                "title": [{ "text": { "content": "Daily Summary Operations Report" } }]
-                            },
-                            "children": [
-                                {
-                                    "object": "block",
-                                    "type": "heading_2",
-                                    "heading_2": {
-                                        "rich_text": [{ "text": { "content": "Daily Summary Operations Report" } }]
-                                    }
-                                },
-                                {
-                                    "object": "block",
-                                    "type": "bulleted_list_item",
-                                    "bulleted_list_item": {
-                                        "rich_text": [{ "text": { "content": "Orders Dispatched: 156 | Revenue: ₹12,740" } }]
-                                    }
-                                }
-                            ]
-                        }, null, 2);
-                        
-                        logApi("POST https://api.notion.com/v1/pages", "request");
-                        logApi(`Headers:\n${headersStr}`, "system");
-                        logApi(`Payload:\n${payloadStr}`, "payload");
-                        
-                        if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
-                        
-                        playSynthSound('success');
-                        speakText("Daily summary synced to Notion cloud.");
-                        showToast("Daily summary synced to Notion!", "success");
-                    }
-                }, 300);
-            }
-        });
-    }
-
-    if (btnCopyNote) {
-        btnCopyNote.addEventListener("click", () => {
-            playSynthSound('click');
-            const range = document.createRange();
-            range.selectNode(editorContent);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand("copy");
-            window.getSelection().removeAllRanges();
-            showToast("Report content copied to clipboard!", "success");
-        });
-    }
-
-    // Close Add Column popover if clicked elsewhere
-    document.addEventListener("click", (e) => {
-        const popover = document.getElementById("addColumnPopover");
-        if (popover && !popover.contains(e.target) && e.target.id !== "thAddColumn") {
-            popover.style.display = "none";
-        }
-    });
-
-    // ==========================================================================
-    // AI VOICE ASSISTANT & PRIORITIZATION DESK
-    // ==========================================================================
-    const btnAutoPrioritize = document.getElementById("btnAutoPrioritize");
-    const btnVoiceMic = document.getElementById("btnVoiceMic");
-    const voiceStatus = document.getElementById("voiceStatus");
-    const voiceChatThread = document.getElementById("voiceChatThread");
-    const aiAssistantOrbContainer = document.getElementById("aiAssistantOrbContainer");
-
-    // Unified helper to update agent status monitoring nodes dynamically
-    function updateAgentStatus(agent, status) {
-        const dot = document.getElementById(`agent-dot-${agent}`);
-        const badge = document.getElementById(`agent-status-${agent}`);
-        if (!dot || !badge) return;
-        
-        badge.textContent = status;
-        
-        if (status === "ACTIVE") {
-            dot.classList.add("active");
-            if (agent === "prioritizer") {
-                badge.style.color = "var(--accent-purple)";
-                badge.style.background = "var(--accent-purple-soft)";
-                badge.style.borderColor = "rgba(16, 185, 129, 0.2)";
-            } else if (agent === "router") {
-                badge.style.color = "var(--accent-orange)";
-                badge.style.background = "var(--accent-orange-soft)";
-                badge.style.borderColor = "rgba(245, 158, 11, 0.2)";
-            } else if (agent === "stock") {
-                badge.style.color = "var(--accent-blue)";
-                badge.style.background = "var(--accent-blue-soft)";
-                badge.style.borderColor = "rgba(14, 165, 233, 0.2)";
-            }
-        } else {
-            dot.classList.remove("active");
-            badge.style.color = "var(--text-muted)";
-            badge.style.background = "rgba(0,0,0,0.03)";
-            badge.style.borderColor = "var(--border-color)";
-        }
-    }
-
-    // Chat Bubble Appending Helper
-    function addChatMessage(sender, text) {
-        if (!voiceChatThread) return;
-        
-        const bubble = document.createElement("div");
-        const isUser = sender.toLowerCase() === "user";
-        bubble.className = `chat-bubble ${isUser ? 'user' : 'agent'}`;
-        
-        bubble.innerHTML = `
-            <span class="chat-sender" style="font-weight: 700; font-size: 10px; display: block; text-transform: uppercase; margin-bottom: 2px; color: ${isUser ? 'var(--text-main)' : 'var(--accent-purple)'};">
-                ${isUser ? 'Vendor' : 'AI Assistant'}
-            </span>
-            <span class="chat-text" style="font-size: 12px; display: block;">${text}</span>
-        `;
-        
-        voiceChatThread.appendChild(bubble);
-        voiceChatThread.scrollTop = voiceChatThread.scrollHeight;
-    }
-
-    // Initial welcome message
-    setTimeout(() => {
-        addChatMessage('agent', "Namaste! Main aapka RailQuick assistant hu. Ask me: 'prioritize orders' (Pehle konsa banaye?), 'check trains' (Timetable schedules), or 'stock status' (Inventory levels). Main madad ke liye tayyar hu!");
-    }, 500);
-
-    // Helper to calculate top priority order based on countdown times
-    function getTopPriorityOrder() {
-        const activeP3Orders = orders.filter(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated");
-        if (activeP3Orders.length === 0) return null;
-        
-        activeP3Orders.sort((a, b) => a.etaSeconds - b.etaSeconds);
-        return activeP3Orders[0];
-    }
-
-    // Function to speak AI voice response
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-IN'; // Indian English accent fits Hinglish well
-            utterance.pitch = 1.05;
-            utterance.rate = 0.95;
-            
-            // Handle Speaking animation state on the Orb
-            utterance.onstart = () => {
-                if (aiAssistantOrbContainer) {
-                    aiAssistantOrbContainer.classList.add("speaking");
-                    aiAssistantOrbContainer.classList.remove("listening");
-                }
-            };
-            utterance.onend = () => {
-                if (aiAssistantOrbContainer) {
-                    aiAssistantOrbContainer.classList.remove("speaking");
-                }
-            };
-            utterance.onerror = () => {
-                if (aiAssistantOrbContainer) {
-                    aiAssistantOrbContainer.classList.remove("speaking");
-                }
-            };
-
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    // Trigger prioritization highlight & feedback
-    function triggerPrioritization() {
-        const topOrder = getTopPriorityOrder();
-        if (!topOrder) {
-            prioritizedOrderId = null;
-            renderOrders();
-            const reply = "You have no pending orders on Platform 3. All clear!";
-            addChatMessage('agent', reply);
-            speakText(reply);
-            showToast("No pending orders on Platform 3.", "info");
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><path d="M9 21V9"/></svg></div>
+                    <div class="empty-title">No orders here</div>
+                    <div class="empty-desc">Switch filter or wait for new orders</div>
+                </div>`;
             return;
         }
 
-        prioritizedOrderId = topOrder.id;
-        renderOrders();
+        // Sort by ETA ascending (most urgent first)
+        filtered = [...filtered].sort((a, b) => a.etaSeconds - b.etaSeconds);
 
-        const etaMin = Math.floor(topOrder.etaSeconds / 60);
-        const englishReply = `Order ${topOrder.id} for ${topOrder.trainName} is your top priority. The train arrives in ${etaMin} minutes. Kripya isey pehle tayyar karein!`;
-        
-        addChatMessage('agent', englishReply);
-        
-        // Auto scroll to target card if needed
-        setTimeout(() => {
-            const cardElem = document.querySelector(`.order-touch-card.prioritized-highlight`);
-            if (cardElem) {
-                cardElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }, 100);
+        filtered.forEach((order, idx) => {
+            const urgency = getUrgencyClass(order.etaSeconds);
+            const priorityClass = order.status === 'Preparing' ? 'status-preparing'
+                : order.status === 'Ready' ? 'status-ready'
+                : getUrgencyPriority(order.etaSeconds);
 
-        speakText(englishReply);
-        showToast(`Prioritizing ${topOrder.id} (${etaMin}m ETA)`, "success");
-    }
+            const packedCount = getPackedCount(order);
+            const totalItems = order.items.length;
+            const packPct = totalItems > 0 ? (packedCount / totalItems) * 100 : 0;
 
-    if (btnAutoPrioritize) {
-        btnAutoPrioritize.addEventListener("click", () => {
-            playSynthSound('click');
-            triggerPrioritization();
+            const card = document.createElement('div');
+            card.className = `order-card ${priorityClass} ${order.status === 'Delivered' ? 'status-delivered' : ''}`;
+            card.dataset.orderId = order.id;
+
+            const itemChips = order.items.map(item =>
+                `<span class="item-chip ${item.packed ? 'packed' : ''}" data-item="${item.name}" data-order="${order.id}">
+                    <span class="chip-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    ${item.name} ×${item.qty}
+                </span>`
+            ).join('');
+
+            const statusPillClass = {
+                'Pending': 'pill-pending',
+                'Preparing': 'pill-preparing',
+                'Ready': 'pill-ready',
+                'Delivered': 'pill-delivered',
+                'Cancelled': 'pill-cancelled'
+            }[order.status] || 'pill-pending';
+
+            const platClass = order.reallocated ? 'reallocated' : '';
+            const platText = order.reallocated ? `P${order.actualPlatform} ⟳` : `P${order.actualPlatform}`;
+
+            card.innerHTML = `
+                <div class="order-card-top">
+                    <div class="order-id-train">
+                        <span class="order-id">${order.id} · Coach ${order.coach}</span>
+                        <span class="train-name">${order.trainName}</span>
+                        <span class="train-route">${order.fromTo}</span>
+                    </div>
+                    <div class="order-right-meta">
+                        <span class="order-status-pill ${statusPillClass}">${order.status}</span>
+                        <div class="eta-countdown ${urgency}" id="eta-${order.id}">${formatETA(order.etaSeconds)}</div>
+                        <span class="eta-label">ETA left</span>
+                    </div>
+                </div>
+                <div class="order-items-strip" id="items-${order.id}">
+                    ${itemChips}
+                </div>
+                <div class="order-progress-bar">
+                    <div class="order-progress-fill" id="prog-${order.id}" style="width:${packPct}%"></div>
+                </div>
+                <div class="order-card-actions">
+                    <span class="otp-label">OTP:</span>
+                    <span class="otp-display">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        ${order.otp}
+                    </span>
+                    <span class="plat-badge ${platClass}">${platText}</span>
+                    <span style="flex:1;"></span>
+                    ${order.status === 'Pending' ? `<button class="btn btn-amber btn-xs" onclick="startPrep('${order.id}')">Start Prep</button>` : ''}
+                    ${order.status === 'Preparing' ? `<button class="btn btn-cyan btn-xs" onclick="markReady('${order.id}')">Mark Ready</button>` : ''}
+                    ${order.status === 'Ready' ? `<button class="btn btn-solid-green btn-xs" onclick="markDelivered('${order.id}')"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="20 6 9 17 4 12"/></svg> Deliver</button>` : ''}
+                    ${order.status !== 'Delivered' && order.status !== 'Cancelled' ? `<button class="btn btn-ghost btn-xs" onclick="openOrderModal('${order.id}')">Details</button>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
         });
+
+        // Bind item chip toggles
+        container.querySelectorAll('.item-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const orderId = chip.dataset.order;
+                const itemName = chip.dataset.item;
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                const item = order.items.find(i => i.name === itemName);
+                if (item) {
+                    item.packed = !item.packed;
+                    chip.classList.toggle('packed', item.packed);
+                    chip.querySelector('.chip-check').style.display = item.packed ? 'inline' : 'none';
+                    const packed = getPackedCount(order);
+                    const total = order.items.length;
+                    const fill = document.getElementById(`prog-${order.id}`);
+                    if (fill) fill.style.width = `${(packed / total) * 100}%`;
+                    if (packed === total && order.status === 'Preparing') {
+                        showToast(`All items packed for ${order.trainName}!`, 'success');
+                    }
+                }
+            });
+        });
+
+        // Update badge
+        const active = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
+        const badge = document.getElementById('activeOrdersBadge');
+        if (badge) badge.textContent = active;
     }
 
-    // Speech recognition setup
-    let recognition = null;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-IN';
+    // Expose functions to window for onclick attrs
+    window.startPrep = (id) => {
+        const order = orders.find(o => o.id === id);
+        if (order) { order.status = 'Preparing'; renderOrders(); showToast(`Preparing ${order.trainName} order...`, 'info'); }
+    };
 
-        recognition.onstart = () => {
-            if (aiAssistantOrbContainer) {
-                aiAssistantOrbContainer.classList.add("listening");
-                aiAssistantOrbContainer.classList.remove("speaking");
-            }
-            btnVoiceMic.classList.add("listening");
-            const waveContainer = document.getElementById("audioWaveContainer");
-            if (waveContainer) waveContainer.classList.add("active");
-            voiceStatus.textContent = "Listening to voice command...";
-            playSynthSound('click');
-        };
+    window.markReady = (id) => {
+        const order = orders.find(o => o.id === id);
+        if (order) { order.status = 'Ready'; renderOrders(); showToast(`${order.trainName} order READY for handoff!`, 'success'); }
+    };
 
-        recognition.onerror = (e) => {
-            console.error("Speech Recognition Error:", e);
-            if (aiAssistantOrbContainer) {
-                aiAssistantOrbContainer.classList.remove("listening");
-            }
-            btnVoiceMic.classList.remove("listening");
-            const waveContainer = document.getElementById("audioWaveContainer");
-            if (waveContainer) waveContainer.classList.remove("active");
-            voiceStatus.textContent = "Voice error or permission denied.";
-        };
-
-        recognition.onend = () => {
-            if (aiAssistantOrbContainer) {
-                aiAssistantOrbContainer.classList.remove("listening");
-            }
-            btnVoiceMic.classList.remove("listening");
-            const waveContainer = document.getElementById("audioWaveContainer");
-            if (waveContainer) waveContainer.classList.remove("active");
-        };
-
-        recognition.onresult = (event) => {
-            const resultText = event.results[0][0].transcript;
-            addChatMessage('user', resultText);
-            processVoiceQuery(resultText);
-        };
-    }
-
-    function processVoiceQuery(query) {
-        const text = query.toLowerCase().trim();
-        
-        if (text.includes("priorit") || text.includes("pehle") || text.includes("urgent") || text.includes("first") || text.includes("taiyar") || text.includes("kon sa") || text.includes("priority")) {
-            triggerPrioritization();
-        } else if (text.includes("train") || text.includes("timetable") || text.includes("gaadi") || text.includes("arriving")) {
-            const p3Trains = activeTrains.filter(t => t.platform === 3);
-            if (p3Trains.length === 0) {
-                const reply = "No upcoming trains scheduled on Platform 3 right now.";
-                addChatMessage('agent', reply);
-                speakText(reply);
-            } else {
-                const trainNames = p3Trains.map(t => `${t.name} in ${Math.floor(t.eta / 60)} minutes`).join(", and ");
-                const reply = `Platform 3 upcoming schedules are: ${trainNames}.`;
-                addChatMessage('agent', reply);
-                speakText(reply);
-            }
-        } else if (text.includes("stock") || text.includes("inventory") || text.includes("maal") || text.includes("shortage") || text.includes("kam")) {
-            const lowStockItems = inventory.filter(i => i.stock <= i.minStock);
-            if (lowStockItems.length === 0) {
-                const reply = "All stock levels are optimal. Koee shortage nahi hai.";
-                addChatMessage('agent', reply);
-                speakText(reply);
-            } else {
-                const itemNames = lowStockItems.map(i => i.name).join(", ");
-                const reply = `Stock alert. Items ${itemNames} are below safety limits. Please restock soon.`;
-                addChatMessage('agent', reply);
-                speakText(reply);
-            }
-        } else if (text.includes("hello") || text.includes("namaste") || text.includes("hi ") || text.includes("help") || text.includes("sunona")) {
-            const reply = "Hello! Main aapka RailQuick assistant hu. Ask me: 'prioritize orders' or 'stock update'. Main madad ke liye tayyar hu!";
-            addChatMessage('agent', reply);
-            speakText(reply);
-        } else {
-            const reply = `Heard: "${query}". Try asking "prioritize orders" or "pehle konsa order banaye?" to check train timings.`;
-            addChatMessage('agent', reply);
-            speakText(reply);
+    window.markDelivered = (id) => {
+        const order = orders.find(o => o.id === id);
+        if (order) {
+            order.status = 'Delivered';
+            state.ordersFilled++;
+            state.totalRevenue += order.amount;
+            document.getElementById('salesOrdersFilled').textContent = state.ordersFilled;
+            document.getElementById('salesTotalRevenue').textContent = `₹${state.totalRevenue.toLocaleString('en-IN')}`;
+            renderOrders();
+            showToast(`Delivered to ${order.trainName}! ₹${order.amount} earned.`, 'success');
         }
-    }
+    };
 
-    if (btnVoiceMic) {
-        btnVoiceMic.addEventListener("click", () => {
-            if (recognition) {
-                try {
-                    recognition.start();
-                } catch(e) {
-                    console.log("Recognition already running", e);
-                }
-            } else {
-                const waveContainer = document.getElementById("audioWaveContainer");
-                if (waveContainer) waveContainer.classList.add("active");
-                const query = prompt("Speak to AI Agent (Enter voice command text):\n- 'prioritize orders' (Pehle konsa banaye?)\n- 'check trains' (Timetable update)\n- 'stock status' (Inventory levels)");
-                if (query) {
-                    addChatMessage('user', query);
-                    processVoiceQuery(query);
-                }
-                setTimeout(() => {
-                    if (waveContainer) waveContainer.classList.remove("active");
-                }, 2000);
-            }
-        });
-    }
-
-    // Floating voice shortcut button (FAB)
-    const btnVoiceShortcut = document.getElementById("btnVoiceShortcut");
-    if (btnVoiceShortcut) {
-        btnVoiceShortcut.addEventListener("click", () => {
-            playSynthSound('click');
-            // Navigate to the AI Assistant tab
-            const aiNavItem = document.querySelector('.app-bottom-nav .nav-item[data-tab="ai"]');
-            if (aiNavItem) {
-                aiNavItem.click();
-            }
-            // Trigger mic listening
-            setTimeout(() => {
-                const voiceMic = document.getElementById("btnVoiceMic");
-                if (voiceMic) voiceMic.click();
-            }, 300);
-        });
-    }
+    window.openOrderModal = (id) => openOrderModal(id);
 
     // ==========================================================================
-    // PREMIUM LIVE TRANSIT RADAR & METRICS ENGINE
+    // ORDER DETAIL MODAL
     // ==========================================================================
-    function renderRadar() {
-        const trainsToTrack = ["12423", "12056", "12952"];
-        trainsToTrack.forEach(no => {
-            const train = activeTrains.find(t => t.no === no);
-            const dot = document.getElementById(`radar-train-${no}`);
-            if (!dot || !train) return;
-            
-            if (train.eta <= 0) {
-                // Train has arrived
-                dot.style.left = "92%";
-                dot.style.background = "var(--accent-purple)";
-                dot.style.boxShadow = "0 0 12px var(--accent-purple)";
-            } else if (train.eta > 900) {
-                // Too far away
-                dot.style.left = "5%";
-                dot.style.opacity = "0.3";
-            } else {
-                // Within radar range
-                dot.style.opacity = "1";
-                const fraction = 1 - (train.eta / 900);
-                const percent = 5 + (fraction * 85);
-                dot.style.left = `${percent.toFixed(1)}%`;
-            }
-        });
+    function openOrderModal(id) {
+        const order = orders.find(o => o.id === id);
+        if (!order) return;
+        const modal = document.getElementById('orderDetailModal');
+        document.getElementById('modalOrderTitle').textContent = `${order.trainName} — ${order.id}`;
+
+        const urgency = getUrgencyClass(order.etaSeconds);
+        const body = document.getElementById('orderModalBody');
+        body.innerHTML = `
+            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                <span class="plat-badge">${order.fromTo}</span>
+                <span class="plat-badge ${order.reallocated ? 'reallocated' : ''}">Platform ${order.actualPlatform}</span>
+                <span class="plat-badge" style="background:var(--neon-violet-dim);border-color:rgba(168,85,247,0.3);color:var(--neon-violet);">Coach ${order.coach}</span>
+            </div>
+            <div style="margin-bottom:14px;">
+                <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px;">OTP CODE</div>
+                <div class="otp-display" style="font-size:18px;padding:10px 16px;justify-content:center;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    ${order.otp}
+                </div>
+            </div>
+            <div style="margin-bottom:14px;">
+                <div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:8px;">ORDER ITEMS</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    ${order.items.map(item => `
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-sm);">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">${item.name}</span>
+                            <span style="font-size:11px;font-weight:800;color:var(--neon-cyan);">×${item.qty}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-sm);margin-bottom:14px;">
+                <span style="font-size:11px;font-weight:700;color:var(--text-muted);">ORDER TOTAL</span>
+                <span style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--neon-green);">₹${order.amount}</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+                ${order.status === 'Pending' ? `<button class="btn btn-amber btn-full" onclick="startPrep('${order.id}');closeOrderModal()">Start Preparation</button>` : ''}
+                ${order.status === 'Preparing' ? `<button class="btn btn-solid-cyan btn-full" onclick="markReady('${order.id}');closeOrderModal()">Mark Ready</button>` : ''}
+                ${order.status === 'Ready' ? `<button class="btn btn-solid-green btn-full" onclick="markDelivered('${order.id}');closeOrderModal()">Confirm Delivery</button>` : ''}
+            </div>
+        `;
+
+        modal.classList.add('open');
     }
 
-    function updatePerformanceChart() {
-        const avgPrepTimeVal = document.getElementById("avgPrepTimeVal");
-        if (avgPrepTimeVal) {
-            // Dynamic calculation: starts around 1m 45s, decreases/increases slightly
-            const totalSecs = Math.max(80, 105 - (ordersFilledCount - 18) * 3);
-            const min = Math.floor(totalSecs / 60);
-            const sec = totalSecs % 60;
-            avgPrepTimeVal.textContent = `${min}m ${sec}s`;
-        }
-        
-        const bar12 = document.getElementById("chart-bar-12");
-        if (bar12) {
-            // Increase bar 12 height dynamically as they fill more orders
-            const newHeight = Math.min(100, 45 + (ordersFilledCount - 18) * 10);
-            bar12.style.height = `${newHeight}%`;
-        }
-    }
+    window.closeOrderModal = () => document.getElementById('orderDetailModal').classList.remove('open');
+    document.getElementById('closeOrderModal').addEventListener('click', closeOrderModal);
+    document.getElementById('orderDetailModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeOrderModal();
+    });
 
-    // Bind Voice Command Quick-Chips
-    document.querySelectorAll(".voice-chip").forEach(chip => {
-        chip.addEventListener("click", () => {
-            const query = chip.getAttribute("data-query");
-            if (query) {
-                playSynthSound('click');
-                addChatMessage('user', chip.textContent);
-                // Switch voice tab visualizer active
-                const waveContainer = document.getElementById("audioWaveContainer");
-                if (waveContainer) {
-                    waveContainer.classList.add("active");
-                    setTimeout(() => waveContainer.classList.remove("active"), 1500);
-                }
-                processVoiceQuery(query);
-            }
+    // ==========================================================================
+    // ORDER FILTER TABS
+    // ==========================================================================
+    document.querySelectorAll('.filter-tab[data-filter]').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab[data-filter]').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            state.orderFilter = tab.dataset.filter;
+            renderOrders();
         });
     });
 
     // ==========================================================================
-    // OTP VERIFICATION MODAL LOGIC
+    // AUTO-PRIORITIZE
     // ==========================================================================
-    const otpModalElement = document.getElementById("otpVerificationModal");
-    const btnVerifyOtp = document.getElementById("btnVerifyOtp");
-    const btnCancelOtp = document.getElementById("btnCancelOtp");
-    const otpInput = document.getElementById("otpInput");
-    const otpErrorMsg = document.getElementById("otpErrorMsg");
+    document.getElementById('btnAutoPrioritize').addEventListener('click', () => {
+        orders.sort((a, b) => {
+            if (a.status === 'Delivered') return 1;
+            if (b.status === 'Delivered') return -1;
+            return a.etaSeconds - b.etaSeconds;
+        });
+        renderOrders();
+        showToast('Queue auto-prioritized by train ETA!', 'success');
 
-    if (btnVerifyOtp && btnCancelOtp && otpInput && otpModalElement) {
-        function verifyOtpSubmission() {
-            const id = otpModalElement.getAttribute("data-verifying-id");
-            const order = orders.find(o => o.id === id);
-            if (!order) {
-                otpModalElement.classList.remove("active");
-                return;
-            }
-            
-            const enteredOtp = otpInput.value.trim();
-            if (enteredOtp === order.otp) {
-                // Correct OTP! Dispatch the order
-                playSynthSound('success');
-                otpModalElement.classList.remove("active");
-                
-                orders = orders.filter(o => o.id !== id);
-                
-                // Add order values to Daily Sales Ledger
-                let orderSum = 0;
-                order.items.forEach(item => {
-                    const invItem = inventory.find(i => i.name === item.name);
-                    if (invItem) orderSum += invItem.price * item.qty;
+        // Brief agent activation
+        setAgentStatus('prioritizer', 'COMPUTING', 'processing');
+        setTimeout(() => setAgentStatus('prioritizer', 'ACTIVE', 'active'), 2000);
+        logToConsole('> Prioritizer Agent: Sorting 3 orders by ETA urgency...', 'system');
+        setTimeout(() => logToConsole('✓ Queue reordered. Top priority: RQ-1082 (2min ETA)', 'success'), 800);
+    });
+
+    // ==========================================================================
+    // INVENTORY RENDERING
+    // ==========================================================================
+    function getStockLevel(item) {
+        if (item.stock === 0) return 'low';
+        if (item.stock < item.minStock) return 'medium';
+        return 'high';
+    }
+
+    function renderInventory() {
+        const grid = document.getElementById('inventoryGrid');
+        if (!grid) return;
+
+        let items = inventory;
+        if (state.inventoryFilter !== 'All') {
+            items = items.filter(i => i.category === state.inventoryFilter);
+        }
+        if (state.inventorySearch) {
+            const q = state.inventorySearch.toLowerCase();
+            items = items.filter(i => i.name.toLowerCase().includes(q));
+        }
+
+        grid.innerHTML = '';
+
+        if (items.length === 0) {
+            grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><path d="M9 21V9"/></svg></div><div class="empty-title">No items found</div></div>`;
+            return;
+        }
+
+        items.forEach(item => {
+            const level = getStockLevel(item);
+            const pct = item.stock > 0 ? Math.min(100, (item.stock / (item.minStock * 4)) * 100) : 0;
+            const cardClass = item.stock === 0 ? 'stock-critical' : item.stock < item.minStock ? 'stock-low' : '';
+
+            const card = document.createElement('div');
+            card.className = `inv-item-card ${cardClass}`;
+            card.innerHTML = `
+                <div class="inv-category-icon">${item.icon}</div>
+                <div class="inv-info">
+                    <div class="inv-name">${item.name}</div>
+                    <div class="inv-meta">${item.category} · Min: ${item.minStock} units · ₹${item.price}</div>
+                </div>
+                <div class="inv-stock-display">
+                    <div class="stock-qty ${level}">${item.stock}</div>
+                    <div class="stock-bar-wrap">
+                        <div class="stock-bar-track">
+                            <div class="stock-bar-fill ${level}" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                    <div class="stock-price">₹${item.price}</div>
+                </div>
+                <div class="inv-actions">
+                    <button class="btn btn-cyan btn-xs" title="Add stock" onclick="adjustStock(${item.id}, 10)">+10</button>
+                    <button class="btn btn-red btn-xs" title="Remove stock" onclick="adjustStock(${item.id}, -1)">−</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    window.adjustStock = (id, delta) => {
+        const item = inventory.find(i => i.id === id);
+        if (!item) return;
+        item.stock = Math.max(0, item.stock + delta);
+        renderInventory();
+        const level = getStockLevel(item);
+        if (level === 'low') showToast(`${item.name} is critically low (${item.stock} units)!`, 'warning');
+        const aiEl = document.getElementById('aiCurrentBottlesStock');
+        if (aiEl && item.id === 1) aiEl.textContent = item.stock;
+    };
+
+    // Inventory filter tabs
+    document.querySelectorAll('.filter-tab[data-cat]').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab[data-cat]').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            state.inventoryFilter = tab.dataset.cat;
+            renderInventory();
+        });
+    });
+
+    // Inventory search
+    const inventorySearchInput = document.getElementById('inventorySearch');
+    if (inventorySearchInput) {
+        inventorySearchInput.addEventListener('input', (e) => {
+            state.inventorySearch = e.target.value;
+            renderInventory();
+        });
+    }
+
+    // Add Item modal
+    document.getElementById('btnAddNewItem').addEventListener('click', () => {
+        document.getElementById('addItemModal').classList.add('open');
+    });
+    document.getElementById('closeItemModal').addEventListener('click', () => {
+        document.getElementById('addItemModal').classList.remove('open');
+    });
+    document.getElementById('cancelAddItem').addEventListener('click', () => {
+        document.getElementById('addItemModal').classList.remove('open');
+    });
+    document.getElementById('addItemModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) document.getElementById('addItemModal').classList.remove('open');
+    });
+
+    document.getElementById('addItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cat = document.getElementById('itemCategory').value;
+        const newItem = {
+            id: inventory.length + 1,
+            name: document.getElementById('itemName').value,
+            category: cat,
+            stock: parseInt(document.getElementById('itemStock').value),
+            minStock: parseInt(document.getElementById('itemMinStock').value),
+            price: parseFloat(document.getElementById('itemPrice').value),
+            icon: svgIcons[cat] || svgIcons.Other
+        };
+        inventory.push(newItem);
+        renderInventory();
+        document.getElementById('addItemModal').classList.remove('open');
+        document.getElementById('addItemForm').reset();
+        showToast(`${newItem.name} added to inventory!`, 'success');
+    });
+
+    // AI Refill
+    document.getElementById('btnAiRefill').addEventListener('click', () => {
+        const bottle = inventory.find(i => i.id === 1);
+        if (bottle) {
+            bottle.stock += 50;
+            renderInventory();
+            document.getElementById('aiCurrentBottlesStock').textContent = bottle.stock;
+            showToast('Restocked 50 Water Bottles via AI suggestion!', 'success');
+            logToConsole('> Stock Agent: +50 Water Bottles restocked automatically', 'success');
+        }
+    });
+
+    // ==========================================================================
+    // ANALYTICS CHARTS
+    // ==========================================================================
+    function renderAnalyticsCharts() {
+        const chart = document.getElementById('revenueBarChart');
+        if (!chart) return;
+        if (chart.children.length > 0) return; // Already rendered
+
+        const maxRevenue = Math.max(...hourlyData.map(d => d.revenue));
+        hourlyData.forEach(d => {
+            const heightPct = (d.revenue / maxRevenue) * 100;
+            const col = document.createElement('div');
+            col.className = 'bar-col';
+            const color = d.hour === '11' ? 'violet' : d.hour === '13' ? 'green' : 'cyan';
+            col.innerHTML = `
+                <div class="bar-fill ${color}" style="height:0%;" data-height="${heightPct}%"></div>
+                <span class="bar-label">${d.hour}:00</span>
+            `;
+            chart.appendChild(col);
+        });
+
+        // Animate bars after insertion
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                chart.querySelectorAll('.bar-fill').forEach(bar => {
+                    bar.style.height = bar.dataset.height;
                 });
-                if (orderSum === 0) orderSum = 120; // default minimum
-                dailyRevenue += orderSum;
-                ordersFilledCount++;
-                
-                renderLedger();
-                updatePerformanceChart();
-                
-                showToast(`OTP Verified! Order ${id} dispatched successfully.`, "success");
-                
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                addLogEntry(time, `OTP VERIFIED: Order ${id} handed to runner after secure dispatch authorization.`, "success");
-                
-                renderOrders();
-                renderPlatformMap();
-            } else {
-                // Incorrect OTP
-                playSynthSound('warning');
-                otpErrorMsg.textContent = "Invalid OTP code. Try again!";
-                otpErrorMsg.style.display = "block";
-                otpInput.focus();
-                otpInput.select();
-            }
-        }
-
-        btnVerifyOtp.addEventListener("click", () => {
-            verifyOtpSubmission();
-        });
-
-        btnCancelOtp.addEventListener("click", () => {
-            playSynthSound('click');
-            otpModalElement.classList.remove("active");
-        });
-
-        otpInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                verifyOtpSubmission();
-            } else {
-                if (otpErrorMsg) otpErrorMsg.style.display = "none";
-            }
-        });
-        
-        // Auto-submit when exactly 4 digits are typed
-        otpInput.addEventListener("input", () => {
-            if (otpInput.value.trim().length === 4) {
-                verifyOtpSubmission();
-            }
+            });
         });
     }
 
     // ==========================================================================
-    // INITIALIZATION RUNS
+    // NOTION SYNC
     // ==========================================================================
-    function updateClock() {
-        const statusBarClock = document.getElementById("statusBarClock");
-        if (statusBarClock) {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            hours = hours < 10 ? '0' + hours : hours;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            statusBarClock.textContent = `${hours}:${minutes}`;
-        }
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    document.getElementById('notionIntegrationMode').addEventListener('change', (e) => {
+        document.getElementById('realNotionFields').style.display = e.target.checked ? 'block' : 'none';
+    });
 
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        showToast('Settings saved successfully!', 'success');
+        logToConsole('> Config saved. Integration mode: ' + (document.getElementById('notionIntegrationMode').checked ? 'Live API' : 'Mock'), 'info');
+    });
+
+    function doNotionSync() {
+        showToast('Syncing to Notion...', 'info');
+        logToConsole('> Initiating Notion DB sync...', 'system');
+        setTimeout(() => {
+            const payload = {
+                orders: orders.length,
+                revenue: state.totalRevenue,
+                inventory: inventory.map(i => ({ name: i.name, stock: i.stock })),
+                timestamp: new Date().toISOString()
+            };
+            logToConsole('> POST /notion/orders — 200 OK', 'success');
+            logToConsole('> POST /notion/inventory — 200 OK', 'success');
+            logToConsole(`> Payload: ${JSON.stringify(payload).slice(0, 80)}...`, 'info');
+            showToast('Notion synced! Orders + Inventory pushed.', 'success');
+        }, 1800);
+    }
+
+    document.getElementById('notionSyncBtn').addEventListener('click', doNotionSync);
+    document.getElementById('btnOneTapReport').addEventListener('click', generateDailyReport);
+
+    function generateDailyReport() {
+        showToast('Generating AI report...', 'info');
+        const report = `# Daily Operations Summary — Platform 3
+> Generated: ${new Date().toLocaleString('en-IN')}
+
+## Revenue
+- **Total Today**: ₹${state.totalRevenue.toLocaleString('en-IN')}
+- **Orders Filled**: ${state.ordersFilled}
+- **AI Assists**: ${state.aiAssists}
+- **Avg Prep Time**: 1:45 min
+
+## Trains Served
+${activeTrains.map(t => `- ${t.name} (#${t.no}) — Platform 3`).join('\n')}
+
+## Stock Alerts
+${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.name}: ${i.stock} units (Low)`).join('\n') || '- All stocks nominal'}
+
+## Performance Score: 98.4%
+`;
+        const el = document.getElementById('editorContent');
+        const el2 = document.getElementById('editorContent2');
+        if (el) el.textContent = report;
+        if (el2) el2.textContent = report;
+        showToast('AI daily report generated!', 'success');
+        logToConsole('> Daily report compiled. 340 words generated.', 'success');
+    }
+
+    function handlePushReport() {
+        showToast('Pushing report to Notion...', 'info');
+        setTimeout(() => showToast('Report pushed to Notion successfully!', 'success'), 1500);
+    }
+
+    document.getElementById('btnTriggerDailyReport').addEventListener('click', generateDailyReport);
+    if (document.getElementById('btnTriggerDailyReport2')) {
+        document.getElementById('btnTriggerDailyReport2').addEventListener('click', generateDailyReport);
+    }
+    document.getElementById('btnPushReportToNotion').addEventListener('click', handlePushReport);
+    if (document.getElementById('btnPushReportToNotion2')) {
+        document.getElementById('btnPushReportToNotion2').addEventListener('click', handlePushReport);
+    }
+
+    document.getElementById('btnClearTerminal').addEventListener('click', () => {
+        document.getElementById('apiTerminalBody').innerHTML = '<span class="terminal-line system">Terminal cleared.</span>';
+    });
+
+    document.getElementById('btnCopyNote').addEventListener('click', () => {
+        const content = document.getElementById('editorContent').textContent;
+        navigator.clipboard?.writeText(content).then(() => showToast('Report copied to clipboard!', 'success'));
+    });
+
+    // ==========================================================================
+    // CONSOLE LOGGER
+    // ==========================================================================
+    function logToConsole(message, type = 'system') {
+        const body = document.getElementById('apiTerminalBody');
+        if (!body) return;
+        const line = document.createElement('span');
+        line.className = `terminal-line ${type}`;
+        line.textContent = `[${new Date().toLocaleTimeString('en-IN')}] ${message}`;
+        body.appendChild(document.createElement('br'));
+        body.appendChild(line);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    // ==========================================================================
+    // AI VOICE DESK
+    // ==========================================================================
+    const orbBtn = document.getElementById('btnVoiceMic');
+    const orbContainer = document.getElementById('aiAssistantOrbContainer');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const chatThread = document.getElementById('voiceChatThread');
+    const waveBars = document.querySelectorAll('.wave-bar');
+
+    function startListening() {
+        state.isListening = true;
+        orbContainer.classList.add('listening');
+        voiceStatus.textContent = 'Listening...';
+        waveBars.forEach(b => b.classList.add('active'));
+    }
+
+    function stopListening() {
+        state.isListening = false;
+        orbContainer.classList.remove('listening');
+        voiceStatus.textContent = 'Tap to Speak';
+        waveBars.forEach(b => b.classList.remove('active'));
+    }
+
+    function addBubble(text, role) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${role}`;
+        bubble.textContent = text;
+        chatThread.appendChild(bubble);
+        chatThread.scrollTop = chatThread.scrollHeight;
+    }
+
+    function processQuery(query) {
+        addBubble(query, 'user');
+        voiceStatus.textContent = 'Processing...';
+
+        setTimeout(() => {
+            const key = Object.keys(aiResponses).find(k => query.toLowerCase().includes(k));
+            const responsePool = aiResponses[key] || aiResponses['default'];
+            const response = responsePool[Math.floor(Math.random() * responsePool.length)];
+            addBubble(response, 'ai');
+            stopListening();
+
+            // Special actions
+            if (query.includes('rush mode')) {
+                document.getElementById('rushHourBanner').classList.add('visible');
+                setAgentStatus('router', 'ACTIVE', 'active');
+            }
+        }, 1200);
+    }
+
+    orbBtn.addEventListener('click', () => {
+        if (state.isListening) {
+            stopListening();
+        } else {
+            startListening();
+            // Simulate voice recognition (in demo, use keyboard shortcut or random)
+            setTimeout(() => {
+                if (state.isListening) {
+                    processQuery('prioritize orders');
+                }
+            }, 2500);
+        }
+    });
+
+    // FAB shortcut → AI tab
+    document.getElementById('btnVoiceShortcut').addEventListener('click', () => {
+        switchTab('ai');
+        setTimeout(() => startListening(), 300);
+        setTimeout(() => {
+            if (state.isListening) processQuery('prioritize orders');
+        }, 2500);
+    });
+
+    // Quick chips
+    document.querySelectorAll('.quick-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const query = chip.dataset.query;
+            startListening();
+            setTimeout(() => processQuery(query), 600);
+        });
+    });
+
+    // Scanner Widget
+    document.getElementById('scannerWidget').addEventListener('click', () => {
+        showToast('Camera scanner opening... (Demo Mode)', 'info');
+        setTimeout(() => showToast('Scanned: Order RQ-1085 found!', 'success'), 1200);
+    });
+
+    // ==========================================================================
+    // AGENT STATUS HELPER
+    // ==========================================================================
+    function setAgentStatus(agent, status, badgeClass) {
+        const badge = document.getElementById(`agent-status-${agent}`);
+        const dot = document.getElementById(`agent-dot-${agent}`);
+        if (badge) { badge.textContent = status; badge.className = `agent-badge ${badgeClass}`; }
+    }
+
+    // ==========================================================================
+    // PLATFORM RADAR ANIMATION
+    // ==========================================================================
+    function updateRadar() {
+        const trains = [
+            { id: 'radar-train-12423', etaS: activeTrains[0].etaSeconds },
+            { id: 'radar-train-12056', etaS: activeTrains[1].etaSeconds },
+            { id: 'radar-train-12952', etaS: activeTrains[2].etaSeconds },
+        ];
+        trains.forEach(t => {
+            const dot = document.getElementById(t.id);
+            if (!dot) return;
+            // Map eta to position: 2min=far, 0=here (right end ~88%)
+            const maxEta = 1200;
+            const pct = Math.max(4, 80 - (t.etaS / maxEta) * 76);
+            dot.style.left = `${pct}%`;
+        });
+    }
+
+    // Platform schematic train animation
+    function animatePlatformTrains() {
+        const slots = [1, 2, 3, 4, 5];
+        slots.forEach(n => {
+            const slot = document.getElementById(`train-slot-${n}`);
+            if (!slot) return;
+            // Animate periodically
+            setTimeout(() => {
+                slot.style.opacity = '1';
+                slot.style.left = '4%';
+                setTimeout(() => {
+                    slot.style.transition = 'left 3s linear, opacity 0.5s';
+                    slot.style.left = '75%';
+                    setTimeout(() => {
+                        slot.style.opacity = '0';
+                        slot.style.left = '4%';
+                        slot.style.transition = 'none';
+                    }, 3200);
+                }, 50);
+            }, n * 800 + Math.random() * 2000);
+        });
+    }
+
+    setInterval(animatePlatformTrains, 9000);
+    setTimeout(animatePlatformTrains, 2000);
+
+    // ==========================================================================
+    // MARQUEE ROTATION
+    // ==========================================================================
+    const marqueeMessages = [
+        "AI dispatcher active — Platform 3 Express lane open · Next train Rajdhani Express in 2min · Stock Agent: Water Bottle alert triggered",
+        "Rush Mode standby · 3 active orders in queue · Prioritizer Agent sorting by ETA urgency",
+        "Samosa Plate OUT OF STOCK — AI recommending supplier reorder · Chai Flask critically low (3 units)",
+        "Jan Shatabdi arriving in 5min · Coach B2 order RQ-1085 must be ready · OTP: " + orders[1].otp,
+        "Today's revenue: ₹2,840 · 18 orders filled · 98.4% satisfaction rate · 4 AI-assisted deliveries",
+    ];
+    let marqueeIdx = 0;
+    function rotateMarquee() {
+        marqueeIdx = (marqueeIdx + 1) % marqueeMessages.length;
+        document.getElementById('liveMarqueeText').textContent = marqueeMessages[marqueeIdx];
+    }
+    setInterval(rotateMarquee, 28000);
+
+    // ==========================================================================
+    // SIMULATED INCOMING ORDER (every 45s)
+    // ==========================================================================
+    const newOrderNames = [
+        { trainName: "Shatabdi Express", trainNo: "12001", fromTo: "NDLS → CNB", coach: "C5", amount: 95 },
+        { trainName: "Duronto Express", trainNo: "12213", fromTo: "HWH → NDLS", coach: "A4", amount: 180 },
+        { trainName: "Garib Rath", trainNo: "12203", fromTo: "PNBE → NDLS", coach: "S2", amount: 60 },
+    ];
+    let newOrderIdx = 0;
+    setInterval(() => {
+        const template = newOrderNames[newOrderIdx % newOrderNames.length];
+        newOrderIdx++;
+        const newOrder = {
+            id: `RQ-${1100 + newOrderIdx}`,
+            trainNo: template.trainNo,
+            trainName: template.trainName,
+            fromTo: template.fromTo,
+            scheduledPlatform: 3,
+            actualPlatform: 3,
+            etaSeconds: 180 + Math.floor(Math.random() * 600),
+            prepTimeMinutes: 2 + Math.floor(Math.random() * 3),
+            items: [
+                { name: "Chai (Flask)", qty: 1, packed: false },
+                { name: "Veg Cutlet", qty: 2, packed: false }
+            ],
+            status: "Pending",
+            source: "Platform 3 Express",
+            reallocated: false,
+            otp: genOTP(),
+            amount: template.amount,
+            coach: template.coach
+        };
+        orders.push(newOrder);
+        if (state.currentTab === 'orders') renderOrders();
+        showToast(`New order ${newOrder.id} from ${newOrder.trainName}!`, 'info');
+        logToConsole(`> NEW ORDER: ${newOrder.id} — ${newOrder.trainName} (Coach ${newOrder.coach})`, 'system');
+    }, 45000);
+
+    // ==========================================================================
+    // INITIAL RENDER
+    // ==========================================================================
     renderOrders();
-    renderPlatformMap();
-    renderInventoryHeader();
     renderInventory();
-    renderTimetable();
-    renderLedger();
-    renderRadar();
-    updatePerformanceChart();
+    updateHandoffTimer();
+    updateNextTrainStrip();
+
+    // Startup logs
+    setTimeout(() => logToConsole('> RailQuick OS v4 booted. All systems nominal.', 'success'), 500);
+    setTimeout(() => logToConsole('> AI Agents: Prioritizer ACTIVE | Router IDLE | Stock MONITORING | Forecaster COMPUTING', 'system'), 1000);
+    setTimeout(() => logToConsole('> Train radar linked. 3 trains tracked on P3.', 'info'), 1500);
+    setTimeout(() => showToast('RailQuick OS v4 Ready — 3 orders in queue!', 'success'), 2000);
+
+    // Periodic agent status simulation
+    setInterval(() => {
+        const states = ['IDLE', 'COMPUTING', 'ACTIVE', 'MONITORING'];
+        setAgentStatus('router', 'ROUTING', 'processing');
+        setTimeout(() => setAgentStatus('router', 'IDLE', 'idle'), 3000);
+    }, 30000);
+
+    // Rush mode check on load
+    updateRushMode();
+
+    console.log('RailQuick Vendor OS v4 — Premium Edition loaded');
 });

@@ -1,584 +1,822 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RailQuick Vendor POS</title>
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>RailQuick — Premium Vendor OS</title>
+    <meta name="description" content="Ultra-premium AI-powered railway platform vendor OS.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
+<div class="app-container">
 
-        <!-- Mobile Top Header -->
-        <header class="app-header-mobile">
-            <h1 class="app-brand">RailQuick</h1>
-            <div class="header-right-meta">
-                <span class="stall-badge">P3 Express</span>
-                <span class="status-indicator online"></span>
+    <!-- ===== HEADER ===== -->
+    <header class="app-header-mobile">
+        <div class="header-brand-group">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2" ry="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="M8 19l-2 3"/><path d="M18 22l-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></svg>
             </div>
-        </header>
-
-        <!-- Main Content Area -->
-        <div class="main-canvas">
-            <!-- Live Marquee alert banner -->
-            <div class="live-alert-marquee">
-                <span class="marquee-icon">SYSTEM SIGNAL</span>
-                <div class="marquee-text-container">
-                    <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
-                </div>
+            <div>
+                <h1 class="app-brand">RailQuick</h1>
+                <div class="brand-tagline">Vendor OS · AI Dispatch</div>
             </div>
-
-            <!-- Dynamic Rush Hour Mode Banner -->
-            <div class="rush-hour-banner" id="rushHourBanner">
-                <span>RUSH MODE ACTIVATED</span>
-                <span>•</span>
-                <span id="rushModeOrders">Pending: 3 orders</span>
-                <span>•</span>
-                <span>Avg Pack: 32 sec</span>
-                <span>•</span>
-                <span>Staff Required: 3</span>
-            </div>
-
-            <!-- Scroll Area for Views -->
-            <main class="app-viewport">
-                <!-- ================= TAB 1: ACTIVE ORDERS ================= -->
-                <section id="tab-orders" class="tab-view active">
-                    <!-- Horizontal summary bar for mobile -->
-                    <div class="horizontal-summary-bar">
-                        <!-- Revenue & Analytics Block -->
-                        <div class="summary-stats-block">
-                            <div class="summary-stat">
-                                <span class="summary-lbl">Daily Sales</span>
-                                <span class="summary-val" id="salesTotalRevenue">₹2,840.00</span>
-                            </div>
-                            <div class="summary-stat">
-                                <span class="summary-lbl">Filled</span>
-                                <span class="summary-val" id="salesOrdersFilled">18</span>
-                            </div>
-                            <div class="summary-stat">
-                                <span class="summary-lbl">AI Relocated</span>
-                                <span class="summary-val" id="salesAiCommissions">4</span>
-                            </div>
-                        </div>
-
-                        <!-- Horizontally scrollable train arrivals ticker -->
-                        <div class="train-ticker-container">
-                            <span class="ticker-title">P3 Arrivals:</span>
-                            <div class="train-ticker-feed" id="upcomingTrainsList">
-                                <!-- Dynamic horizontal train badges go here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Active Orders Touch List -->
-                    <div class="orders-section-header">
-                        <h2>Active Fulfillment Queue</h2>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 11px; padding: 6px 12px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 700;">Prioritize Queue</button>
-                            <span class="orders-count-badge" id="activeOrdersBadge">3</span>
-                        </div>
-                    </div>
-                    
-                    <div class="orders-touch-list" id="active-orders-container">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- ================= TAB 2: STALL INVENTORY ================= -->
-                <section id="tab-inventory" class="tab-view">
-                    <!-- AI Stock Manager Alert Card -->
-                    <div class="ai-stock-manager-card" id="aiStockManagerAlert">
-                        <h4>AI Stock Alert: Expected Shortage</h4>
-                        <p>Water Bottles stock is low. High demand is expected due to upcoming train arrivals.</p>
-                        <div class="stock-stats-row">
-                            <span>Current Stock: <strong id="aiCurrentBottlesStock">18</strong></span>
-                            <span>•</span>
-                            <span>Expected Demand: <strong>64</strong></span>
-                        </div>
-                        <button class="action-btn primary-btn compact-btn" id="btnAiRefill" style="margin-top: 6px; background: #10b981; color: #ffffff; padding: 4px 10px; border-radius: var(--r-sm); font-size: 11px; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15);">Refill 50 Bottles</button>
-                    </div>
-
-                    <!-- Search and Add controls -->
-                    <div class="inventory-toolbar" style="margin-top: 15px;">
-                        <input type="text" id="inventorySearch" placeholder="Search stock items...">
-                        <button class="action-btn primary-btn compact-btn" id="btnAddNewItem">Add Item</button>
-                    </div>
-
-                    <div class="table-instructions">Double-tap cells to edit values directly. Press Enter to save.</div>
-
-                    <!-- Scrollable table container -->
-                    <div class="notion-table-wrapper" style="margin-top: 10px;">
-                        <table class="notion-table" id="inventoryTable">
-                            <thead>
-                                <tr id="inventoryTableHeaderRow">
-                                    <th data-prop="name">Name</th>
-                                    <th data-prop="category">Category</th>
-                                    <th data-prop="stock">Stock Level</th>
-                                    <th data-prop="price">Price</th>
-                                    <th data-prop="status">Status</th>
-                                    <th id="thAddColumn" class="add-column-header">+ Add Column</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryTableBody">
-                                <!-- Dynamic rows -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- ================= TAB 3: NOTION SYNC DESK ================= -->
-                <section id="tab-sync" class="tab-view">
-                    <div class="sync-grid">
-                        <div class="sync-panel-left">
-                            <div class="sync-card">
-                                <h3>Notion Sync Center</h3>
-                                <p class="sync-desc">Push live vendor sales, stock indices, and active dispatch logs to your cloud Notion databases.</p>
-
-                                <div class="sync-form-group">
-                                    <label>Sync Configuration</label>
-                                    <div class="sync-toggle-row">
-                                        <span class="toggle-lbl">Real Notion API Sync</span>
-                                        <input type="checkbox" id="notionIntegrationMode">
-                                    </div>
-                                    <span class="mode-descriptor-lbl" id="integrationModeLabel">Mock Sync (Interactive Console)</span>
-                                </div>
-
-                                <!-- Real API fields -->
-                                <div id="realNotionFields" style="display: none;">
-                                    <div class="form-group-mobile">
-                                        <label for="notionApiKey">Integration Token</label>
-                                        <input type="password" id="notionApiKey" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxx">
-                                    </div>
-                                    <div class="form-group-mobile">
-                                        <label for="notionOrdersDbId">Orders Database ID</label>
-                                        <input type="text" id="notionOrdersDbId" placeholder="32-character ID">
-                                    </div>
-                                    <div class="form-group-mobile">
-                                        <label for="notionInventoryDbId">Inventory Database ID</label>
-                                        <input type="text" id="notionInventoryDbId" placeholder="32-character ID">
-                                    </div>
-                                    <div class="form-group-mobile">
-                                        <label for="notionParentPageId">Notes Parent ID</label>
-                                        <input type="text" id="notionParentPageId" placeholder="32-character ID">
-                                    </div>
-                                </div>
-
-                                <div class="sync-actions-mobile">
-                                    <button class="action-btn primary-btn block-btn" id="saveSettingsBtn">Save Keys</button>
-                                    <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">Push Sync to Notion</button>
-                                    <button class="action-btn block-btn" id="btnOneTapReport" style="margin-top: 10px; background: #10b981; color: #ffffff; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 6px;">One-Tap Daily Report</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="sync-panel-right">
-                            <!-- Fulfillment Performance Card -->
-                            <div class="performance-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-                                <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 14px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 12px;">Fulfillment Metrics</h3>
-                                
-                                <div class="stats-mini-row" style="display: flex; justify-content: space-between; margin-bottom: 14px; gap: 10px;">
-                                    <div class="metric-box" style="text-align: center; flex: 1; border-right: 1px solid var(--border-color); padding-right: 8px;">
-                                        <div style="font-size: 9px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Avg Prep Time</div>
-                                        <div style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-top: 4px;" id="avgPrepTimeVal">1m 45s</div>
-                                    </div>
-                                    <div class="metric-box" style="text-align: center; flex: 1; padding-left: 8px;">
-                                        <div style="font-size: 9px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Satisfaction Rate</div>
-                                        <div style="font-size: 16px; font-weight: 800; color: var(--accent-purple); margin-top: 4px;">98.4%</div>
-                                    </div>
-                                </div>
-
-                                <div class="chart-title" style="font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.3px;">Order Volume (Hourly)</div>
-                                <div class="bar-chart-container" style="display: flex; align-items: flex-end; justify-content: space-around; height: 80px; background: rgba(0,0,0,0.01); border-bottom: 2px solid var(--border-color); padding: 4px 10px; margin-bottom: 6px;">
-                                    <div class="chart-bar-wrap" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-                                        <div class="chart-bar" id="chart-bar-9" style="width: 12px; height: 35%; background: var(--border-strong); border-radius: 3px 3px 0 0; transition: height 0.5s ease;"></div>
-                                        <span style="font-size: 8px; color: var(--text-muted); margin-top: 4px;">09:00</span>
-                                    </div>
-                                    <div class="chart-bar-wrap" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-                                        <div class="chart-bar" id="chart-bar-10" style="width: 12px; height: 60%; background: var(--border-strong); border-radius: 3px 3px 0 0; transition: height 0.5s ease;"></div>
-                                        <span style="font-size: 8px; color: var(--text-muted); margin-top: 4px;">10:00</span>
-                                    </div>
-                                    <div class="chart-bar-wrap" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-                                        <div class="chart-bar" id="chart-bar-11" style="width: 12px; height: 85%; background: var(--accent-purple); border-radius: 3px 3px 0 0; transition: height 0.5s ease;"></div>
-                                        <span style="font-size: 8px; color: var(--text-muted); margin-top: 4px;">11:00</span>
-                                    </div>
-                                    <div class="chart-bar-wrap" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-                                        <div class="chart-bar" id="chart-bar-12" style="width: 12px; height: 45%; background: var(--border-strong); border-radius: 3px 3px 0 0; transition: height 0.5s ease;"></div>
-                                        <span style="font-size: 8px; color: var(--text-muted); margin-top: 4px;">12:00</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Interactive Notion CLI Console -->
-                            <div class="mobile-console-card">
-                                <div class="console-card-header">
-                                    <span class="console-title">Notion Database Logs</span>
-                                    <button class="console-clear-btn" id="btnClearTerminal">Clear</button>
-                                </div>
-                                <div class="console-body" id="apiTerminalBody">
-                                    <div class="terminal-line system">Console ready. Sync databases to inspect raw JSON payloads.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ================= TAB 4: DEDICATED AI ASSISTANT TAB ================= -->
-                <section id="tab-ai" class="tab-view">
-                    <div class="ai-tab-container" style="padding: 16px; display: flex; flex-direction: column; gap: 16px;">
-                        <!-- AI Voice Desk Card -->
-                        <div class="ai-voice-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
-                            <h3 style="margin-bottom: 12px; font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">AI Voice Desk</h3>
-                            
-                            <!-- Siri/Gemini Pulsing Orb Assistant -->
-                            <div class="ai-assistant-orb-container" id="aiAssistantOrbContainer">
-                                <div class="orb-pulse-ring-1"></div>
-                                <div class="orb-pulse-ring-2"></div>
-                                <div class="orb-ring-outer"></div>
-                                <div class="orb-ring-inner"></div>
-                                <div class="ai-assistant-orb" id="btnVoiceMic" title="Tap to speak"></div>
-                            </div>
-                            
-                            <div class="voice-status-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-bottom: 12px;">
-                                <div class="voice-status" id="voiceStatus" style="font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Tap the Orb to Speak</div>
-                            </div>
-
-                            <!-- Visual sound wave container -->
-                            <div class="audio-wave-container" id="audioWaveContainer" style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 32px; margin-bottom: 12px; background: rgba(0, 0, 0, 0.02); border-radius: var(--r-sm); border: 1px dashed var(--border-color); padding: 4px;">
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                                <div class="audio-wave-bar" style="width: 4px; height: 10px; background: var(--accent-purple); border-radius: var(--r-pill); transition: height 0.15s ease;"></div>
-                            </div>
-
-                            <!-- Conversational chat thread log container -->
-                            <div class="voice-chat-thread" id="voiceChatThread" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; min-height: 130px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--r-sm); padding: 12px; margin-bottom: 12px; scroll-behavior: smooth;">
-                                <!-- Bubbles injected dynamically -->
-                            </div>
-
-                            <!-- Command Quick-Chips -->
-                            <div class="voice-command-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
-                                <button class="voice-chip" data-query="prioritize orders" style="font-size: 11px; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border-strong); background: rgba(16, 185, 129, 0.05); color: var(--accent-purple); font-weight: 700; cursor: pointer; transition: all 0.2s ease;">Pehle kya banaye?</button>
-                                <button class="voice-chip" data-query="check trains" style="font-size: 11px; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Train kab aayegi?</button>
-                                <button class="voice-chip" data-query="stock status" style="font-size: 11px; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Stock low hai kya?</button>
-                                <button class="voice-chip" data-query="hello" style="font-size: 11px; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Namaste AI</button>
-                            </div>
-
-                            <div class="voice-hints-row" style="font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; background: rgba(0,0,0,0.01); padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-color);">
-                                <span style="font-weight:700;">Suggested Commands:</span>
-                                <span>- "prioritize orders" (Pehle konsa banaye?)</span>
-                                <span>- "check trains" (Timetable schedules)</span>
-                                <span>- "stock status" (Inventory healthcheck)</span>
-                            </div>
-                        </div>
-
-                        <!-- Platform Map Schematic Card -->
-                        <div class="ai-map-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
-                            <div class="map-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Platform Schematic Map</h3>
-                                <span class="status-indicator online"></span>
-                                                      <div class="platforms-mini-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-                                <div class="mini-plat-row" id="mini-plat-1" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
-                                    <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P1</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-1" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
-                                    <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
-                                </div>
-                                <div class="mini-plat-row" id="mini-plat-2" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
-                                    <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P2</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-2" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
-                                    <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
-                                </div>
-                                <div class="mini-plat-row active-stall" id="mini-plat-3" style="display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.09); border: 1px solid rgba(16, 185, 129, 0.45); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px;">
-                                    <span class="p-num" style="font-weight:700; width:20px; color: var(--accent-purple);">P3</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-3" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
-                                    <span class="p-vend" style="font-size: 10px; color:var(--accent-purple); width:50px; text-align:right; font-weight: 700;">Us</span>
-                                </div>
-                                <div class="mini-plat-row" id="mini-plat-4" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
-                                    <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P4</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-4" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
-                                    <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
-                                </div>
-                                <div class="mini-plat-row" id="mini-plat-5" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 8px 12px; border-radius: var(--r-sm); font-size: 12px; border: 1px solid var(--border-color);">
-                                    <span class="p-num" style="font-weight:700; width:20px; color: var(--text-muted);">P5</span>
-                                    <div class="p-track" style="flex:1; height: 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 6px; position: relative; overflow: hidden;"><div class="mini-train-slot" id="train-slot-5" style="position: absolute; top: 2px; left: 5px; height: 8px; width: 60px; background: var(--accent-purple); border-radius: 4px; opacity: 0; transition: left 0.3s, opacity 0.3s;"></div></div>
-                                    <span class="p-vend" style="font-size: 10px; color:var(--text-muted); width:50px; text-align:right;">Partner</span>
-                                </div>
-                            </div>    </div>
-                            
-                            <!-- Mini Logs -->
-                            <div class="mini-logs-box" id="relocationLogs" style="background: #1e2d24; padding: 10px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 11px; color: #a4bea8; max-height: 100px; overflow-y: auto; border: 1px solid var(--border-color);">
-                                <div class="mini-log system">Router ready. Listening to Station master...</div>
-                            </div>
-                        </div>
-
-                        <!-- Live Train Radar Card -->
-                        <div class="ai-radar-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-                            <div class="radar-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 14px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Live platform Transit Radar</h3>
-                                <span class="radar-ping-dot" style="width: 8px; height: 8px; background: var(--accent-purple); border-radius: 50%; display: inline-block;"></span>
-                            </div>
-                            
-                            <div class="radar-timeline-wrapper" style="position: relative; height: 44px; background: rgba(0,0,0,0.02); border-radius: var(--r-sm); border: 1px solid var(--border-color); margin-bottom: 10px; overflow: hidden; display: flex; align-items: center; padding: 0 16px;">
-                                <!-- Distance labels -->
-                                <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: space-between; padding: 4px 16px; font-size: 8px; color: var(--text-muted); font-weight: 700; pointer-events: none;">
-                                    <span>2.0km</span>
-                                    <span>1.0km</span>
-                                    <span>Station Platform 3 (Us)</span>
-                                </div>
-                                <!-- Transit Track Line -->
-                                <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; position: relative;">
-                                    <!-- Dynamic Train Tracker dots -->
-                                    <div class="radar-train-dot" id="radar-train-12423" style="position: absolute; left: 15%; top: -6px; width: 16px; height: 16px; background: var(--accent-purple); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: left 1s linear; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #ffffff;">1</div>
-                                    <div class="radar-train-dot" id="radar-train-12056" style="position: absolute; left: 45%; top: -6px; width: 16px; height: 16px; background: var(--accent-orange); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: left 1s linear; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #ffffff;">2</div>
-                                    <div class="radar-train-dot" id="radar-train-12952" style="position: absolute; left: 75%; top: -6px; width: 16px; height: 16px; background: var(--accent-blue); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: left 1s linear; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #ffffff;">3</div>
-                                </div>
-                            </div>
-                            <div class="radar-status-lbl" style="font-size: 10px; color: var(--text-muted); text-align: center; font-weight: 600;">AI Signals scanning. Train dots advance in real-time.</div>
-                        </div>
-
-                        <!-- AI Agents Node Monitor Card -->
-                        <div class="ai-agents-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-                            <div class="agents-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <h3 style="font-weight: 700; font-family: var(--font-heading); font-size: 14px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">Active AI Agents Node Monitor</h3>
-                                <span class="status-indicator online"></span>
-                            </div>
-                            
-                            <div class="agents-grid" style="display: flex; flex-direction: column; gap: 10px;">
-                                <div class="agent-node" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.01); border: 1px solid var(--border-color); border-radius: var(--r-sm);">
-                                    <div style="display:flex; align-items:center; gap: 8px;">
-                                        <div class="agent-pulse-dot active" id="agent-dot-prioritizer" style="width: 8px; height: 8px; background: var(--accent-purple); border-radius: 50%; position:relative;"></div>
-                                        <span style="font-size: 12px; font-weight:700; color: var(--text-main);">Prioritizer Agent</span>
-                                    </div>
-                                    <span class="agent-status-badge" id="agent-status-prioritizer" style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--accent-purple); background: var(--accent-purple-soft); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16,185,129,0.2);">ACTIVE</span>
-                                </div>
-                                <div class="agent-node" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.01); border: 1px solid var(--border-color); border-radius: var(--r-sm);">
-                                    <div style="display:flex; align-items:center; gap: 8px;">
-                                        <div class="agent-pulse-dot" id="agent-dot-router" style="width: 8px; height: 8px; background: var(--accent-orange); border-radius: 50%;"></div>
-                                        <span style="font-size: 12px; font-weight:700; color: var(--text-main);">Routing Agent</span>
-                                    </div>
-                                    <span class="agent-status-badge" id="agent-status-router" style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: rgba(0,0,0,0.03); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">IDLE</span>
-                                </div>
-                                <div class="agent-node" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.01); border: 1px solid var(--border-color); border-radius: var(--r-sm);">
-                                    <div style="display:flex; align-items:center; gap: 8px;">
-                                        <div class="agent-pulse-dot" id="agent-dot-stock" style="width: 8px; height: 8px; background: var(--accent-blue); border-radius: 50%;"></div>
-                                        <span style="font-size: 12px; font-weight:700; color: var(--text-main);">Stock Agent</span>
-                                    </div>
-                                    <span class="agent-status-badge" id="agent-status-stock" style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: rgba(0,0,0,0.03); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">MONITORING</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notion Daily operational summary report Card -->
-                        <div class="ai-report-card" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--r-md); padding: 18px; box-shadow: var(--shadow-sm);">
-                            <h3 style="margin-bottom: 12px; font-weight: 700; font-family: var(--font-heading); font-size: 15px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Notion Daily Report</h3>
-                            <button class="ai-preset-option" id="btnTriggerDailyReport" style="border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); padding: 12px; display: flex; text-align: left; width: 100%; border-radius: var(--r-sm); margin-bottom: 12px; cursor: pointer; align-items: center;">
-                                <span class="p-icon" style="color:#10b981; font-weight: bold; margin-right: 12px; font-size: 12px;">[REPORT]</span>
-                                <div class="p-meta">
-                                    <span class="p-title" style="color:#10b981; font-weight: 700; display: block; font-size: 13px;">Generate One-Tap Daily Summary</span>
-                                    <span class="p-desc" style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">Aggregates orders, sales total, lost revenues, and demand forecast</span>
-                                </div>
-                            </button>
-
-                            <div class="ai-output-container" style="border: 1px solid var(--border-color); border-radius: var(--r-md); overflow: hidden; margin-top: 10px;">
-                                <div class="output-header" style="background: rgba(0,0,0,0.03); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color);">
-                                    <span>Preview Report Markdown</span>
-                                    <button class="output-copy-btn" id="btnCopyNote" style="color: var(--accent-blue); cursor: pointer; font-weight: 700;">Copy</button>
-                                </div>
-                                <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI report will stream here..." style="font-family: var(--font-ui); font-size: 12px; line-height: 1.5; min-height: 120px; max-height: 180px; overflow-y: auto; background: var(--bg-card); padding: 12px; color: var(--text-main);">
-                                    <h1>Daily Operations Summary - Platform 3</h1>
-                                    <p>Tap the button above to compile today's live station logs into a structured Notion report.</p>
-                                </div>
-                            </div>
-
-                            <button class="action-btn primary-btn block-btn" id="btnPushReportToNotion" style="margin-top: 12px; background: #10b981; color: #ffffff; width: 100%; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; height: 42px; border-radius: var(--r-sm); cursor: pointer;">Push Report to Notion</button>
-                        </div>
-                    </div>
-                </section>
-            </main>
         </div>
+        <div class="header-right-meta">
+            <span class="header-time-display" id="headerClock">13:19</span>
+            <span class="stall-badge">P3 Express</span>
+            <span class="status-indicator online" title="Connected"></span>
+        </div>
+    </header>
 
-        <!-- Floating Mic Shortcut Button (FAB) on Orders tab -->
-        <button class="floating-voice-fab" id="btnVoiceShortcut" title="Speak to AI Assistant">
-            <svg class="mic-svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-            </svg>
-        </button>
-
-        <!-- Mobile Bottom Tab Bar Navigation -->
-        <nav class="app-bottom-nav">
-            <button class="nav-item active" data-tab="orders">
-                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                </svg>
-                <span class="nav-lbl">Orders</span>
-            </button>
-            <button class="nav-item" data-tab="inventory">
-                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="9"></rect>
-                    <rect x="14" y="3" width="7" height="5"></rect>
-                    <rect x="14" y="12" width="7" height="9"></rect>
-                    <rect x="3" y="16" width="7" height="5"></rect>
-                </svg>
-                <span class="nav-lbl">Inventory</span>
-            </button>
-            <button class="nav-item" data-tab="sync">
-                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"></path>
-                </svg>
-                <span class="nav-lbl">Sync</span>
-            </button>
-            <button class="nav-item" data-tab="ai">
-                <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2Z"></path>
-                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2Z"></path>
-                </svg>
-                <span class="nav-lbl">AI Agent</span>
-            </button>
-        </nav>
-
+    <!-- ===== LIVE ALERT MARQUEE ===== -->
+    <div class="live-alert-marquee">
+        <span class="marquee-icon">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            LIVE
+        </span>
+        <div class="marquee-text-container">
+            <span class="marquee-text" id="liveMarqueeText">AI dispatcher active — Platform 3 Express lane open · Next train Rajdhani Express in 2min · Stock Agent: Water Bottle alert triggered · Rush Mode standby</span>
+        </div>
     </div>
 
-    <!-- Notification Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- ===== RUSH HOUR BANNER ===== -->
+    <div class="rush-hour-banner" id="rushHourBanner">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span>RUSH MODE</span>
+        <span>•</span>
+        <span id="rushModeOrders">3 Pending</span>
+        <span>•</span>
+        <span>Avg Pack: 32s</span>
+        <span>•</span>
+        <span>Staff: 3 Active</span>
+    </div>
 
-    <!-- Add Item Modal (Stock) -->
-    <div class="modal" id="addItemModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Inventory Item</h3>
-                <span class="close-modal" id="closeItemModal">&times;</span>
-            </div>
-            <form id="addItemForm" class="modal-form">
-                <div class="form-group-mobile">
-                    <label for="itemName">Item Name</label>
-                    <input type="text" id="itemName" required placeholder="e.g. Bread Butter">
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-canvas">
+        <main class="app-viewport custom-scroll">
+
+            <!-- ============================================================
+                 TAB 1: ACTIVE ORDERS
+                 ============================================================ -->
+            <section id="tab-orders" class="tab-view active">
+
+                <!-- KPI Summary Row -->
+                <div class="horizontal-summary-bar">
+                    <div class="kpi-row">
+                        <div class="kpi-card kpi-cyan">
+                            <span class="kpi-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+                            <span class="kpi-label">Revenue</span>
+                            <span class="kpi-value cyan" id="salesTotalRevenue">₹2,840</span>
+                        </div>
+                        <div class="kpi-card kpi-green">
+                            <span class="kpi-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+                            <span class="kpi-label">Filled</span>
+                            <span class="kpi-value green" id="salesOrdersFilled">18</span>
+                        </div>
+                        <div class="kpi-card kpi-amber">
+                            <span class="kpi-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+                            <span class="kpi-label">AI Done</span>
+                            <span class="kpi-value amber" id="salesAiCommissions">4</span>
+                        </div>
+                        <div class="kpi-card kpi-violet">
+                            <span class="kpi-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                            <span class="kpi-label">Avg Time</span>
+                            <span class="kpi-value violet" id="avgPrepKpi">1:45</span>
+                        </div>
+                    </div>
+
+                    <!-- Train Ticker -->
+                    <div class="train-ticker-container">
+                        <span class="ticker-title">
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px; vertical-align:-2px;"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                            P3:
+                        </span>
+                        <div class="train-ticker-feed" id="upcomingTrainsList">
+                            <!-- Dynamic badges -->
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group-mobile">
-                    <label for="itemCategory">Category</label>
-                    <select id="itemCategory">
+
+                <!-- Handoff Countdown Timer -->
+                <div class="next-train-strip" id="nextTrainStrip">
+                    <div>
+                        <div class="strip-label">Next Handoff</div>
+                        <div class="strip-train" id="stripTrainName">Rajdhani Express</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:10px;color:var(--text-muted);font-weight:600;">ETA</span>
+                        <div class="strip-eta" id="stripEtaDisplay">02:00</div>
+                    </div>
+                </div>
+
+                <!-- Handoff Timer Widget -->
+                <div style="padding: 10px 16px 0;">
+                    <div class="handoff-timer-card">
+                        <div class="handoff-row">
+                            <div class="handoff-info">
+                                <div class="handoff-label">Active Handoff Target</div>
+                                <div class="handoff-name" id="handoffTrainName">Rajdhani Express · #12423</div>
+                                <div class="handoff-platform">Platform 3 · Coach A1-A3</div>
+                            </div>
+                            <div class="handoff-countdown" id="handoffTimer">02:00</div>
+                        </div>
+                        <div class="handoff-progress">
+                            <div class="handoff-fill" id="handoffFill" style="width:70%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Orders Header with controls -->
+                <div class="orders-section-header" style="padding-top:16px;">
+                    <h2>Active Queue</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-prioritize" id="btnAutoPrioritize">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Prioritize
+                        </button>
+                        <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                    </div>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="Pending">Pending</button>
+                    <button class="filter-tab" data-filter="Preparing">Preparing</button>
+                    <button class="filter-tab" data-filter="Ready">Ready</button>
+                    <button class="filter-tab" data-filter="Delivered">Delivered</button>
+                </div>
+
+                <!-- Order Cards -->
+                <div class="orders-touch-list" id="active-orders-container">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Scanner Widget -->
+                <div style="padding: 0 14px 16px;">
+                    <div class="scanner-widget" id="scannerWidget">
+                        <div class="scanner-icon-wrap">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                        </div>
+                        <div class="scanner-text">
+                            <div class="scanner-title">Scan QR / Barcode</div>
+                            <div class="scanner-desc">Tap to open camera scanner for quick order lookup</div>
+                        </div>
+                        <svg class="scanner-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                    </div>
+                </div>
+
+                <!-- Staff Roster -->
+                <div style="padding: 0 16px 16px;">
+                    <div style="font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Staff Roster
+                    </div>
+                    <div class="staff-row">
+                        <div class="staff-slot active">
+                            <div class="staff-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                            <div class="staff-name">Ravi</div>
+                            <div class="staff-status-dot"></div>
+                        </div>
+                        <div class="staff-slot busy">
+                            <div class="staff-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                            <div class="staff-name">Priya</div>
+                            <div class="staff-status-dot"></div>
+                        </div>
+                        <div class="staff-slot active">
+                            <div class="staff-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                            <div class="staff-name">Arun</div>
+                            <div class="staff-status-dot"></div>
+                        </div>
+                        <div class="staff-slot offline">
+                            <div class="staff-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                            <div class="staff-name">Neha</div>
+                            <div class="staff-status-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TAB 2: INVENTORY
+                 ============================================================ -->
+            <section id="tab-inventory" class="tab-view">
+
+                <div class="inventory-header">
+                    <h2>Stock Manager</h2>
+                    <button class="btn btn-solid-cyan btn-sm" id="btnAddNewItem">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Item
+                    </button>
+                </div>
+
+                <!-- AI Alert -->
+                <div class="ai-stock-alert-card" id="aiStockManagerAlert">
+                    <div class="alert-header">
+                        <span class="alert-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </span>
+                        <span class="alert-title">AI Stock Alert</span>
+                    </div>
+                    <div class="alert-body">Water Bottles critically low. High demand expected from 3 incoming trains.</div>
+                    <div class="alert-stats">
+                        <span>Current: <strong id="aiCurrentBottlesStock">18</strong> units</span>
+                        <span>Expected Demand: <strong>64</strong> units</span>
+                    </div>
+                    <button class="btn btn-solid-green btn-sm" id="btnAiRefill">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
+                        Refill 50 Bottles
+                    </button>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="inventory-toolbar">
+                    <div class="search-input-wrap">
+                        <svg class="search-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="inventorySearch" placeholder="Search stock items...">
+                    </div>
+                </div>
+
+                <div class="filter-tabs" style="padding-top:0;">
+                    <button class="filter-tab active" data-cat="All">All</button>
+                    <button class="filter-tab" data-cat="Food">Food</button>
+                    <button class="filter-tab" data-cat="Beverage">Beverage</button>
+                    <button class="filter-tab" data-cat="Snack">Snack</button>
+                    <button class="filter-tab" data-cat="Other">Other</button>
+                </div>
+
+                <!-- Inventory Cards -->
+                <div class="inventory-grid" id="inventoryGrid">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <div style="height:20px;"></div>
+            </section>
+
+            <!-- ============================================================
+                 TAB 3: ANALYTICS
+                 ============================================================ -->
+            <section id="tab-analytics" class="tab-view">
+                <div class="analytics-container">
+                    <div class="analytics-header">
+                        <h2>Analytics Hub</h2>
+                        <p>Today's performance · Platform 3 Express</p>
+                    </div>
+
+                    <!-- Revenue Chart Card -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <div class="chart-title">Hourly Revenue</div>
+                                <div class="chart-subtitle">Orders fulfilled per hour</div>
+                            </div>
+                            <div>
+                                <div class="chart-value" id="chartRevTotal">₹2,840</div>
+                                <div class="chart-delta">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                                    18% vs yesterday
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bar-chart" id="revenueBarChart">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Metrics Pill Row -->
+                    <div class="metrics-row">
+                        <div class="metric-pill cyan-accent">
+                            <div class="metric-pill-label">Avg Prep Time</div>
+                            <div class="metric-pill-value cyan">1:45</div>
+                            <div class="metric-pill-sub">Target: 2:00</div>
+                        </div>
+                        <div class="metric-pill green-accent">
+                            <div class="metric-pill-label">Fill Rate</div>
+                            <div class="metric-pill-value green">98.4%</div>
+                            <div class="metric-pill-sub">18 of 18 orders</div>
+                        </div>
+                        <div class="metric-pill amber-accent">
+                            <div class="metric-pill-label">AI Assists</div>
+                            <div class="metric-pill-value amber">4</div>
+                            <div class="metric-pill-sub">Auto-routed today</div>
+                        </div>
+                        <div class="metric-pill violet-accent">
+                            <div class="metric-pill-label">Rating</div>
+                            <div class="metric-pill-value violet">4.9★</div>
+                            <div class="metric-pill-sub">From 12 reviews</div>
+                        </div>
+                    </div>
+
+                    <!-- Order Category Donut -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <div class="chart-title">Order Mix</div>
+                                <div class="chart-subtitle">By category today</div>
+                            </div>
+                        </div>
+                        <div class="donut-wrap">
+                            <svg class="donut-svg" viewBox="0 0 120 120">
+                                <!-- Donut circles -->
+                                <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="18"/>
+                                <circle cx="60" cy="60" r="40" fill="none" stroke="#00d4ff" stroke-width="18"
+                                    stroke-dasharray="100 151" stroke-dashoffset="-88" stroke-linecap="round"
+                                    style="transform:rotate(-90deg);transform-origin:60px 60px"/>
+                                <circle cx="60" cy="60" r="40" fill="none" stroke="#00ff88" stroke-width="18"
+                                    stroke-dasharray="56 195" stroke-dashoffset="-188" stroke-linecap="round"
+                                    style="transform:rotate(-90deg);transform-origin:60px 60px"/>
+                                <circle cx="60" cy="60" r="40" fill="none" stroke="#ffb700" stroke-width="18"
+                                    stroke-dasharray="45 206" stroke-dashoffset="-244" stroke-linecap="round"
+                                    style="transform:rotate(-90deg);transform-origin:60px 60px"/>
+                                <text x="60" y="57" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="800" font-family="Outfit,sans-serif">18</text>
+                                <text x="60" y="70" text-anchor="middle" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">ORDERS</text>
+                            </svg>
+                            <div class="donut-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--neon-cyan)"></div>
+                                    <span class="legend-lbl">Food</span>
+                                    <span class="legend-pct">40%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--neon-green)"></div>
+                                    <span class="legend-lbl">Beverages</span>
+                                    <span class="legend-pct">22%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--neon-amber)"></div>
+                                    <span class="legend-lbl">Snacks</span>
+                                    <span class="legend-pct">18%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--neon-violet)"></div>
+                                    <span class="legend-lbl">Other</span>
+                                    <span class="legend-pct">20%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fulfillment Speed Widget -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <div class="chart-title">Fulfillment Speed</div>
+                                <div class="chart-subtitle">Current throughput vs target</div>
+                            </div>
+                        </div>
+                        <div class="speed-widget" style="border:none;padding:4px 0 0;">
+                            <svg class="speed-arc-svg" viewBox="0 0 140 80">
+                                <!-- Background arc -->
+                                <path d="M 10 70 A 60 60 0 0 1 130 70" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="10" stroke-linecap="round"/>
+                                <!-- Progress arc (78% speed) -->
+                                <path d="M 10 70 A 60 60 0 0 1 130 70" fill="none" stroke="url(#speedGrad)" stroke-width="10" stroke-linecap="round"
+                                    stroke-dasharray="188" stroke-dashoffset="41"/>
+                                <defs>
+                                    <linearGradient id="speedGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#00ff88"/>
+                                        <stop offset="70%" style="stop-color:#00d4ff"/>
+                                        <stop offset="100%" style="stop-color:#a855f7"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Tick marks -->
+                                <text x="6" y="80" fill="#64748b" font-size="8" font-family="Inter">0</text>
+                                <text x="125" y="80" fill="#64748b" font-size="8" font-family="Inter">MAX</text>
+                                <!-- Needle -->
+                                <line x1="70" y1="70" x2="108" y2="34" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="70" cy="70" r="5" fill="var(--neon-cyan)" opacity="0.8"/>
+                            </svg>
+                            <div class="flex gap-4" style="width:100%;justify-content:center;gap:24px;">
+                                <div style="text-align:center;">
+                                    <div class="speed-value glow-cyan">78%</div>
+                                    <div class="speed-unit">Efficiency</div>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div class="speed-value" style="color:var(--neon-green);">32s</div>
+                                    <div class="speed-unit">Avg Pack</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TAB 4: SYNC / SETTINGS
+                 ============================================================ -->
+            <section id="tab-sync" class="tab-view">
+                <div class="sync-container">
+
+                    <!-- Notion Sync Card -->
+                    <div class="sync-card">
+                        <div class="sync-card-title">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                            Notion Sync
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-label">Real API Sync</div>
+                                <div class="toggle-desc">Enable live Notion database push</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notionIntegrationMode">
+                                <span class="toggle-track"></span>
+                            </label>
+                        </div>
+                        <div id="realNotionFields" style="display:none;margin-top:12px;">
+                            <div class="form-field">
+                                <label>Integration Token</label>
+                                <input type="password" class="form-input" id="notionApiKey" placeholder="secret_xxxxxxxxxxxx">
+                            </div>
+                            <div class="form-field">
+                                <label>Orders DB ID</label>
+                                <input type="text" class="form-input" id="notionOrdersDbId" placeholder="32-character database ID">
+                            </div>
+                            <div class="form-field">
+                                <label>Inventory DB ID</label>
+                                <input type="text" class="form-input" id="notionInventoryDbId" placeholder="32-character database ID">
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+                            <button class="btn btn-solid-cyan btn-full" id="saveSettingsBtn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                Save Settings
+                            </button>
+                            <button class="btn btn-cyan btn-full" id="notionSyncBtn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                Push Sync to Notion
+                            </button>
+                            <button class="btn btn-solid-green btn-full" id="btnOneTapReport">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                One-Tap Daily Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Performance Card -->
+                    <div class="sync-card">
+                        <div class="sync-card-title">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+                            Fulfillment Metrics
+                        </div>
+                        <div class="perf-stat-grid">
+                            <div class="perf-stat">
+                                <div class="perf-stat-val" id="avgPrepTimeVal">1:45</div>
+                                <div class="perf-stat-lbl">Avg Prep</div>
+                            </div>
+                            <div class="perf-stat">
+                                <div class="perf-stat-val" style="color:var(--neon-green);">98.4%</div>
+                                <div class="perf-stat-lbl">Fill Rate</div>
+                            </div>
+                            <div class="perf-stat">
+                                <div class="perf-stat-val" style="color:var(--neon-amber);">4.9★</div>
+                                <div class="perf-stat-lbl">Rating</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Console -->
+                    <div class="console-card scanline">
+                        <div class="console-header">
+                            <span class="console-title">▶ Notion Database Logs</span>
+                            <button class="btn btn-xs btn-ghost" id="btnClearTerminal">Clear</button>
+                        </div>
+                        <div class="console-body" id="apiTerminalBody">
+                            <span class="terminal-line system">[ RAILQUICK OS ] Console initialized. Sync to inspect JSON payloads.</span>
+                        </div>
+                    </div>
+
+                    <!-- Daily Report -->
+                    <div class="sync-card">
+                        <div class="sync-card-title">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Daily Report Generator
+                        </div>
+                        <button class="btn btn-amber btn-full" id="btnTriggerDailyReport" style="margin-bottom:10px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Generate AI Summary
+                        </button>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Preview Output</span>
+                            <button class="btn btn-xs btn-ghost" id="btnCopyNote">Copy</button>
+                        </div>
+                        <div class="report-output" id="editorContent">
+                            <p style="color:var(--text-muted);font-style:italic;">Tap "Generate AI Summary" to compile today's data...</p>
+                        </div>
+                        <button class="btn btn-solid-green btn-full" id="btnPushReportToNotion" style="margin-top:10px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"/></svg>
+                            Push to Notion
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TAB 5: AI ASSISTANT
+                 ============================================================ -->
+            <section id="tab-ai" class="tab-view">
+                <div class="ai-container">
+
+                    <!-- AI Voice Desk -->
+                    <div class="ai-orb-wrap">
+                        <div class="orb-container" id="aiAssistantOrbContainer">
+                            <div class="orb-ring orb-ring-1"></div>
+                            <div class="orb-ring orb-ring-2"></div>
+                            <div class="orb-ring orb-ring-3"></div>
+                            <div class="orb-core" id="btnVoiceMic">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </div>
+                        </div>
+                        <div class="orb-status" id="voiceStatus">Tap to Speak</div>
+                        <div class="audio-wave" id="audioWaveContainer">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                        <div class="chat-thread custom-scroll" id="voiceChatThread">
+                            <div class="chat-bubble ai">Greetings. RailQuick AI Assistant is online. How can I optimize your workflow today?</div>
+                        </div>
+                        <div class="quick-chips" id="voiceCommandChips">
+                            <button class="quick-chip" data-query="prioritize orders">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                Prioritize queue
+                            </button>
+                            <button class="quick-chip" data-query="check trains">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><rect x="4" y="3" width="16" height="16" rx="2" ry="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="M8 19l-2 3"/><path d="M18 22l-2-3"/></svg>
+                                Train status
+                            </button>
+                            <button class="quick-chip" data-query="stock status">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                Stock check
+                            </button>
+                            <button class="quick-chip" data-query="daily revenue">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                Today's revenue
+                            </button>
+                            <button class="quick-chip" data-query="rush mode">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                                Activate rush
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Platform Schematic Map -->
+                    <div class="platform-map-card">
+                        <div class="platform-map-title">
+                            <span class="status-indicator online" style="flex-shrink:0;"></span>
+                            Platform Schematic Map
+                        </div>
+
+                        <div id="platformRows">
+                            <div class="platform-row">
+                                <span class="plat-num">P1</span>
+                                <div class="plat-track"><div class="train-slot" id="train-slot-1" style="background:var(--neon-violet)"></div></div>
+                                <span class="plat-label">Partner</span>
+                            </div>
+                            <div class="platform-row">
+                                <span class="plat-num">P2</span>
+                                <div class="plat-track"><div class="train-slot" id="train-slot-2" style="background:var(--neon-amber)"></div></div>
+                                <span class="plat-label">Partner</span>
+                            </div>
+                            <div class="platform-row our-stall">
+                                <span class="plat-num">P3</span>
+                                <div class="plat-track"><div class="train-slot" id="train-slot-3" style="background:var(--neon-cyan)"></div></div>
+                                <span class="plat-label" style="display:flex;align-items:center;gap:4px;">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    Our Stall
+                                </span>
+                            </div>
+                            <div class="platform-row">
+                                <span class="plat-num">P4</span>
+                                <div class="plat-track"><div class="train-slot" id="train-slot-4" style="background:var(--neon-green)"></div></div>
+                                <span class="plat-label">Partner</span>
+                            </div>
+                            <div class="platform-row">
+                                <span class="plat-num">P5</span>
+                                <div class="plat-track"><div class="train-slot" id="train-slot-5" style="background:var(--neon-red)"></div></div>
+                                <span class="plat-label">Partner</span>
+                            </div>
+                        </div>
+
+                        <div class="console-body scanline" id="relocationLogs" style="border:1px solid rgba(0,212,255,0.12);border-radius:var(--r-sm);margin-top:10px;background:rgba(0,10,20,0.5);">
+                            <span class="terminal-line system">Router ready. Listening to Station Master signals...</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Radar -->
+                    <div class="platform-map-card">
+                        <div class="platform-map-title">
+                            <span style="color:var(--neon-red);animation:pulse-green 1s ease-in-out infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--neon-red);"></span>
+                            Live Transit Radar
+                        </div>
+                        <div class="radar-wrapper">
+                            <div class="radar-track"></div>
+                            <div class="radar-station-marker" title="Platform 3 — Our Stall"></div>
+                            <div class="radar-train-dot" id="radar-train-12423" style="left:10%;background:var(--neon-red);">1</div>
+                            <div class="radar-train-dot" id="radar-train-12056" style="left:42%;background:var(--neon-amber);">2</div>
+                            <div class="radar-train-dot" id="radar-train-12952" style="left:70%;background:var(--neon-cyan);">3</div>
+                        </div>
+                        <div class="radar-labels">
+                            <span>2.0 km</span>
+                            <span>1.0 km</span>
+                            <span>Platform 3 ▲</span>
+                        </div>
+                    </div>
+
+                    <!-- AI Agent Monitor -->
+                    <div class="platform-map-card">
+                        <div class="platform-map-title">
+                            <span class="status-indicator online" style="flex-shrink:0;"></span>
+                            AI Agent Node Monitor
+                        </div>
+                        <div class="agents-grid">
+                            <div class="agent-node">
+                                <div class="agent-left">
+                                    <div class="agent-indicator active" style="background:var(--neon-green);"></div>
+                                    <div>
+                                        <div class="agent-name">Prioritizer Agent</div>
+                                        <div class="agent-desc">Smart order queue sorting</div>
+                                    </div>
+                                </div>
+                                <span class="agent-badge active" id="agent-status-prioritizer">ACTIVE</span>
+                            </div>
+                            <div class="agent-node">
+                                <div class="agent-left">
+                                    <div class="agent-indicator idle" id="agent-dot-router"></div>
+                                    <div>
+                                        <div class="agent-name">Routing Agent</div>
+                                        <div class="agent-desc">Platform reallocation engine</div>
+                                    </div>
+                                </div>
+                                <span class="agent-badge idle" id="agent-status-router">IDLE</span>
+                            </div>
+                            <div class="agent-node">
+                                <div class="agent-left">
+                                    <div class="agent-indicator monitoring" id="agent-dot-stock"></div>
+                                    <div>
+                                        <div class="agent-name">Stock Agent</div>
+                                        <div class="agent-desc">Live inventory sentinel</div>
+                                    </div>
+                                </div>
+                                <span class="agent-badge monitoring" id="agent-status-stock">MONITORING</span>
+                            </div>
+                            <div class="agent-node">
+                                <div class="agent-left">
+                                    <div class="agent-indicator" id="agent-dot-forecast" style="background:var(--neon-violet);animation:pulse-amber 2s ease-in-out infinite;"></div>
+                                    <div>
+                                        <div class="agent-name">Demand Forecaster</div>
+                                        <div class="agent-desc">Train-based demand prediction</div>
+                                    </div>
+                                </div>
+                                <span class="agent-badge processing" id="agent-status-forecast">COMPUTING</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notion Report -->
+                    <div class="platform-map-card">
+                        <div class="platform-map-title">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Notion Daily Report
+                        </div>
+                        <button class="btn btn-green btn-full" id="btnTriggerDailyReport2" style="margin-bottom:10px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Generate Operations Summary
+                        </button>
+                        <div class="report-output" id="editorContent2">
+                            <p style="color:var(--text-muted);font-style:italic;">AI will compile today's logs and demand analysis here...</p>
+                        </div>
+                        <button class="btn btn-solid-green btn-full" id="btnPushReportToNotion2" style="margin-top:10px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-2.73"/></svg>
+                            Push to Notion
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===== BOTTOM TAB BAR ===== -->
+    <nav class="app-bottom-nav">
+        <button class="nav-item active" data-tab="orders" id="navOrders">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            <span class="nav-lbl">Orders</span>
+            <span class="nav-badge hidden" id="ordersBadge">3</span>
+        </button>
+        <button class="nav-item" data-tab="inventory" id="navInventory">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/>
+                <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
+            </svg>
+            <span class="nav-lbl">Stock</span>
+        </button>
+        <button class="nav-item" data-tab="analytics" id="navAnalytics">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+            </svg>
+            <span class="nav-lbl">Analytics</span>
+        </button>
+        <button class="nav-item" data-tab="sync" id="navSync">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38"/>
+            </svg>
+            <span class="nav-lbl">Sync</span>
+        </button>
+        <button class="nav-item" data-tab="ai" id="navAI">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="2"/><path d="M12 2a7 7 0 017 7v3a7 7 0 01-14 0V9a7 7 0 017-7z"/>
+                <path d="M9 21v1M15 21v1"/>
+            </svg>
+            <span class="nav-lbl">AI Agent</span>
+        </button>
+    </nav>
+
+</div>
+
+<!-- ===== FAB ===== -->
+<button class="fab" id="btnVoiceShortcut" title="AI Assistant">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+    </svg>
+</button>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== ADD ITEM MODAL ===== -->
+<div class="modal-overlay" id="addItemModal">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <h3>Add Inventory Item</h3>
+            <button class="modal-close" id="closeItemModal">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="addItemForm">
+                <div class="form-field">
+                    <label>Item Name</label>
+                    <input type="text" class="form-input" id="itemName" required placeholder="e.g. Bread Butter">
+                </div>
+                <div class="form-field">
+                    <label>Category</label>
+                    <select class="form-input" id="itemCategory">
                         <option value="Food">Food</option>
                         <option value="Beverage">Beverage</option>
                         <option value="Snack">Snack</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <div class="form-group-mobile">
-                    <label for="itemStock">Stock Level</label>
-                    <input type="number" id="itemStock" min="0" required placeholder="30">
+                <div class="form-field">
+                    <label>Current Stock</label>
+                    <input type="number" class="form-input" id="itemStock" min="0" required placeholder="30">
                 </div>
-                <div class="form-group-mobile">
-                    <label for="itemMinStock">Min Stock Limit</label>
-                    <input type="number" id="itemMinStock" min="1" required placeholder="10">
+                <div class="form-field">
+                    <label>Min Stock Alert</label>
+                    <input type="number" class="form-input" id="itemMinStock" min="1" required placeholder="10">
                 </div>
-                <div class="form-group-mobile">
-                    <label for="itemPrice">Price (₹)</label>
-                    <input type="number" id="itemPrice" min="1" step="0.5" required placeholder="40">
+                <div class="form-field">
+                    <label>Price (₹)</label>
+                    <input type="number" class="form-input" id="itemPrice" min="1" step="0.5" required placeholder="40">
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="cancelAddItem">Cancel</button>
-                    <button type="submit" class="btn-submit">Add Item</button>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button type="button" class="btn btn-ghost btn-full" id="cancelAddItem">Cancel</button>
+                    <button type="submit" class="btn btn-solid-cyan btn-full">Add Item</button>
                 </div>
             </form>
         </div>
     </div>
+</div>
 
-    <!-- Notion Sync Loading Overlay -->
-    <div class="modal" id="notionSyncModal">
-        <div class="modal-content" style="text-align: center;">
-            <div class="sync-animation-wrapper">
-                <div class="sync-spinner-ring"></div>
-                <span class="sync-logo">N</span>
-            </div>
-            <h3 style="margin-top: 16px; font-family: var(--font-heading);">Syncing to Notion...</h3>
-            <p style="font-size: 13px; color: #a1a1aa; margin-top: 8px;" id="syncModalText">Uploading lists to Notion database endpoints...</p>
-            <div class="sync-progress-bar" style="height: 4px; background: #27272a; border-radius: 2px; margin-top: 16px; overflow: hidden;">
-                <div id="syncProgressFill" style="height: 100%; width: 0%; background: #a855f7; transition: width 0.1s linear;"></div>
-            </div>
+<!-- ===== ORDER DETAIL MODAL ===== -->
+<div class="modal-overlay" id="orderDetailModal">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <h3 id="modalOrderTitle">Order Detail</h3>
+            <button class="modal-close" id="closeOrderModal">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" id="orderModalBody">
+            <!-- Populated by JS -->
         </div>
     </div>
+</div>
 
-    <!-- New Order Arrival Popup Modal -->
-    <div class="modal" id="orderArrivalModal">
-        <div class="modal-content" style="text-align: center; border: 2px solid var(--accent-purple); box-shadow: 0 0 25px rgba(56, 189, 248, 0.4); max-width: 320px; padding: 22px;">
-            <div class="modal-header" style="justify-content: center; margin-bottom: 8px;">
-                <h3 style="color: var(--accent-purple); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border: none; padding: 0;">Incoming AI Dispatch</h3>
-            </div>
-            <div style="font-size: 26px; margin: 10px 0;" class="order-alert-icon">⚡</div>
-            <h4 id="popupOrderId" style="font-family: var(--font-heading); font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px; border: none; padding: 0;">RQ-1095</h4>
-            <p id="popupOrderTrain" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">Duronto Express (12260) • Platform 3</p>
-            
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--r-sm); padding: 12px; margin-bottom: 16px; text-align: left;">
-                <span style="font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.3px;">Fulfillment Checklist:</span>
-                <div id="popupOrderItems" style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #ffffff;">
-                    <!-- Items populated dynamically -->
-                </div>
-            </div>
-            
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Est. Pack: <strong>35s</strong></span>
-                <span id="popupOrderEta" style="color: var(--accent-orange); font-weight: 700;">ETA: 4m 0s</span>
-            </div>
-            
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" id="btnRejectOrder" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25);">REASSIGN</button>
-                <button type="button" class="btn-submit" id="btnAcceptOrder" style="background: var(--accent-purple); box-shadow: 0 0 12px rgba(56, 189, 248, 0.3); color: #ffffff; border: none;">ACCEPT & PACK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- OTP Verification Modal -->
-    <div class="modal" id="otpVerificationModal">
-        <div class="modal-content" style="text-align: center; max-width: 320px; padding: 22px;">
-            <div class="modal-header" style="justify-content: center; margin-bottom: 8px;">
-                <h3 style="color: var(--accent-purple); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border: none; padding: 0;">Runner Verification</h3>
-            </div>
-            <div style="font-size: 26px; margin: 10px 0;" class="order-alert-icon">🔒</div>
-            <h4 style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 4px; border: none; padding: 0;">Enter Dispatch OTP</h4>
-            <p style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 12px;" id="otpModalInstructions">Ask the runner for the 4-digit code shown on their device for order <strong id="otpModalOrderId">RQ-1082</strong>.</p>
-            
-            <div style="margin: 16px 0;">
-                <input type="text" id="otpInput" maxlength="4" placeholder="••••" style="font-family: var(--font-mono); font-size: 24px; letter-spacing: 8px; text-align: center; width: 140px; padding: 10px; background: rgba(0,0,0,0.3); border: 2px solid var(--border-color); border-radius: var(--r-sm); color: #ffffff; font-weight: 700; outline: none;">
-            </div>
-            
-            <div id="otpErrorMsg" style="color: var(--accent-red); font-size: 11px; font-weight: 700; margin-bottom: 12px; display: none; height: 16px;">Invalid OTP code. Try again!</div>
-            
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" id="btnCancelOtp" style="background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border-color);">CANCEL</button>
-                <button type="button" class="btn-submit" id="btnVerifyOtp" style="background: var(--accent-purple); color: #ffffff; border: none;">VERIFY DISPATCH</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Database Column Popover -->
-    <div class="notion-prop-popover" id="addColumnPopover" style="display: none; padding: 12px; width: 220px; z-index: 1000;">
-        <div class="popover-title" style="margin-bottom: 8px; font-weight: 600; font-size: 12px;">Add New Property</div>
-        <div class="form-group-mobile" style="margin-bottom: 8px;">
-            <label style="font-size: 10px; color: #a1a1aa;">Property Name</label>
-            <input type="text" id="newColName" placeholder="e.g. Supplier Name" style="font-size: 12px; padding: 6px; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; background: #121212; color: #ffffff; width: 100%;">
-        </div>
-        <div class="form-group-mobile" style="margin-bottom: 12px;">
-            <label style="font-size: 10px; color: #a1a1aa;">Property Type</label>
-            <select id="newColType" style="font-size: 12px; padding: 6px; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; background: #121212; color: #ffffff; width: 100%;">
-                <option value="text">Text</option>
-                <option value="number">Number</option>
-                <option value="select">Select</option>
-            </select>
-        </div>
-        <button class="action-btn primary-btn compact-btn block-btn" id="btnCreateColumn" style="width: 100%; font-size: 11px; padding: 6px 0; justify-content: center;">Create Property</button>
-    </div>
-
-    <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
