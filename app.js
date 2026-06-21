@@ -1038,7 +1038,7 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
             // Simulate voice recognition wait time
             setTimeout(() => {
                 if (state.isListening) {
-                    processQuery('What is today\\'s revenue?');
+                    processQuery("What is today's revenue?");
                 }
             }, 3000);
         }
