@@ -184,6 +184,14 @@ document.addEventListener("DOMContentLoaded", () => {
         { id: 6, name: "Biscuit Pack", category: "Snack", stock: 60, minStock: 20, price: 15, icon: svgIcons.Snack },
         { id: 7, name: "Cold Drink 500ml", category: "Beverage", stock: 8, minStock: 20, price: 35, icon: svgIcons.Beverage },
         { id: 8, name: "Veg Thali", category: "Food", stock: 12, minStock: 5, price: 150, icon: svgIcons.Food },
+        { id: 9, name: "Egg Biryani", category: "Food", stock: 8, minStock: 10, price: 130, icon: svgIcons.Food },
+        { id: 10, name: "Frooti 200ml", category: "Beverage", stock: 35, minStock: 15, price: 20, icon: svgIcons.Beverage },
+        { id: 11, name: "Kurkure Masala", category: "Snack", stock: 45, minStock: 20, price: 20, icon: svgIcons.Snack },
+        { id: 12, name: "Masala Dosa", category: "Food", stock: 15, minStock: 5, price: 80, icon: svgIcons.Food },
+        { id: 13, name: "Amul Lassi", category: "Beverage", stock: 22, minStock: 10, price: 25, icon: svgIcons.Beverage },
+        { id: 14, name: "Bread Pakora", category: "Snack", stock: 18, minStock: 10, price: 30, icon: svgIcons.Snack },
+        { id: 15, name: "Newspaper (English)", category: "Other", stock: 10, minStock: 5, price: 5, icon: svgIcons.Other },
+        { id: 16, name: "Earphones", category: "Other", stock: 5, minStock: 3, price: 150, icon: svgIcons.Other }
     ];
 
     let activeTrains = [
@@ -1232,6 +1240,11 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         // Brief rush mode activation
         document.getElementById('rushHourBanner').classList.add('visible');
         setTimeout(() => updateRushMode(), 3000);
+        
+        // Pop up the new order directly on screen
+        setTimeout(() => {
+            openOrderModal(newOrder.id);
+        }, 500);
     }
 
     // Auto trigger every 60s
