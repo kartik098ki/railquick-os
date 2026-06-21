@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailQuick Backend Database</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="notion.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="notion-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">RQ</div>
+            RailQuick Workspace
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-label">PRIVATE</div>
+            <div class="sidebar-item active">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Orders Database
+            </div>
+            <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Inventory Tracker
+            </div>
+            <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                Web Analytics
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN APP -->
+    <main class="notion-main">
+        <div class="notion-topbar">
+            <a href="index.html">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                Back to Mobile App
+            </a>
+            <span style="margin-left: 10px;">/ Orders Database</span>
+        </div>
+
+        <div class="notion-cover"></div>
+        <div class="notion-icon">🚂</div>
+
+        <div class="notion-page-content">
+            <h1 class="notion-h1">Orders Database</h1>
+            <p class="notion-description">Centralized backend for all RailQuick platform orders, statuses, and revenue records.</p>
+
+            <div class="notion-db-header">
+                <div class="notion-db-tab">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Master View
+                </div>
+            </div>
+
+            <div class="notion-table-container">
+                <table class="notion-table">
+                    <thead>
+                        <tr>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg> Name</div></th>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Status</div></th>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg> Order ID</div></th>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Train</div></th>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</div></th>
+                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenue</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Samosa Plate, Chai (Flask)</strong></td>
+                            <td><span class="tag tag-yellow">Pending</span></td>
+                            <td>RQ-1089</td>
+                            <td><span class="tag tag-purple">Mumbai Rajdhani</span></td>
+                            <td>Today 14:31</td>
+                            <td class="number-col">₹135.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Water Bottle 1L (x4)</strong></td>
+                            <td><span class="tag tag-blue">Preparing</span></td>
+                            <td>RQ-1090</td>
+                            <td><span class="tag tag-purple">Shatabdi Express</span></td>
+                            <td>Today 14:15</td>
+                            <td class="number-col">₹180.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Paneer Tikka Roll (x2)</strong></td>
+                            <td><span class="tag tag-yellow">Pending</span></td>
+                            <td>RQ-1091</td>
+                            <td><span class="tag tag-purple">Duronto Express</span></td>
+                            <td>Today 14:02</td>
+                            <td class="number-col">₹160.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Samosa Plate, Chai</strong></td>
+                            <td><span class="tag tag-yellow">Pending</span></td>
+                            <td>RQ-1092</td>
+                            <td><span class="tag tag-purple">Garib Rath</span></td>
+                            <td>Today 13:58</td>
+                            <td class="number-col">₹105.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Water Bottle 1L</strong></td>
+                            <td><span class="tag tag-green">Ready</span></td>
+                            <td>RQ-1093</td>
+                            <td><span class="tag tag-purple">Rajdhani Express</span></td>
+                            <td>Today 13:45</td>
+                            <td class="number-col">₹20.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chai (Flask) (x2), Veg Cutlet</strong></td>
+                            <td><span class="tag tag-green">Done</span></td>
+                            <td>RQ-1082</td>
+                            <td><span class="tag tag-purple">Rajdhani Express</span></td>
+                            <td>Today 13:10</td>
+                            <td class="number-col">₹140.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Masala Dosa, Frooti</strong></td>
+                            <td><span class="tag tag-green">Done</span></td>
+                            <td>RQ-1077</td>
+                            <td><span class="tag tag-purple">Garib Rath</span></td>
+                            <td>Today 12:45</td>
+                            <td class="number-col">₹100.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Egg Biryani, Cold Drink</strong></td>
+                            <td><span class="tag tag-green">Done</span></td>
+                            <td>RQ-1075</td>
+                            <td><span class="tag tag-purple">Duronto Express</span></td>
+                            <td>Today 12:15</td>
+                            <td class="number-col">₹165.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Veg Thali</strong></td>
+                            <td><span class="tag tag-green">Done</span></td>
+                            <td>RQ-1072</td>
+                            <td><span class="tag tag-purple">Shatabdi Express</span></td>
+                            <td>Today 11:55</td>
+                            <td class="number-col">₹150.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--notion-border); display: flex; justify-content: space-between; color: var(--notion-text-light);">
+                <span>Count 9</span>
+                <span>Sum ₹1,155.00</span>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>
