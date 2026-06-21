@@ -342,8 +342,20 @@ body {
   background: var(--notion-bg);
 }
 .gallery-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.gallery-cover { height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-.gallery-body { padding: 12px; border-top: 1px solid var(--notion-border); }
+.gallery-cover {
+  height: 120px;
+  background: var(--notion-sidebar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--notion-text-light);
+  border-bottom: 1px solid var(--notion-border);
+}
+.gallery-cover svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.8;
+}
 .gallery-title { font-weight: 600; margin-bottom: 8px; }
 
 /* Dashboard Cards (Analytics) */

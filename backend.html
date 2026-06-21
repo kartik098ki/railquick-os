@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RailQuick Backend Database</title>
+    <title>RailQuick Backend OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="notion.css">
@@ -76,7 +76,10 @@
         </div>
 
         <div class="notion-cover" id="pageCover" style="background: linear-gradient(135deg, #e0eafc, #cfdef3);"></div>
-        <div class="notion-icon" id="pageEmoji">🚂</div>
+        <div class="notion-icon-svg" id="pageIcon">
+            <!-- Inject SVG here via JS -->
+            <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </div>
 
         <div class="notion-page-content">
             <h1 class="notion-h1" id="pageTitle">Orders Database</h1>
@@ -127,17 +130,8 @@
                 <div class="notion-db-header">
                     <div class="notion-db-tab"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="7" y="7" width="3" height="9"/><rect x="14" y="7" width="3" height="5"/></svg> Gallery View</div>
                 </div>
-                <div class="notion-gallery">
-                    <div class="gallery-card"><div class="gallery-cover">🍛</div><div class="gallery-body"><div class="gallery-title">Egg Biryani</div><span class="tag tag-blue">Food</span><div style="margin-top:8px;font-size:12px;">Stock: 12 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🍲</div><div class="gallery-body"><div class="gallery-title">Veg Thali</div><span class="tag tag-blue">Food</span><div style="margin-top:8px;font-size:12px;">Stock: 45 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🧃</div><div class="gallery-body"><div class="gallery-title">Frooti 200ml</div><span class="tag tag-green">Beverage</span><div style="margin-top:8px;font-size:12px;">Stock: 35 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover" style="background:#ffe6e6">📉</div><div class="gallery-body"><div class="gallery-title">Water Bottle 1L</div><span class="tag tag-green">Beverage</span><div style="margin-top:8px;font-size:12px;color:#d93025;font-weight:bold;">Stock: 2 left (Low!)</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">☕</div><div class="gallery-body"><div class="gallery-title">Chai (Flask)</div><span class="tag tag-green">Beverage</span><div style="margin-top:8px;font-size:12px;">Stock: 18 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🥟</div><div class="gallery-body"><div class="gallery-title">Samosa Plate</div><span class="tag tag-yellow">Snack</span><div style="margin-top:8px;font-size:12px;">Stock: 40 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🍪</div><div class="gallery-body"><div class="gallery-title">Biscuit Pack</div><span class="tag tag-yellow">Snack</span><div style="margin-top:8px;font-size:12px;">Stock: 60 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🥪</div><div class="gallery-body"><div class="gallery-title">Veg Sandwich</div><span class="tag tag-yellow">Snack</span><div style="margin-top:8px;font-size:12px;">Stock: 15 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover">🗞️</div><div class="gallery-body"><div class="gallery-title">English Newspaper</div><span class="tag tag-gray">Other</span><div style="margin-top:8px;font-size:12px;">Stock: 10 left</div></div></div>
-                    <div class="gallery-card"><div class="gallery-cover" style="background:#ffe6e6">📉</div><div class="gallery-body"><div class="gallery-title">Hindi Magazine</div><span class="tag tag-gray">Other</span><div style="margin-top:8px;font-size:12px;color:#d93025;font-weight:bold;">Stock: 0 left (Out!)</div></div></div>
+                <div class="notion-gallery" id="inventoryGallery">
+                    <!-- Populated via JS -->
                 </div>
             </div>
 
@@ -243,21 +237,72 @@
 
     <!-- JAVASCRIPT FOR INTERACTIVITY -->
     <script>
-        // Massive Dummy Data Generator
+        // Massive SVG Icons (No Emojis)
+        const svgFood = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`;
+        const svgDrink = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`;
+        const svgMisc = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>`;
+        const svgAlert = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#d93025" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+
+        // Huge Item Catalog
+        const inventoryItems = [
+            { name: "Egg Biryani", cat: "Food", tag: "blue", stock: 12, svg: svgFood },
+            { name: "Veg Thali", cat: "Food", tag: "blue", stock: 45, svg: svgFood },
+            { name: "Idli Sambhar", cat: "Food", tag: "blue", stock: 22, svg: svgFood },
+            { name: "Dal Makhani Combo", cat: "Food", tag: "blue", stock: 14, svg: svgFood },
+            { name: "Paneer Butter Masala", cat: "Food", tag: "blue", stock: 8, svg: svgFood },
+            { name: "Vada Pav", cat: "Snack", tag: "yellow", stock: 50, svg: svgFood },
+            { name: "Samosa Plate", cat: "Snack", tag: "yellow", stock: 40, svg: svgFood },
+            { name: "Paneer Tikka Roll", cat: "Snack", tag: "yellow", stock: 25, svg: svgFood },
+            { name: "Veg Sandwich", cat: "Snack", tag: "yellow", stock: 15, svg: svgFood },
+            { name: "Biscuit Pack", cat: "Snack", tag: "yellow", stock: 60, svg: svgFood },
+            { name: "Frooti 200ml", cat: "Beverage", tag: "green", stock: 35, svg: svgDrink },
+            { name: "Water Bottle 1L", cat: "Beverage", tag: "green", stock: 2, svg: svgAlert, urgent: true },
+            { name: "Chai (Flask)", cat: "Beverage", tag: "green", stock: 18, svg: svgDrink },
+            { name: "Cold Coffee", cat: "Beverage", tag: "green", stock: 10, svg: svgDrink },
+            { name: "Lassi", cat: "Beverage", tag: "green", stock: 12, svg: svgDrink },
+            { name: "Buttermilk", cat: "Beverage", tag: "green", stock: 30, svg: svgDrink },
+            { name: "Nimbu Pani", cat: "Beverage", tag: "green", stock: 5, svg: svgAlert, urgent: true },
+            { name: "English Newspaper", cat: "Other", tag: "gray", stock: 10, svg: svgMisc },
+            { name: "Hindi Magazine", cat: "Other", tag: "gray", stock: 0, svg: svgAlert, urgent: true },
+            { name: "Travel Blanket", cat: "Other", tag: "gray", stock: 15, svg: svgMisc },
+            { name: "Neck Pillow", cat: "Other", tag: "gray", stock: 8, svg: svgMisc },
+            { name: "Hand Sanitizer", cat: "Other", tag: "gray", stock: 20, svg: svgMisc }
+        ];
+
+        // Generate Inventory Gallery
+        const gallery = document.getElementById('inventoryGallery');
+        inventoryItems.forEach(item => {
+            let extraStyle = item.urgent ? 'style="background:#ffe6e6"' : '';
+            let stockStyle = item.urgent ? 'style="color:#d93025;font-weight:bold;"' : '';
+            let urgentText = item.stock === 0 ? '(Out!)' : (item.stock < 10 ? '(Low!)' : '');
+            gallery.innerHTML += `
+                <div class="gallery-card">
+                    <div class="gallery-cover" ${extraStyle}>${item.svg}</div>
+                    <div class="gallery-body">
+                        <div class="gallery-title">${item.name}</div>
+                        <span class="tag tag-${item.tag}">${item.cat}</span>
+                        <div style="margin-top:8px;font-size:12px;" ${stockStyle}>Stock: ${item.stock} left ${urgentText}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Massive Dummy Orders Data Generator
         const trains = ['Rajdhani Express', 'Shatabdi Express', 'Vande Bharat', 'Duronto Express', 'Garib Rath'];
-        const items = ['Samosa Plate', 'Chai (Flask)', 'Water Bottle 1L', 'Egg Biryani', 'Veg Thali', 'Paneer Tikka Roll', 'Masala Dosa', 'Frooti', 'Biscuit Pack'];
         const statuses = ['Pending', 'Preparing', 'Ready', 'Done', 'Done', 'Done', 'Done']; // Weight heavily towards Done
         const statusColors = {'Pending':'yellow', 'Preparing':'blue', 'Ready':'green', 'Done':'gray'};
 
         const tbody = document.getElementById('ordersTbody');
         let totalRev = 0;
         
-        for(let i=1; i<=30; i++) {
+        for(let i=1; i<=35; i++) {
             let tr = document.createElement('tr');
-            let itemStr = items[Math.floor(Math.random()*items.length)] + (Math.random()>0.5 ? ' (x2)' : '') + (Math.random()>0.7 ? ', ' + items[Math.floor(Math.random()*items.length)] : '');
+            let randItem1 = inventoryItems[Math.floor(Math.random()*inventoryItems.length)].name;
+            let randItem2 = inventoryItems[Math.floor(Math.random()*inventoryItems.length)].name;
+            let itemStr = randItem1 + (Math.random()>0.5 ? ' (x2)' : '') + (Math.random()>0.7 ? ', ' + randItem2 : '');
             let stat = statuses[Math.floor(Math.random()*statuses.length)];
             let train = trains[Math.floor(Math.random()*trains.length)];
-            let price = Math.floor(Math.random() * 200) + 40;
+            let price = Math.floor(Math.random() * 400) + 40;
             totalRev += price;
             
             tr.innerHTML = `
@@ -271,16 +316,16 @@
             `;
             tbody.appendChild(tr);
         }
-        document.getElementById('ordersCountSum').textContent = `Count 30 | Sum ₹${totalRev}.00`;
+        document.getElementById('ordersCountSum').textContent = `Count 35 | Sum ₹${totalRev}.00`;
 
-        // Tab Switching Logic
+        // Tab Switching Logic (No Emojis)
         const tabs = {
-            'orders': { title: 'Orders Database', desc: 'Centralized backend for all RailQuick platform orders.', emoji: '🚂', cover: 'linear-gradient(135deg, #e0eafc, #cfdef3)' },
-            'inventory': { title: 'Inventory Tracker', desc: 'Live gallery view of all current stock levels.', emoji: '📦', cover: 'linear-gradient(135deg, #fdfbfb, #ebedee)' },
-            'radar': { title: 'Live Radar Map', desc: 'Real-time GPS tracking of delivery agents.', emoji: '📡', cover: 'linear-gradient(135deg, #0f2027, #203a43)' },
-            'fleet': { title: 'Delivery Fleet', desc: 'Live tracking of all delivery agents on the platform.', emoji: '🏃‍♂️', cover: 'linear-gradient(135deg, #e2e2e2, #c9d6ff)' },
-            'logs': { title: 'System Logs', desc: 'AI decision logs and system events.', emoji: '🖥️', cover: 'linear-gradient(135deg, #434343, #000000)' },
-            'analytics': { title: 'Web Analytics', desc: 'High-level dashboard and AI-driven sales insights.', emoji: '🧠', cover: 'linear-gradient(135deg, #f6d365, #fda085)' }
+            'orders': { title: 'Orders Database', desc: 'Centralized backend for all RailQuick platform orders.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>', cover: 'linear-gradient(135deg, #e0eafc, #cfdef3)' },
+            'inventory': { title: 'Inventory Tracker', desc: 'Live gallery view of all current stock levels.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>', cover: 'linear-gradient(135deg, #fdfbfb, #ebedee)' },
+            'radar': { title: 'Live Radar Map', desc: 'Real-time GPS tracking of delivery agents.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', cover: 'linear-gradient(135deg, #0f2027, #203a43)' },
+            'fleet': { title: 'Delivery Fleet', desc: 'Live tracking of all delivery agents on the platform.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', cover: 'linear-gradient(135deg, #e2e2e2, #c9d6ff)' },
+            'logs': { title: 'System Logs', desc: 'AI decision logs and system events.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>', cover: 'linear-gradient(135deg, #434343, #000000)' },
+            'analytics': { title: 'Web Analytics', desc: 'High-level dashboard and AI-driven sales insights.', icon: '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', cover: 'linear-gradient(135deg, #f6d365, #fda085)' }
         };
 
         let chartsRendered = false;
@@ -297,7 +342,7 @@
                 const meta = tabs[viewId];
                 document.getElementById('pageTitle').textContent = meta.title;
                 document.getElementById('pageDesc').textContent = meta.desc;
-                document.getElementById('pageEmoji').textContent = meta.emoji;
+                document.getElementById('pageIcon').innerHTML = meta.icon;
                 document.getElementById('breadcrumb').textContent = '/ ' + meta.title;
                 document.getElementById('pageCover').style.background = meta.cover;
 
@@ -345,17 +390,19 @@
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }, 3500);
 
-        // Live Toasts
+        // Live Toasts (No Emojis)
         const toastContainer = document.getElementById('toastContainer');
         setInterval(() => {
             if(Math.random() > 0.6) return;
             const toast = document.createElement('div');
             toast.className = 'toast';
-            const item = items[Math.floor(Math.random()*items.length)];
+            const item = inventoryItems[Math.floor(Math.random()*inventoryItems.length)].name;
             toast.innerHTML = `
-                <div class="toast-icon">🔔</div>
+                <div class="toast-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
                 <div class="toast-content">
-                    <div class="toast-title">New Order!</div>
+                    <div class="toast-title">New Order Created</div>
                     <div class="toast-desc">1x ${item} for Vande Bharat</div>
                 </div>
             `;
