@@ -17,17 +17,28 @@
         </div>
         
         <div class="sidebar-section">
+            <div class="sidebar-item" id="btnSearch">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Search (Cmd+K)
+            </div>
+            <div class="sidebar-item" id="btnTheme">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Toggle Dark Mode
+            </div>
+        </div>
+
+        <div class="sidebar-section">
             <div class="sidebar-label">PRIVATE</div>
-            <div class="sidebar-item active">
+            <div class="sidebar-item active" data-view="orders">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                 Orders Database
             </div>
-            <div class="sidebar-item">
+            <div class="sidebar-item" data-view="inventory">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 Inventory Tracker
             </div>
-            <div class="sidebar-item">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            <div class="sidebar-item" data-view="analytics">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 Web Analytics
             </div>
         </div>
@@ -40,119 +51,209 @@
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
                 Back to Mobile App
             </a>
-            <span style="margin-left: 10px;">/ Orders Database</span>
+            <span style="margin-left: 10px;" id="breadcrumb">/ Orders Database</span>
+            <div style="margin-left:auto;">
+                <button class="notion-btn">New <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+            </div>
         </div>
 
         <div class="notion-cover"></div>
-        <div class="notion-icon">🚂</div>
+        <div class="notion-icon" id="pageEmoji">🚂</div>
 
         <div class="notion-page-content">
-            <h1 class="notion-h1">Orders Database</h1>
-            <p class="notion-description">Centralized backend for all RailQuick platform orders, statuses, and revenue records.</p>
+            <h1 class="notion-h1" id="pageTitle">Orders Database</h1>
+            <p class="notion-description" id="pageDesc">Centralized backend for all RailQuick platform orders, statuses, and revenue records.</p>
 
-            <div class="notion-db-header">
-                <div class="notion-db-tab">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                    Master View
+            <!-- ORDERS VIEW -->
+            <div id="view-orders" class="notion-view active">
+                <div class="notion-db-header">
+                    <div class="notion-db-tab">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        Master View
+                    </div>
+                </div>
+                <div class="notion-table-container">
+                    <table class="notion-table">
+                        <thead>
+                            <tr>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg> Name</div></th>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Status</div></th>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg> Order ID</div></th>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Train</div></th>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</div></th>
+                                <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenue</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Samosa Plate, Chai (Flask)</strong> <div class="row-open-btn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M10 14L21 3"/></svg> OPEN</div></td>
+                                <td><span class="tag tag-yellow">Pending</span></td>
+                                <td>RQ-1089</td>
+                                <td><span class="tag tag-purple">Mumbai Rajdhani</span></td>
+                                <td>Today 14:31</td>
+                                <td class="number-col">₹135.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Water Bottle 1L (x4)</strong> <div class="row-open-btn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M10 14L21 3"/></svg> OPEN</div></td>
+                                <td><span class="tag tag-blue">Preparing</span></td>
+                                <td>RQ-1090</td>
+                                <td><span class="tag tag-purple">Shatabdi Express</span></td>
+                                <td>Today 14:15</td>
+                                <td class="number-col">₹180.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Paneer Tikka Roll (x2)</strong> <div class="row-open-btn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M10 14L21 3"/></svg> OPEN</div></td>
+                                <td><span class="tag tag-yellow">Pending</span></td>
+                                <td>RQ-1091</td>
+                                <td><span class="tag tag-purple">Duronto Express</span></td>
+                                <td>Today 14:02</td>
+                                <td class="number-col">₹160.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Samosa Plate, Chai</strong> <div class="row-open-btn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M10 14L21 3"/></svg> OPEN</div></td>
+                                <td><span class="tag tag-green">Done</span></td>
+                                <td>RQ-1082</td>
+                                <td><span class="tag tag-purple">Rajdhani Express</span></td>
+                                <td>Today 13:10</td>
+                                <td class="number-col">₹140.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; color: var(--notion-text-light);">Count 4 | Sum ₹615.00</div>
+            </div>
+
+            <!-- INVENTORY VIEW -->
+            <div id="view-inventory" class="notion-view">
+                <div class="notion-db-header">
+                    <div class="notion-db-tab">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="7" y="7" width="3" height="9"/><rect x="14" y="7" width="3" height="5"/></svg>
+                        Gallery View
+                    </div>
+                </div>
+                <div class="notion-gallery">
+                    <div class="gallery-card">
+                        <div class="gallery-cover">🍛</div>
+                        <div class="gallery-body">
+                            <div class="gallery-title">Egg Biryani</div>
+                            <span class="tag tag-blue">Food</span>
+                            <div style="margin-top:8px;font-size:12px;">Stock: 8 left</div>
+                        </div>
+                    </div>
+                    <div class="gallery-card">
+                        <div class="gallery-cover">🧃</div>
+                        <div class="gallery-body">
+                            <div class="gallery-title">Frooti 200ml</div>
+                            <span class="tag tag-green">Beverage</span>
+                            <div style="margin-top:8px;font-size:12px;">Stock: 35 left</div>
+                        </div>
+                    </div>
+                    <div class="gallery-card">
+                        <div class="gallery-cover">🍪</div>
+                        <div class="gallery-body">
+                            <div class="gallery-title">Biscuit Pack</div>
+                            <span class="tag tag-yellow">Snack</span>
+                            <div style="margin-top:8px;font-size:12px;">Stock: 60 left</div>
+                        </div>
+                    </div>
+                    <div class="gallery-card">
+                        <div class="gallery-cover">🗞️</div>
+                        <div class="gallery-body">
+                            <div class="gallery-title">English Newspaper</div>
+                            <span class="tag tag-gray">Other</span>
+                            <div style="margin-top:8px;font-size:12px;">Stock: 10 left</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="notion-table-container">
-                <table class="notion-table">
-                    <thead>
-                        <tr>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg> Name</div></th>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Status</div></th>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg> Order ID</div></th>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Train</div></th>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</div></th>
-                            <th><div class="col-header"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenue</div></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Samosa Plate, Chai (Flask)</strong></td>
-                            <td><span class="tag tag-yellow">Pending</span></td>
-                            <td>RQ-1089</td>
-                            <td><span class="tag tag-purple">Mumbai Rajdhani</span></td>
-                            <td>Today 14:31</td>
-                            <td class="number-col">₹135.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Water Bottle 1L (x4)</strong></td>
-                            <td><span class="tag tag-blue">Preparing</span></td>
-                            <td>RQ-1090</td>
-                            <td><span class="tag tag-purple">Shatabdi Express</span></td>
-                            <td>Today 14:15</td>
-                            <td class="number-col">₹180.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Paneer Tikka Roll (x2)</strong></td>
-                            <td><span class="tag tag-yellow">Pending</span></td>
-                            <td>RQ-1091</td>
-                            <td><span class="tag tag-purple">Duronto Express</span></td>
-                            <td>Today 14:02</td>
-                            <td class="number-col">₹160.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Samosa Plate, Chai</strong></td>
-                            <td><span class="tag tag-yellow">Pending</span></td>
-                            <td>RQ-1092</td>
-                            <td><span class="tag tag-purple">Garib Rath</span></td>
-                            <td>Today 13:58</td>
-                            <td class="number-col">₹105.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Water Bottle 1L</strong></td>
-                            <td><span class="tag tag-green">Ready</span></td>
-                            <td>RQ-1093</td>
-                            <td><span class="tag tag-purple">Rajdhani Express</span></td>
-                            <td>Today 13:45</td>
-                            <td class="number-col">₹20.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Chai (Flask) (x2), Veg Cutlet</strong></td>
-                            <td><span class="tag tag-green">Done</span></td>
-                            <td>RQ-1082</td>
-                            <td><span class="tag tag-purple">Rajdhani Express</span></td>
-                            <td>Today 13:10</td>
-                            <td class="number-col">₹140.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Masala Dosa, Frooti</strong></td>
-                            <td><span class="tag tag-green">Done</span></td>
-                            <td>RQ-1077</td>
-                            <td><span class="tag tag-purple">Garib Rath</span></td>
-                            <td>Today 12:45</td>
-                            <td class="number-col">₹100.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Egg Biryani, Cold Drink</strong></td>
-                            <td><span class="tag tag-green">Done</span></td>
-                            <td>RQ-1075</td>
-                            <td><span class="tag tag-purple">Duronto Express</span></td>
-                            <td>Today 12:15</td>
-                            <td class="number-col">₹165.00</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Veg Thali</strong></td>
-                            <td><span class="tag tag-green">Done</span></td>
-                            <td>RQ-1072</td>
-                            <td><span class="tag tag-purple">Shatabdi Express</span></td>
-                            <td>Today 11:55</td>
-                            <td class="number-col">₹150.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--notion-border); display: flex; justify-content: space-between; color: var(--notion-text-light);">
-                <span>Count 9</span>
-                <span>Sum ₹1,155.00</span>
+            <!-- ANALYTICS VIEW -->
+            <div id="view-analytics" class="notion-view">
+                <div class="analytics-grid">
+                    <div class="stat-box">
+                        <div class="stat-lbl">Today's Revenue</div>
+                        <div class="stat-val">₹2,840</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">Orders Processed</div>
+                        <div class="stat-val">18</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-lbl">Avg Processing Time</div>
+                        <div class="stat-val">1m 45s</div>
+                    </div>
+                </div>
+                <p>AI Insights: Bundling snacks with beverages increases Kamai by 14% on average.</p>
             </div>
 
         </div>
     </main>
 
+    <!-- COMMAND PALETTE OVERLAY -->
+    <div class="cmd-palette-overlay" id="cmdOverlay">
+        <div class="cmd-palette">
+            <input type="text" class="cmd-input" placeholder="Search RailQuick Workspace..." id="cmdInput">
+            <div class="cmd-results">
+                <div class="cmd-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Q3 Financial Report</div>
+                <div class="cmd-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> Orders Database</div>
+                <div class="cmd-item"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Staff Roster Logs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        // Tab Switching Logic
+        const tabs = {
+            'orders': { title: 'Orders Database', desc: 'Centralized backend for all RailQuick platform orders, statuses, and revenue records.', emoji: '🚂' },
+            'inventory': { title: 'Inventory Tracker', desc: 'Live gallery view of all current stock levels at your platform stall.', emoji: '📦' },
+            'analytics': { title: 'Web Analytics', desc: 'High-level dashboard and AI-driven sales insights for your business.', emoji: '🧠' }
+        };
+
+        document.querySelectorAll('.sidebar-item[data-view]').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const viewId = item.dataset.view;
+                document.querySelectorAll('.notion-view').forEach(v => v.classList.remove('active'));
+                document.getElementById('view-' + viewId).classList.add('active');
+
+                const meta = tabs[viewId];
+                document.getElementById('pageTitle').textContent = meta.title;
+                document.getElementById('pageDesc').textContent = meta.desc;
+                document.getElementById('pageEmoji').textContent = meta.emoji;
+                document.getElementById('breadcrumb').textContent = '/ ' + meta.title;
+            });
+        });
+
+        // Dark Mode Toggle
+        document.getElementById('btnTheme').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Command Palette (Cmd+K)
+        const cmdOverlay = document.getElementById('cmdOverlay');
+        const cmdInput = document.getElementById('cmdInput');
+        
+        document.getElementById('btnSearch').addEventListener('click', openSearch);
+        
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                openSearch();
+            }
+            if (e.key === 'Escape') cmdOverlay.classList.remove('open');
+        });
+
+        cmdOverlay.addEventListener('click', (e) => {
+            if(e.target === cmdOverlay) cmdOverlay.classList.remove('open');
+        });
+
+        function openSearch() {
+            cmdOverlay.classList.add('open');
+            setTimeout(() => cmdInput.focus(), 100);
+        }
+    </script>
 </body>
 </html>
