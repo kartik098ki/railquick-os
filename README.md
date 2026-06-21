@@ -1,14 +1,21 @@
-# RailQuick Vendor Mobile OS (RailQuick OS)
+# RailQuick Vendor Web App (RailQuick OS)
 
-A premium, touch-optimized Mobile Platform Vendor POS and Dispatch App designed for railway station stalls (specifically Platform 3). It features a sleek, light-mint and white operations dashboard (inspired by fast fulfillment centers like Zepto and Blinkit), real-time train arrivals timetables, automated sales ledgers, background AI-driven platform relocation tracking, a live transit radar timeline, checkable order lists, and cloud Notion integration with an interactive CLI log console.
+A premium, touch-optimized Web Portal and Dispatch App designed for railway station stalls (specifically Platform 3). It features a sleek, professional Slate-900 operations dashboard, real-time train arrivals timetables, automated sales ledgers, background AI-driven platform relocation tracking, a live transit radar timeline, checkable order lists, secure dispatch verification, and cloud Notion integration with an interactive CLI log console.
 
 ---
 
 ## Core Features and Redesigns
 
-### Centered Mobile App Layout
-- Restricted width to 480px on desktop screens to provide a simulated mobile viewport experience, while automatically scaling to fill 100% of real smartphone screens.
-- Replaced the sidebar with a native-style bottom tab navigation bar containing views for Orders, Inventory, Notion Sync, and AI Agent.
+### Centered Web App Layout
+- Removed simulated smartphone bezel chassis, notch, simulated status bar, and home indicators to present a clean, native web application layout.
+- Optimized and centered viewport (480px max-width) on desktop screens, while automatically scaling to fill 100% of mobile screens.
+- Sleek neutral Slate-900 theme (`#0f172a` base, `#1e293b` panels, `#334155` cards) with sky-blue accents (`#38bdf8`) for high readability and premium aesthetics.
+- Replaced sidebars with a native bottom tab navigation bar containing views for Orders, Inventory, Notion Sync, and AI Agent.
+
+### Secure Dispatch Verification (Runner OTP Flow)
+- Every incoming order has a unique, randomly generated 4-digit verification code.
+- Tapping the READY button intercepts the dispatch event and prompts the vendor with a secure OTP modal popup.
+- The dispatch is authorized and credited to the sales ledger only when the vendor inputs the correct OTP (provided by the runner). Correct OTP auto-submits when 4 digits are entered.
 
 ### Interactive Packing Checklist
 - Active orders render checkable list items. Vendors can tap items individually to pack them.

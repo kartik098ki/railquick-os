@@ -7,6 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // INITIAL SYSTEM STATES
     // ==========================================================================
 
+    // Generate OTP helper
+    function generateOTP() {
+        return Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
     let orders = [
         {
             id: "RQ-1082",
@@ -23,7 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ],
             status: "Pending",
             source: "Platform 3 Express (Us)",
-            reallocated: false
+            reallocated: false,
+            otp: generateOTP()
         },
         {
             id: "RQ-1085",
@@ -40,7 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ],
             status: "Pending",
             source: "Platform 3 Express (Us)",
-            reallocated: false
+            reallocated: false,
+            otp: generateOTP()
         },
         {
             id: "RQ-1089",
@@ -57,7 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ],
             status: "Pending",
             source: "Platform 3 Express (Us)",
-            reallocated: false
+            reallocated: false,
+            otp: generateOTP()
         }
     ];
 
@@ -326,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const allPacked = order.items.every(i => i.packed);
             const packBtnText = allPacked ? "PACKED" : "PACK";
             const packBtnStyle = allPacked ? "background: var(--accent-green-soft); color: var(--accent-green); border-color: rgba(16,185,129,0.25);" : "";
-            const readyBtnStyle = allPacked ? "background: var(--accent-purple) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);" : "";
+            const readyBtnStyle = allPacked ? "background: var(--accent-purple) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);" : "";
 
             const card = document.createElement("div");
             card.className = `order-touch-card ${cardClass}`;
@@ -334,7 +342,10 @@ document.addEventListener("DOMContentLoaded", () => {
             card.innerHTML = `
                 <div class="card-header-row">
                     <span class="order-id-lbl">${order.id}</span>
-                    ${priorityString}
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <span class="otp-badge" style="font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--accent-purple); background: var(--accent-purple-soft); padding: 2px 6px; border: 1px dashed var(--accent-purple); border-radius: var(--r-sm);">OTP: ${order.otp}</span>
+                        ${priorityString}
+                    </div>
                 </div>
                 <div class="card-details-block">
                     ${itemsChecklist}
@@ -416,27 +427,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.querySelectorAll(".card-btn.ready").forEach(btn => {
             btn.addEventListener("click", () => {
-                playSynthSound('success');
                 const id = btn.getAttribute("data-id");
                 const order = orders.find(o => o.id === id);
-                orders = orders.filter(o => o.id !== id);
+                if (!order) return;
                 
-                // Add order values to Daily Sales Ledger
-                if (order) {
-                    let orderSum = 0;
-                    order.items.forEach(item => {
-                        const invItem = inventory.find(i => i.name === item.name);
-                        if (invItem) orderSum += invItem.price * item.qty;
-                    });
-                    if (orderSum === 0) orderSum = 120; // default minimum
-                    dailyRevenue += orderSum;
-                    ordersFilledCount++;
-                    renderLedger();
-                    updatePerformanceChart();
+                // Open OTP Verification Modal
+                playSynthSound('click');
+                const otpModal = document.getElementById("otpVerificationModal");
+                const otpModalOrderId = document.getElementById("otpModalOrderId");
+                const otpInput = document.getElementById("otpInput");
+                const otpErrorMsg = document.getElementById("otpErrorMsg");
+                
+                if (otpModal && otpModalOrderId && otpInput && otpErrorMsg) {
+                    otpModalOrderId.textContent = order.id;
+                    otpInput.value = "";
+                    otpErrorMsg.style.display = "none";
+                    otpModal.classList.add("active");
+                    otpModal.setAttribute("data-verifying-id", order.id);
+                    setTimeout(() => otpInput.focus(), 100);
                 }
-
-                showToast(`Order ${id} is ready for dispatch!`, "success");
-                renderOrders();
             });
         });
 
@@ -685,7 +694,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         items: [{ name: "Veg Cutlet", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 2, packed: false }],
                         status: "Pending",
                         source: "Platform 1 Partner",
-                        reallocated: true
+                        reallocated: true,
+                        otp: generateOTP()
                     };
                     showIncomingOrderPopup(newOrder);
                 }, 1500);
@@ -720,7 +730,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     items: [{ name: "Paneer Tikka Roll", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 1, packed: false }],
                     status: "Pending",
                     source: "Platform 3 Express (Us)",
-                    reallocated: false
+                    reallocated: false,
+                    otp: generateOTP()
                 });
             }
 
@@ -1782,6 +1793,87 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    // ==========================================================================
+    // OTP VERIFICATION MODAL LOGIC
+    // ==========================================================================
+    const otpModalElement = document.getElementById("otpVerificationModal");
+    const btnVerifyOtp = document.getElementById("btnVerifyOtp");
+    const btnCancelOtp = document.getElementById("btnCancelOtp");
+    const otpInput = document.getElementById("otpInput");
+    const otpErrorMsg = document.getElementById("otpErrorMsg");
+
+    if (btnVerifyOtp && btnCancelOtp && otpInput && otpModalElement) {
+        function verifyOtpSubmission() {
+            const id = otpModalElement.getAttribute("data-verifying-id");
+            const order = orders.find(o => o.id === id);
+            if (!order) {
+                otpModalElement.classList.remove("active");
+                return;
+            }
+            
+            const enteredOtp = otpInput.value.trim();
+            if (enteredOtp === order.otp) {
+                // Correct OTP! Dispatch the order
+                playSynthSound('success');
+                otpModalElement.classList.remove("active");
+                
+                orders = orders.filter(o => o.id !== id);
+                
+                // Add order values to Daily Sales Ledger
+                let orderSum = 0;
+                order.items.forEach(item => {
+                    const invItem = inventory.find(i => i.name === item.name);
+                    if (invItem) orderSum += invItem.price * item.qty;
+                });
+                if (orderSum === 0) orderSum = 120; // default minimum
+                dailyRevenue += orderSum;
+                ordersFilledCount++;
+                
+                renderLedger();
+                updatePerformanceChart();
+                
+                showToast(`OTP Verified! Order ${id} dispatched successfully.`, "success");
+                
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                addLogEntry(time, `OTP VERIFIED: Order ${id} handed to runner after secure dispatch authorization.`, "success");
+                
+                renderOrders();
+                renderPlatformMap();
+            } else {
+                // Incorrect OTP
+                playSynthSound('warning');
+                otpErrorMsg.textContent = "Invalid OTP code. Try again!";
+                otpErrorMsg.style.display = "block";
+                otpInput.focus();
+                otpInput.select();
+            }
+        }
+
+        btnVerifyOtp.addEventListener("click", () => {
+            verifyOtpSubmission();
+        });
+
+        btnCancelOtp.addEventListener("click", () => {
+            playSynthSound('click');
+            otpModalElement.classList.remove("active");
+        });
+
+        otpInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                verifyOtpSubmission();
+            } else {
+                if (otpErrorMsg) otpErrorMsg.style.display = "none";
+            }
+        });
+        
+        // Auto-submit when exactly 4 digits are typed
+        otpInput.addEventListener("input", () => {
+            if (otpInput.value.trim().length === 4) {
+                verifyOtpSubmission();
+            }
+        });
+    }
 
     // ==========================================================================
     // INITIALIZATION RUNS

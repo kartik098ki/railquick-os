@@ -3,30 +3,30 @@
    ========================================================================== */
 
 :root {
-    /* Color Palette - Premium Dark Glassmorphic Mint/Emerald Theme */
-    --bg-dark-gray: #050806;             /* Almost black deep forest base */
-    --bg-panel: rgba(15, 25, 20, 0.65);  /* Semi-transparent panel with glass backdrop filter */
-    --bg-card: rgba(25, 40, 32, 0.45);   /* Lighter translucent card background */
-    --bg-hover: rgba(16, 185, 129, 0.15); /* Sleek emerald hover highlight */
+    /* Color Palette - Premium Slate-900 / Sky Blue Theme */
+    --bg-dark-gray: #0f172a;             /* Slate 900 base */
+    --bg-panel: rgba(30, 41, 59, 0.85);  /* Semi-transparent Slate 800 panel with glass backdrop filter */
+    --bg-card: rgba(51, 65, 85, 0.5);    /* Semi-transparent Slate 700 card background */
+    --bg-hover: rgba(56, 189, 248, 0.1);  /* Sky blue hover highlight */
     
-    --border-color: rgba(16, 185, 129, 0.18); /* Translucent emerald border */
-    --border-strong: rgba(16, 185, 129, 0.35); /* Glow-ready emerald border */
+    --border-color: rgba(148, 163, 184, 0.12); /* Translucent slate border */
+    --border-strong: rgba(56, 189, 248, 0.3);  /* Sky blue border glow */
     
-    --text-main: #f0fdf4;       /* Mint white for readability */
-    --text-secondary: #bbf7d0;  /* Pastel sage for details */
-    --text-muted: #86efac;      /* Vibrant mint-gray for labels */
+    --text-main: #f8fafc;       /* Slate 50 for primary readability */
+    --text-secondary: #cbd5e1;  /* Slate 300 for details */
+    --text-muted: #94a3b8;      /* Slate 400 for labels */
     
-    /* Accents - Sleek Neon Emerald and Cyan Highlights */
-    --accent-purple: #10b981; 
-    --accent-purple-soft: rgba(16, 185, 129, 0.15);
-    --accent-blue: #06b6d4;
-    --accent-blue-soft: rgba(6, 182, 212, 0.2);
-    --accent-green: #34d399;
-    --accent-green-soft: rgba(52, 211, 153, 0.2);
-    --accent-red: #f87171;
-    --accent-red-soft: rgba(248, 113, 113, 0.18);
-    --accent-orange: #fbbf24;
-    --accent-orange-soft: rgba(251, 191, 36, 0.18);
+    /* Accents - Premium Sky Blue primary and Slate alerts */
+    --accent-purple: #38bdf8; 
+    --accent-purple-soft: rgba(56, 189, 248, 0.15);
+    --accent-blue: #0ea5e9;
+    --accent-blue-soft: rgba(14, 165, 233, 0.15);
+    --accent-green: #10b981;
+    --accent-green-soft: rgba(16, 185, 129, 0.15);
+    --accent-red: #ef4444;
+    --accent-red-soft: rgba(239, 68, 68, 0.15);
+    --accent-orange: #f59e0b;
+    --accent-orange-soft: rgba(245, 158, 11, 0.15);
 
     /* Fonts */
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -57,7 +57,7 @@
 }
 
 body {
-    background: radial-gradient(circle at 30% 20%, #15221b 0%, #060a08 100%);
+    background: radial-gradient(circle at 30% 20%, #1e293b 0%, #0f172a 100%);
     color: var(--text-main);
     font-family: var(--font-ui);
     font-size: 14px;
@@ -1417,7 +1417,7 @@ button, select, input {
 }
 
 .modal-content {
-    background: rgba(15, 25, 20, 0.85);
+    background: rgba(30, 41, 59, 0.95);
     border: 1px solid var(--border-strong);
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
@@ -1425,14 +1425,14 @@ button, select, input {
     width: calc(100% - 32px);
     max-width: 340px;
     padding: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1);
 }
 
 /* Form Input Focus outlines */
 input:focus, select:focus, textarea:focus {
     border-color: var(--accent-purple) !important;
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3) !important;
-    background: rgba(10, 18, 14, 0.9) !important;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
+    background: rgba(15, 23, 42, 0.9) !important;
 }
 
 .modal-header {
@@ -1961,7 +1961,7 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 50px rgba(16, 185, 129, 0.15), 0 0 10px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 40px rgba(56, 189, 248, 0.08), 0 4px 20px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     border-left: 1px solid var(--border-color);
     border-right: 1px solid var(--border-color);
@@ -1970,77 +1970,17 @@ input:focus, select:focus, textarea:focus {
 
 @media (min-width: 481px) {
     .app-container {
-        max-width: 420px;
-        height: min(880px, 95vh);
-        border: 12px solid #111a15;
-        border-radius: 46px;
-        box-shadow: 0 30px 70px rgba(0,0,0,0.85), 
-                    0 0 0 2.5px rgba(16, 185, 129, 0.2), 
-                    0 0 40px rgba(16, 185, 129, 0.15);
+        max-width: 480px;
+        height: min(900px, 95vh);
+        border: 1px solid var(--border-color);
+        border-radius: var(--r-md);
+        box-shadow: 0 30px 70px rgba(0,0,0,0.5), 
+                    0 0 40px rgba(56, 189, 248, 0.05);
         margin: auto;
     }
 }
 
-/* Simulated Smartphone Hardware Add-ons */
-.phone-status-bar {
-    height: 34px;
-    background: var(--bg-panel);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border-bottom: 1px solid rgba(16, 185, 129, 0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 18px 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-main);
-    font-family: var(--font-heading);
-    user-select: none;
-    z-index: 120;
-    flex-shrink: 0;
-    position: relative;
-}
-
-.status-bar-center {
-    width: 90px;
-    height: 18px;
-    background: #000000;
-    border-radius: var(--r-pill);
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 6px;
-    box-shadow: inset 0 0 4px rgba(16, 185, 129, 0.25);
-    z-index: 130;
-}
-
-.status-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.phone-home-indicator {
-    height: 16px;
-    background: var(--bg-panel);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 120;
-    flex-shrink: 0;
-    padding-bottom: 6px;
-}
-
-.home-bar {
-    width: 120px;
-    height: 4.5px;
-    background: rgba(240, 253, 244, 0.35);
-    border-radius: var(--r-pill);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
+/* Simulated Smartphone Hardware Add-ons Removed */
 
 .app-header-mobile {
     height: 60px;
