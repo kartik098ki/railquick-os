@@ -867,7 +867,7 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
     }
 
     // ==========================================================================
-    // AI VOICE DESK
+    // AI VOICE DESK (SMART & WORKABLE)
     // ==========================================================================
     const orbBtn = document.getElementById('btnVoiceMic');
     const orbContainer = document.getElementById('aiAssistantOrbContainer');
@@ -879,6 +879,7 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         state.isListening = true;
         orbContainer.classList.add('listening');
         voiceStatus.textContent = 'Listening...';
+        document.querySelector('.audio-wave').style.opacity = '1';
         waveBars.forEach(b => b.classList.add('active'));
     }
 
@@ -886,13 +887,14 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         state.isListening = false;
         orbContainer.classList.remove('listening');
         voiceStatus.textContent = 'Tap to Speak';
+        document.querySelector('.audio-wave').style.opacity = '0';
         waveBars.forEach(b => b.classList.remove('active'));
     }
 
     function addBubble(text, role) {
         const bubble = document.createElement('div');
         bubble.className = `chat-bubble ${role}`;
-        bubble.textContent = text;
+        bubble.innerHTML = role === 'ai' ? `✨ ${text}` : text;
         chatThread.appendChild(bubble);
         chatThread.scrollTop = chatThread.scrollHeight;
     }
@@ -902,17 +904,43 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         voiceStatus.textContent = 'Processing...';
 
         setTimeout(() => {
-            const key = Object.keys(aiResponses).find(k => query.toLowerCase().includes(k));
-            const responsePool = aiResponses[key] || aiResponses['default'];
-            const response = responsePool[Math.floor(Math.random() * responsePool.length)];
-            addBubble(response, 'ai');
-            stopListening();
+            const q = query.toLowerCase();
+            let response = "I'm sorry, I couldn't process that request.";
 
-            // Special actions
-            if (query.includes('rush mode')) {
+            if (q.includes('prioritize')) {
+                response = "I have scanned the radar. Prioritizing queue based on upcoming train arrivals now.";
+                setTimeout(() => {
+                    switchTab('orders');
+                    const btn = document.getElementById('btnAutoPrioritize');
+                    if(btn) {
+                        btn.style.transform = 'scale(0.9)';
+                        setTimeout(() => btn.style.transform = 'scale(1)', 150);
+                        btn.click();
+                    }
+                }, 1500);
+            } else if (q.includes('revenue') || q.includes('kamai')) {
+                response = `Aaj Ki Kamai is exactly ₹${state.totalRevenue.toLocaleString('en-IN')}. We have filled ${state.ordersFilled} orders today. Excellent work!`;
+            } else if (q.includes('stock')) {
+                const lowStock = inventory.filter(i => getStockLevel(i) !== 'high');
+                if (lowStock.length > 0) {
+                    response = `WARNING: ${lowStock.map(i => i.name).join(', ')} are running critically low. I will highlight them in the Stock tab.`;
+                    setTimeout(() => switchTab('inventory'), 2000);
+                } else {
+                    response = "All inventory levels are looking healthy right now. Ready for the next rush!";
+                }
+            } else if (q.includes('rush') || q.includes('activate')) {
+                response = "Activating Maximum Rush Mode. Alerting staff and prioritizing the router agent.";
                 document.getElementById('rushHourBanner').classList.add('visible');
                 setAgentStatus('router', 'ACTIVE', 'active');
+                setTimeout(() => updateRushMode(), 3000);
+            } else if (q.includes('check trains')) {
+                response = `I see ${activeTrains.length} trains approaching. The next is ${activeTrains[0].name} arriving at Platform 3 shortly.`;
+            } else {
+                response = "I am processing the data. Your platform metrics are looking optimal today.";
             }
+
+            addBubble(response, 'ai');
+            stopListening();
         }, 1200);
     }
 
@@ -921,12 +949,12 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
             stopListening();
         } else {
             startListening();
-            // Simulate voice recognition (in demo, use keyboard shortcut or random)
+            // Simulate voice recognition wait time
             setTimeout(() => {
                 if (state.isListening) {
-                    processQuery('prioritize orders');
+                    processQuery('What is today\\'s revenue?');
                 }
-            }, 2500);
+            }, 3000);
         }
     });
 
@@ -944,7 +972,7 @@ ${inventory.filter(i => getStockLevel(i) !== 'high').map(i => `- [ALERT] ${i.nam
         chip.addEventListener('click', () => {
             const query = chip.dataset.query;
             startListening();
-            setTimeout(() => processQuery(query), 600);
+            setTimeout(() => processQuery(query), 800);
         });
     });
 
