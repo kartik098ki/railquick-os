@@ -1,36 +1,40 @@
-# RailQuick Vendor Notion Workspace (RailQuick OS)
+# RailQuick Vendor Mobile OS (RailQuick OS) 📱🚂
 
-A premium, interactive React-inspired Notion workspace designed for railway platform vendors. This application integrates real-time train schedules with automated priority order routing and AI dispatch management.
-
-## 🌟 Key Features
-
-### 📁 Collapsible Sidebar
-- **UX Details**: A toggle button (`◀`) slides out on the sidebar edge on hover. Clicking it collapses the sidebar with a smooth animation to maximize focus. A burger-expand icon (`▶`) appears floating on the top-left of the workspace when collapsed.
-- **Keyboard Shortcut**: Press `Cmd + \` (Mac) or `Ctrl + \` (Windows/Linux) to toggle the sidebar.
-
-### 🔍 Cmd+K Quick Find Command Palette
-- **UX Details**: Press `Cmd+K` / `Ctrl+K` or click "Search / Jump to..." in the sidebar to open a fuzzy search panel with a translucent glass background.
-- **Scope**: Search across page views (Orders, Map, Inventory, Notes), active trains, specific orders (e.g. searching for `#1082` will highlight it), inventory stock levels, or trigger system actions (like toggling theme, restocking items, or simulating platform shift).
-- **Controls**: Use `ArrowUp`/`ArrowDown` to navigate, `Enter` to select, and `Escape` to close.
-
-### 💬 Shift logs & Page Comments
-- **UX Details**: Standard comments thread located under the main properties panel. It supports collapsing/expanding comment threads, displaying supervisor avatars, relative timestamps, and deletion triggers.
-- **Action**: Type comments and hit `Enter` or click "Comment" to log notes.
-
-### 🏷️ Interactive Properties Picker
-- **UX Details**: Clicking "Runner Assigned" or "Tags" in the page properties panel opens an absolute-positioned dropdown select.
-- **Action**: Search and assign runners (Raj Kumar, Amit Singh, Vikram Patel) or toggle tags (Operations, Live Queue, Restock, Delayed) with real-time sync state feedback animations.
-
-### ✏️ Keyboard Slash Commands & Drag Handles
-- **UX Details**: Inside the Notes editor workspace, typing `/` displays a block-insertion menu that can be navigated using `ArrowUp`/`ArrowDown` and selected using `Enter`.
-- **Drag Handles**: Order cards and layout lists now display Notion's iconic `⠿` drag handles on hover.
+A premium, touch-optimized **Mobile Platform Vendor POS & Dispatch App** designed for railway station stalls (e.g., Platform 3). It features real-time train timetable boards, automated vendor sales ledgers, background AI-driven platform relocation tracking, and cloud Notion integration with an interactive CLI log console.
 
 ---
 
-## 🛠️ Tech Stack & Styling
-- **Core**: Vanilla HTML5, CSS3, and JavaScript (ES6+).
-- **Design Tokens**: Standard Notion gray-scale light/dark theme variables, Outfitters & Inter typography, glassmorphism filters, and smooth CSS transitions.
-- **Audio Feed**: Web Audio API synthesized chimes and speech alerts for priority announcements.
+## 🌟 Core Enhancements & Features
+
+### 🚂 Platform 3 Timetable & Queue Scoping
+- **Scoped Views**: Displays oncoming train departures and orders scheduled *exclusively* for the vendor's platform (Platform 3).
+- **AI Relocation Shifts**: When trains get dynamically rescheduled to other platforms by the AI dispatch engine, the system automatically relocates those orders, logs the shift, and updates the local boards.
+- **Dynamic Assignments**: When trains on other tracks (e.g., Platform 1) get rescheduled to Platform 3, the AI auto-router transfers the order to our queue and notifies the stall immediately.
+
+### 🤖 Autonomous AI Relocations
+- A background simulation engine runs autonomously.
+- Triggers realistic track shifts (e.g., Jan Shatabdi shifted from Platform 3 to Platform 5).
+- Automatically reallocates orders to partner stalls, adds **AI Relocations Commission (15% / ₹18.00)** to our ledger, and triggers browser Speech Synthesis for voice-over dispatch announcements.
+
+### 🛒 Tap-to-Checkout Stall POS
+- **Touch Product Tiles**: Tap on Chai, Cutlets, Rolls, or Samosas to load them into the basket.
+- **Runners & Seats**: Enter the target seat (e.g., Coach B2-46) and select from online runners (Raj Kumar, Amit Singh, Vikram Patel) to dispatch immediately.
+- Dispatched orders feed back into the active queue with countdown delivery timers.
+
+### 📝 Notion AI Assistant & Sync Center
+- **Notion Sync Desk (Tab 4)**: Lets you toggle between **Mock Sync** and **Real API Sync**. Connects to Notion pages and databases (`POST /v1/pages`) to upload live order items and stock records.
+- **API CLI Console**: Shows raw JSON request payloads and auth headers required for Notion integrations.
+- **Notion AI Drawer**: A slide-up companion sheet that scans sales figures and inventory count to draft handovers using markdown blocks (headings, callouts, lists) with typewriter audio chimes.
+
+---
+
+## 🤝 Project Credits & Stack
+
+This application was engineered with code design and implementation help from:
+1. **Notion API & AI**: Provides the structured schema design for inventory/order properties and inspires the AI assistant text-streaming blocks.
+2. **Google DeepMind's Antigravity AI**: Assisted in pair-programming the real-time layout structures, autonomous state timers, and vector dark-mode interface.
+3. **Web Audio API**: Powering the speech synthesis alert announcements and typewriter audio oscillators.
+4. **Vanilla Tech Stack**: Pure HTML5, CSS3 variables, and vanilla JavaScript (no complex bundler setup required).
 
 ---
 

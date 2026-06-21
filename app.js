@@ -226,6 +226,9 @@ document.addEventListener("DOMContentLoaded", () => {
         upcomingTrainsList.innerHTML = "";
 
         activeTrains.forEach(train => {
+            // ONLY SHOW OUR STALL'S PLATFORM (PLATFORM 3)
+            if (train.platform !== 3) return;
+
             const isRescheduled = train.status === "Rescheduled";
             const rowClass = isRescheduled ? "train-timetable-row rescheduled-row" : "train-timetable-row";
             
@@ -266,6 +269,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         orders.forEach(order => {
             if (order.status === "Delivered" || order.status === "Relocated") return;
+            // ONLY SHOW ORDERS SCHEDULED FOR OUR PLATFORM (PLATFORM 3)
+            if (order.actualPlatform !== 3) return;
             
             pendingCount++;
             const isUrgent = order.etaSeconds <= 300; 
