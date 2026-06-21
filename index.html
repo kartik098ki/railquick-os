@@ -533,6 +533,35 @@
         </div>
     </div>
 
+    <!-- New Order Arrival Popup Modal -->
+    <div class="modal" id="orderArrivalModal">
+        <div class="modal-content" style="text-align: center; border: 2px solid var(--accent-purple); box-shadow: 0 0 25px rgba(16, 185, 129, 0.45); max-width: 320px; padding: 22px;">
+            <div class="modal-header" style="justify-content: center; margin-bottom: 8px;">
+                <h3 style="color: var(--accent-purple); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border: none; padding: 0;">Incoming AI Dispatch</h3>
+            </div>
+            <div style="font-size: 26px; margin: 10px 0;" class="order-alert-icon">⚡</div>
+            <h4 id="popupOrderId" style="font-family: var(--font-heading); font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px; border: none; padding: 0;">RQ-1095</h4>
+            <p id="popupOrderTrain" style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">Duronto Express (12260) • Platform 3</p>
+            
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--r-sm); padding: 12px; margin-bottom: 16px; text-align: left;">
+                <span style="font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.3px;">Fulfillment Checklist:</span>
+                <div id="popupOrderItems" style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #ffffff;">
+                    <!-- Items populated dynamically -->
+                </div>
+            </div>
+            
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Est. Pack: <strong>35s</strong></span>
+                <span id="popupOrderEta" style="color: var(--accent-orange); font-weight: 700;">ETA: 4m 0s</span>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="btnRejectOrder" style="background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25);">REASSIGN</button>
+                <button type="button" class="btn-submit" id="btnAcceptOrder" style="background: var(--accent-purple); box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); color: #ffffff; border: none;">ACCEPT & PACK</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Database Column Popover -->
     <div class="notion-prop-popover" id="addColumnPopover" style="display: none; padding: 12px; width: 220px; z-index: 1000;">
         <div class="popover-title" style="margin-bottom: 8px; font-weight: 600; font-size: 12px;">Add New Property</div>

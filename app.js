@@ -518,6 +518,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
 
     // ==========================================================================
+    // NEW ORDER ARRIVAL POPUP MODAL
+    // ==========================================================================
+    function showIncomingOrderPopup(newOrder) {
+        playSynthSound('critical');
+        speakAlert(`New order re-routing request ${newOrder.id} received.`);
+        
+        const modal = document.getElementById("orderArrivalModal");
+        const popupOrderId = document.getElementById("popupOrderId");
+        const popupOrderTrain = document.getElementById("popupOrderTrain");
+        const popupOrderItems = document.getElementById("popupOrderItems");
+        const popupOrderEta = document.getElementById("popupOrderEta");
+        
+        if (modal && popupOrderId && popupOrderTrain && popupOrderItems && popupOrderEta) {
+            popupOrderId.textContent = newOrder.id;
+            popupOrderTrain.textContent = `${newOrder.trainName} (${newOrder.trainNo}) • Platform ${newOrder.actualPlatform}`;
+            
+            let itemsHtml = "";
+            newOrder.items.forEach(item => {
+                itemsHtml += `<div style="padding: 2px 0;">• ${item.qty}x ${item.name}</div>`;
+            });
+            popupOrderItems.innerHTML = itemsHtml;
+            
+            const etaMin = Math.floor(newOrder.etaSeconds / 60);
+            const etaSec = newOrder.etaSeconds % 60;
+            popupOrderEta.textContent = `ETA: ${etaMin}m ${etaSec}s`;
+            
+            modal.classList.add("active");
+            
+            // Countdown timer inside the popup
+            let popupTimerSeconds = newOrder.etaSeconds;
+            const countdownInterval = setInterval(() => {
+                popupTimerSeconds--;
+                if (popupTimerSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    modal.classList.remove("active");
+                } else {
+                    const min = Math.floor(popupTimerSeconds / 60);
+                    const sec = popupTimerSeconds % 60;
+                    popupOrderEta.textContent = `ETA: ${min}m ${sec}s`;
+                }
+            }, 1000);
+            
+            const btnAccept = document.getElementById("btnAcceptOrder");
+            const btnReject = document.getElementById("btnRejectOrder");
+            
+            function closePopup() {
+                modal.classList.remove("active");
+                clearInterval(countdownInterval);
+            }
+            
+            btnAccept.onclick = () => {
+                playSynthSound('success');
+                closePopup();
+                
+                // Add order to list
+                orders.push(newOrder);
+                showToast(`Order ${newOrder.id} accepted! Added to active queue.`, "success");
+                
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                addLogEntry(time, `AI AUTO-ROUTER: Accepted Order ${newOrder.id} assigned to Platform 3 Express (Us).`, "success");
+                
+                renderOrders();
+                renderPlatformMap();
+                renderTimetable();
+            };
+            
+            btnReject.onclick = () => {
+                playSynthSound('warning');
+                closePopup();
+                
+                // Divert to partner
+                statsReallocatedCountVal++;
+                dailyRevenue += 120.00;
+                aiCommissions += 18.00;
+                renderLedger();
+                
+                showToast(`Reassigned: Order ${newOrder.id} reallocated to partner vendor.`, "warning");
+                
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                addLogEntry(time, `AI AUTO-ROUTER: Order ${newOrder.id} rejected and shifted back to partner vendor.`, "warning");
+                
+                renderOrders();
+                renderPlatformMap();
+                renderTimetable();
+            };
+        }
+    }
+
+    // ==========================================================================
     // AUTONOMOUS AI RELOCATION SIMULATOR
     // ==========================================================================
     // AI autonomously reschedules platforms and reallocates orders every 32 seconds!
@@ -598,14 +687,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         source: "Platform 1 Partner",
                         reallocated: true
                     };
-                    orders.push(newOrder);
-                    
-                    addLogEntry(time, `AI AUTO-ROUTER: Order ${newOrder.id} reallocated TO Platform 3 Express (Us) from Platform 1 partner.`, "success");
-                    showToast(`AI ASSIGNMENT: Order ${newOrder.id} transferred to you!`, "success");
-                    
-                    renderOrders();
-                    renderPlatformMap();
-                    renderTimetable();
+                    showIncomingOrderPopup(newOrder);
                 }, 1500);
             }
             simulationState = 2;
