@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailQuick Vendor Workspace</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Notion Sidebar -->
+        <aside class="sidebar" id="notionSidebar">
+            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="sidebar-header">
+                <div class="vendor-profile">
+                    <span class="vendor-avatar">🏪</span>
+                    <div class="vendor-info">
+                        <span class="vendor-name" id="vendorNameInput" contenteditable="true">Platform 3 Express</span>
+                        <span class="station-tag">New Delhi (NDLS)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-search">
+                <button class="search-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    Search / Jump to...
+                </button>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <span class="section-title">Workspace</span>
+                    <nav class="menu-items">
+                        <a href="#" class="menu-item active" data-page="orders">
+                            <span class="item-icon">📥</span>
+                            <span class="item-label">Active Orders</span>
+                            <span class="item-badge" id="activeOrdersBadge">3</span>
+                        </a>
+                        <a href="#" class="menu-item" data-page="rerouting">
+                            <span class="item-icon">🔄</span>
+                            <span class="item-label">AI Rerouting Hub</span>
+                            <span class="item-badge alert" id="reroutingAlertBadge" style="display: none;">!</span>
+                        </a>
+                        <a href="#" class="menu-item" data-page="inventory">
+                            <span class="item-icon">📦</span>
+                            <span class="item-label">Inventory Database</span>
+                        </a>
+                        <a href="#" class="menu-item" data-page="docs">
+                            <span class="item-icon">📝</span>
+                            <span class="item-label">Vendor Workspace</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="menu-section">
+                    <span class="section-title">Notion Docs</span>
+                    <nav class="menu-items" id="docsList">
+                        <!-- Populated by JS -->
+                    </nav>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="notionSyncBtn">
+                    <span class="toggle-icon">🔄</span>
+                    <span class="toggle-text">Sync to Notion</span>
+                </button>
+                <button class="theme-toggle-btn" id="themeToggleBtn">
+                    <span class="toggle-icon">🌙</span>
+                    <span class="toggle-text">Dark Mode</span>
+                </button>
+                <div class="sync-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">AI Synced</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Notion Main Workspace -->
+        <main class="workspace" id="notionWorkspace">
+            <button class="sidebar-expand-btn" id="sidebarExpandBtn" title="Expand sidebar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+            </button>
+            <!-- Notion Cover -->
+            <div class="workspace-cover">
+                <img id="coverImg" src="/Users/kartikguleria/.gemini/antigravity/brain/ef42efc5-86e3-46a2-9f8f-1516d9f0a341/train_cover_1782021049860.png" alt="Workspace Cover">
+                <button class="change-cover-btn" id="changeCoverBtn">Change cover</button>
+                <!-- Cover Picker Popover -->
+                <div class="cover-picker-popover" id="coverPicker">
+                    <div class="cover-picker-header">Select Cover</div>
+                    <div class="cover-thumbnails">
+                        <img class="cover-thumb" src="/Users/kartikguleria/.gemini/antigravity/brain/ef42efc5-86e3-46a2-9f8f-1516d9f0a341/train_cover_1782021049860.png" data-src="/Users/kartikguleria/.gemini/antigravity/brain/ef42efc5-86e3-46a2-9f8f-1516d9f0a341/train_cover_1782021049860.png" title="AI Train">
+                        <img class="cover-thumb" src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=150&q=80" data-src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1200&q=80" title="Classic Track">
+                        <img class="cover-thumb" src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=150&q=80" data-src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80" title="Tokyo Night">
+                        <div class="cover-thumb grad-slate" data-src="linear-gradient(90deg, #4b6cb7 0%, #182848 100%)" title="Slate Blue"></div>
+                        <div class="cover-thumb grad-sunset" data-src="linear-gradient(90deg, #f12711 0%, #f5af19 100%)" title="Sunset"></div>
+                        <div class="cover-thumb grad-ocean" data-src="linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)" title="Ocean Wave"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workspace-content">
+                <!-- Notion Page Header -->
+                <header class="page-header">
+                    <div class="page-icon-wrapper" id="pageIconWrapper">
+                        <span class="page-icon" id="currentPageIcon">📥</span>
+                        <!-- Emoji Picker Dropdown -->
+                        <div class="emoji-picker-dropdown" id="emojiPicker">
+                            <span class="emoji-picker-item">📥</span>
+                            <span class="emoji-picker-item">🔄</span>
+                            <span class="emoji-picker-item">📦</span>
+                            <span class="emoji-picker-item">📝</span>
+                            <span class="emoji-picker-item">🏪</span>
+                            <span class="emoji-picker-item">🍕</span>
+                            <span class="emoji-picker-item">🍔</span>
+                            <span class="emoji-picker-item">☕</span>
+                            <span class="emoji-picker-item">🥤</span>
+                            <span class="emoji-picker-item">🍩</span>
+                            <span class="emoji-picker-item">🚂</span>
+                            <span class="emoji-picker-item">🎫</span>
+                            <span class="emoji-picker-item">🔔</span>
+                            <span class="emoji-picker-item">💡</span>
+                            <span class="emoji-picker-item">🔥</span>
+                            <span class="emoji-picker-item">✨</span>
+                        </div>
+                    </div>
+                    <div class="page-meta">
+                        <div class="page-breadcrumbs">
+                            <span>RailQuick NDLS</span> / <span id="breadcrumbCurrent">Active Orders</span>
+                            <button class="favorite-btn" id="favoritePageBtn" title="Pin to Favorites">⭐️</button>
+                        </div>
+                        <h1 class="page-title" id="currentPageTitle">Active Orders</h1>
+                        
+                        <!-- Notion Page Properties Panel -->
+                        <div class="notion-properties-panel">
+                            <div class="property-row">
+                                <span class="property-label">👤 Runner Assigned</span>
+                                <div class="property-value-wrapper">
+                                    <span class="property-value select-value interactive-prop" id="propAssignee">Raj Kumar</span>
+                                    <!-- Assignee Popover -->
+                                    <div class="notion-prop-popover" id="assigneePopover">
+                                        <div class="popover-search-container">
+                                            <input type="text" class="popover-search" id="assigneePopoverSearch" placeholder="Search runners...">
+                                        </div>
+                                        <div class="popover-options" id="assigneePopoverOptions">
+                                            <div class="popover-option" data-value="Raj Kumar">🏃 Raj Kumar <span class="runner-pop-status online">P3</span></div>
+                                            <div class="popover-option" data-value="Amit Singh">🏃 Amit Singh <span class="runner-pop-status offline">P1</span></div>
+                                            <div class="popover-option" data-value="Vikram Patel">🏃 Vikram Patel <span class="runner-pop-status offline">P5</span></div>
+                                            <div class="popover-option" data-value="Unassigned">❌ Unassigned</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="property-row">
+                                <span class="property-label">📍 Station Location</span>
+                                <span class="property-value" id="propLocation">NDLS Platform 3</span>
+                            </div>
+                            <div class="property-row">
+                                <span class="property-label">🏷️ Tags</span>
+                                <div class="property-value-wrapper">
+                                    <span class="property-value interactive-prop" id="propTags">
+                                        <span class="notion-tag blue">Operations</span>
+                                        <span class="notion-tag green">Live Queue</span>
+                                    </span>
+                                    <!-- Tags Popover -->
+                                    <div class="notion-prop-popover" id="tagsPopover">
+                                        <div class="popover-title">Toggle tags</div>
+                                        <div class="popover-options">
+                                            <div class="popover-option tag-option" data-tag="Operations" data-color="blue"><span class="notion-tag blue">Operations</span></div>
+                                            <div class="popover-option tag-option" data-tag="Live Queue" data-color="green"><span class="notion-tag green">Live Queue</span></div>
+                                            <div class="popover-option tag-option" data-tag="Restock" data-color="orange"><span class="notion-tag orange">Restock</span></div>
+                                            <div class="popover-option tag-option" data-tag="Delayed" data-color="red"><span class="notion-tag red">Delayed</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="property-row">
+                                <span class="property-label">🔄 Sync State</span>
+                                <span class="property-value" id="propSyncState" style="color: var(--accent-green); font-weight:600;">🟢 Connected</span>
+                            </div>
+                        </div>
+
+                        <!-- Notion Page Comments Section -->
+                        <div class="notion-comments-section" id="pageCommentsSection">
+                            <div class="comments-toggle-header" id="commentsToggleHeader">
+                                <span class="comments-toggle-icon">💬</span>
+                                <span class="comments-toggle-text">Page Comments</span>
+                                <span class="comments-count" id="commentsCount">0</span>
+                            </div>
+                            <div class="comments-thread-container" id="commentsThreadContainer" style="display: none;">
+                                <div class="comments-list" id="commentsList">
+                                    <!-- Comments populated dynamically -->
+                                </div>
+                                <div class="comment-input-row">
+                                    <input type="text" id="newCommentInput" placeholder="Add a comment or shift update...">
+                                    <button class="comment-submit-btn" id="btnAddComment">Comment</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="page-description" id="currentPageDescription">Real-time order queue sorted dynamically by RailQuick AI Priority Routing.</p>
+                    </div>
+                </header>
+
+                <!-- Page view container -->
+                <div class="page-view-container">
+
+                    <!-- ================= ACTIVE ORDERS PAGE ================= -->
+                    <div id="page-orders" class="page-view active">
+                        <!-- AI Priority Info Banner -->
+                        <div class="ai-banner">
+                            <div class="ai-banner-icon">⚡</div>
+                            <div class="ai-banner-content">
+                                <strong>RailQuick AI Priority Queue:</strong> Orders are prioritized automatically based on train arrival schedules, platform distances, and runner preparation times. Pack the items at the top first!
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-label">Pending Packing</span>
+                                <span class="stat-value" id="statsPendingCount">3</span>
+                            </div>
+                            <div class="stat-card urgent">
+                                <span class="stat-label">Urgent (Under 5 Mins)</span>
+                                <span class="stat-value" id="statsUrgentCount">1</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Next Train Arrival</span>
+                                <span class="stat-value" id="statsNextTrain">2.4 min</span>
+                            </div>
+                            <div class="stat-card reallocated">
+                                <span class="stat-label">AI Reallocated (Today)</span>
+                                <span class="stat-value" id="statsReallocatedCount">4</span>
+                            </div>
+                        </div>
+
+                        <!-- Notion-style View Tabs -->
+                        <div class="notion-tabs">
+                            <button class="tab-btn active" data-tab="list">📋 List View</button>
+                            <button class="tab-btn" data-tab="board">🗂️ Board View</button>
+                        </div>
+
+                        <!-- Orders List Content -->
+                        <div class="tab-content active" id="orders-list-view">
+                            <div class="order-groups-container">
+                                <!-- CRITICAL GROUP -->
+                                <div class="order-group urgent-group">
+                                    <div class="group-header">
+                                        <span class="group-dot"></span>
+                                        <h3>Critical Prep <span class="group-count" id="count-critical">(0)</span></h3>
+                                        <span class="group-subtitle">Train arriving within 5 mins</span>
+                                    </div>
+                                    <div class="orders-list" id="critical-orders-container">
+                                        <!-- Dynamic Critical Orders -->
+                                    </div>
+                                </div>
+
+                                <!-- UPCOMING GROUP -->
+                                <div class="order-group upcoming-group">
+                                    <div class="group-header">
+                                        <span class="group-dot"></span>
+                                        <h3>Upcoming Prep <span class="group-count" id="count-upcoming">(0)</span></h3>
+                                        <span class="group-subtitle">Train arriving in 5-15 mins</span>
+                                    </div>
+                                    <div class="orders-list" id="upcoming-orders-container">
+                                        <!-- Dynamic Upcoming Orders -->
+                                    </div>
+                                </div>
+
+                                <!-- SCHEDULED GROUP -->
+                                <div class="order-group scheduled-group">
+                                    <div class="group-header">
+                                        <span class="group-dot"></span>
+                                        <h3>Scheduled <span class="group-count" id="count-scheduled">(0)</span></h3>
+                                        <span class="group-subtitle">Train arriving in 15+ mins</span>
+                                    </div>
+                                    <div class="orders-list" id="scheduled-orders-container">
+                                        <!-- Dynamic Scheduled Orders -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kanban Board Content (Optional view) -->
+                        <div class="tab-content" id="orders-board-view" style="display: none;">
+                            <div class="kanban-board">
+                                <div class="kanban-column" id="col-pending">
+                                    <div class="column-header">📋 Received</div>
+                                    <div class="kanban-cards-container" id="kanban-pending-container"></div>
+                                </div>
+                                <div class="kanban-column" id="col-packing">
+                                    <div class="column-header">📦 Packing</div>
+                                    <div class="kanban-cards-container" id="kanban-packing-container"></div>
+                                </div>
+                                <div class="kanban-column" id="col-ready">
+                                    <div class="column-header">✅ Packed & Ready</div>
+                                    <div class="kanban-cards-container" id="kanban-ready-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= AI REROUTING HUB PAGE ================= -->
+                    <div id="page-rerouting" class="page-view">
+                        <div class="rerouting-grid">
+                            <!-- Left: Interactive Map -->
+                            <div class="map-card">
+                                <div class="card-header">
+                                    <h3>Platform Interactive Tracker</h3>
+                                    <span class="badge live">LIVE</span>
+                                </div>
+                                <div class="station-map">
+                                    <div class="map-bg-grid"></div>
+                                    
+                                    <div class="platforms-container">
+                                        <!-- Platform 1 -->
+                                        <div class="platform-row" id="plat-1">
+                                            <div class="platform-label">P1</div>
+                                            <div class="platform-track">
+                                                <div class="train-slot" id="train-slot-1"></div>
+                                            </div>
+                                            <div class="platform-vendor partner">🏪 Partner</div>
+                                        </div>
+                                        <!-- Platform 2 -->
+                                        <div class="platform-row" id="plat-2">
+                                            <div class="platform-label">P2</div>
+                                            <div class="platform-track">
+                                                <div class="train-slot" id="train-slot-2"></div>
+                                            </div>
+                                            <div class="platform-vendor partner">🏪 Partner</div>
+                                        </div>
+                                        <!-- Platform 3 (US) -->
+                                        <div class="platform-row active-vendor" id="plat-3">
+                                            <div class="platform-label">P3</div>
+                                            <div class="platform-track">
+                                                <div class="train-slot" id="train-slot-3"></div>
+                                            </div>
+                                            <div class="platform-vendor primary">🏪 US (P3 Express)</div>
+                                        </div>
+                                        <!-- Platform 4 -->
+                                        <div class="platform-row" id="plat-4">
+                                            <div class="platform-label">P4</div>
+                                            <div class="platform-track">
+                                                <div class="train-slot" id="train-slot-4"></div>
+                                            </div>
+                                            <div class="platform-vendor partner">🏪 Partner</div>
+                                        </div>
+                                        <!-- Platform 5 -->
+                                        <div class="platform-row" id="plat-5">
+                                            <div class="platform-label">P5</div>
+                                            <div class="platform-track">
+                                                <div class="train-slot" id="train-slot-5"></div>
+                                            </div>
+                                            <div class="platform-vendor partner">🏪 Partner</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="map-legend">
+                                        <span class="legend-item"><span class="legend-dot us"></span>Our Vendor</span>
+                                        <span class="legend-item"><span class="legend-dot partner"></span>Partner Vendor</span>
+                                        <span class="legend-item"><span class="legend-dot train"></span>Train Appending</span>
+                                    </div>
+                                </div>
+                                <div class="rerouting-explanation">
+                                    <p>💡 <strong>AI Routing Protocol:</strong> When a train's arrival platform changes, RailQuick AI instantly shifts pending orders to the vendor located at the new platform. If the order is moved *away* from us, we receive a cancellation credit. If it's moved *to* us, we get priority notifications to fulfill it immediately.</p>
+                                </div>
+                            </div>
+
+                            <!-- Right: AI Control Desk & Logs -->
+                            <div class="controls-card">
+                                <div class="card-header">
+                                    <h3>AI Relocation Control Room</h3>
+                                </div>
+                                <div class="ai-controls-panel">
+                                    <div class="simulator-status">
+                                        <span class="pulse-dot"></span>
+                                        <span>AI Simulator Engine: Ready</span>
+                                    </div>
+                                    <p class="panel-subtitle">Simulate real-time railway changes to see how the AI reallocates orders instantly.</p>
+                                    
+                                    <div class="control-actions">
+                                        <button class="action-btn primary-btn" id="btnSimulatePlatChange">
+                                            ⚡ Simulate Train Platform Shift
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Live Runner Dispatch Widget -->
+                                <div class="runner-tracker-panel">
+                                    <h4>🏃 Live Runner Dispatch</h4>
+                                    <div class="runner-card-small">
+                                        <div class="runner-avatar-wrapper">
+                                            <span class="runner-avatar-icon" id="runnerIcon">🏪</span>
+                                            <div class="runner-pulse-glow" id="runnerGlow"></div>
+                                        </div>
+                                        <div class="runner-mini-info">
+                                            <div class="runner-mini-name">Raj Kumar <span class="runner-id-badge">ID: 884</span></div>
+                                            <div class="runner-mini-status" id="runnerStatusText">Status: Standing by at P3</div>
+                                            <div class="runner-metrics">🔋 94% | ❤️ 98 bpm | 📍 Platform 3</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="relocation-logs-section">
+                                    <h4>Relocation Logs & Signals</h4>
+                                    <div class="logs-container" id="relocationLogs">
+                                        <div class="log-entry system">
+                                            <span class="log-time">11:15</span>
+                                            <span class="log-text">AI Routing Engine initialized. Listening to NDLS Station Master feed.</span>
+                                        </div>
+                                        <div class="log-entry success">
+                                            <span class="log-time">11:18</span>
+                                            <span class="log-text"><strong>Order #4210 reallocated to us!</strong> Train 12424 rescheduled to Platform 3. Preparation initiated.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= INVENTORY PAGE ================= -->
+                    <div id="page-inventory" class="page-view">
+                        <!-- AI Restock Recommendation -->
+                        <div class="ai-restock-card" id="restockRecommendation">
+                            <div class="restock-icon">💡</div>
+                            <div class="restock-info">
+                                <h4>AI Smart Stock Alert</h4>
+                                <p id="restockText">Water Bottles and Soda Can stock is lower than expected for the upcoming afternoon rush. A heatwave warning (40°C) is active, and three long-distance trains are delayed, which will increase dwell times.</p>
+                                <button class="action-btn secondary-btn compact-btn" id="btnRestockAll">📦 Restock Recommended Items</button>
+                            </div>
+                        </div>
+
+                        <!-- Inventory Controls -->
+                        <div class="inventory-toolbar">
+                            <div class="search-bar">
+                                <input type="text" id="inventorySearch" placeholder="Search inventory database...">
+                            </div>
+                            <button class="action-btn primary-btn compact-btn" id="btnAddNewItem">➕ Add Item</button>
+                        </div>
+
+                        <!-- Notion-style Database Table -->
+                        <div class="notion-table-wrapper">
+                            <table class="notion-table" id="inventoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Stock Level</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody">
+                                    <!-- Dynamic Inventory Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- AI Analytics Desk -->
+                        <div class="analytics-desk-section">
+                            <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">
+                                <h3 style="font-family: var(--font-heading); font-size: 15px; font-weight: 700;">📊 AI Sales & Relocation Analytics</h3>
+                            </div>
+                            <div class="analytics-grid">
+                                <!-- Sales Trend SVG Chart -->
+                                <div class="analytics-card">
+                                    <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Hourly Order Fulfillment (Today)</h4>
+                                    <div class="svg-chart-container" style="position: relative; height: 120px; width: 100%;">
+                                        <svg viewBox="0 0 400 120" style="width: 100%; height: 100%;">
+                                            <!-- Grid lines -->
+                                            <line x1="10" y1="20" x2="390" y2="20" stroke="var(--border-color)" stroke-dasharray="2,2"/>
+                                            <line x1="10" y1="60" x2="390" y2="60" stroke="var(--border-color)" stroke-dasharray="2,2"/>
+                                            <line x1="10" y1="100" x2="390" y2="100" stroke="var(--border-color)" stroke-width="1"/>
+                                            <!-- Trend Line -->
+                                            <path d="M10,95 L64,80 L118,50 L172,90 L226,30 L280,45 L334,15 L388,40" fill="none" stroke="var(--accent-blue)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <!-- Data points -->
+                                            <circle cx="118" cy="50" r="4" fill="var(--bg-card)" stroke="var(--accent-blue)" stroke-width="2"/>
+                                            <circle cx="226" cy="30" r="4" fill="var(--bg-card)" stroke="var(--accent-blue)" stroke-width="2"/>
+                                            <circle cx="334" cy="15" r="4" fill="var(--bg-card)" stroke="var(--accent-blue)" stroke-width="2"/>
+                                        </svg>
+                                    </div>
+                                    <div class="chart-labels" style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 6px; padding: 0 10px;">
+                                        <span>08:00</span>
+                                        <span>10:00</span>
+                                        <span>12:00</span>
+                                        <span>14:00</span>
+                                    </div>
+                                </div>
+                                <!-- AI Efficiency Stats -->
+                                <div class="analytics-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">AI Routing Efficiency</h4>
+                                        <p style="font-size: 13px; line-height: 1.4; color: var(--text-muted);">AI rerouting prevented <strong>12 late deliveries</strong> today. Platform changes were handled with zero runner delays.</p>
+                                    </div>
+                                    <div style="display: flex; gap: 16px; margin-top: 12px;">
+                                        <div style="flex: 1;">
+                                            <span style="display: block; font-size: 20px; font-weight: 700; color: var(--accent-green);">100%</span>
+                                            <span style="font-size: 10px; color: var(--text-muted);">SLA Met</span>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <span style="display: block; font-size: 20px; font-weight: 700; color: var(--accent-blue);">-4.2m</span>
+                                            <span style="font-size: 10px; color: var(--text-muted);">Avg Delivery Time</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= VENDOR WORKSPACE (NOTION DOCS) PAGE ================= -->
+                    <div id="page-docs" class="page-view">
+                        <div class="docs-workspace-container">
+                            <!-- Left Sidebar for Docs -->
+                            <div class="docs-nav-sidebar">
+                                <button class="action-btn primary-btn block-btn" id="btnCreateNewDoc">➕ New Note</button>
+                                <div class="docs-nav-list" id="docsSidebarList">
+                                    <!-- Dynamic Doc Items -->
+                                </div>
+                            </div>
+
+                            <!-- Right Editor -->
+                            <div class="docs-editor-container">
+                                <div class="editor-header">
+                                    <div class="editor-actions">
+                                        <button class="editor-format-btn" id="btnBold" title="Bold"><strong>B</strong></button>
+                                        <button class="editor-format-btn" id="btnItalic" title="Italic"><em>I</em></button>
+                                        <button class="editor-format-btn" id="btnH1" title="Heading 1">H1</button>
+                                        <button class="editor-format-btn" id="btnH2" title="Heading 2">H2</button>
+                                        <button class="editor-format-btn" id="btnBullet" title="Bullet List">• List</button>
+                                    </div>
+                                    <div class="editor-meta">
+                                        <span class="save-status" id="docSaveStatus">Autosaved to local workspace</span>
+                                    </div>
+                                </div>
+
+                                <div class="editor-body">
+                                    <div class="editor-title-container">
+                                        <span class="editor-doc-icon" id="editorDocIcon">📝</span>
+                                        <input type="text" class="editor-doc-title" id="editorDocTitle" placeholder="Untitled">
+                                    </div>
+                                    <div class="editor-content-area" id="editorContent" contenteditable="true" placeholder="Type '/' for commands or start writing...">
+                                        <!-- Editable document content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Add Item Modal -->
+    <div class="modal" id="addItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Inventory Item</h3>
+                <span class="close-modal" id="closeItemModal">&times;</span>
+            </div>
+            <form id="addItemForm" class="modal-form">
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" required placeholder="e.g. Veg Cheese Sandwich">
+                </div>
+                <div class="form-group">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory">
+                        <option value="Food">Food</option>
+                        <option value="Beverage">Beverage</option>
+                        <option value="Snack">Snack</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="itemStock">Stock Level</label>
+                        <input type="number" id="itemStock" min="0" required placeholder="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemMinStock">Min Stock Trigger</label>
+                        <input type="number" id="itemMinStock" min="1" required placeholder="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="itemPrice">Price (₹)</label>
+                    <input type="number" id="itemPrice" min="1" step="0.5" required placeholder="45">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="cancelAddItem">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notion Sync Modal -->
+    <div class="modal" id="notionSyncModal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="sync-animation-wrapper">
+                <div class="sync-spinner-ring"></div>
+                <span class="sync-logo">N</span>
+            </div>
+            <h3 style="margin-top: 16px; font-family: var(--font-heading);">Syncing Workspace to Notion...</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;" id="syncModalText">Pushing live orders, daily logs, and inventory levels to Notion cloud databases.</p>
+            <div class="sync-progress-bar" style="height: 4px; background: var(--border-color); border-radius: 2px; margin-top: 16px; overflow: hidden;">
+                <div id="syncProgressFill" style="height: 100%; width: 0%; background: var(--accent-blue); transition: width 0.1s linear;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notion Slash Commands Popup Menu -->
+    <div class="notion-slash-menu" id="slashCommandsMenu">
+        <div class="slash-header">Basic Blocks</div>
+        <div class="slash-item" data-command="h1">
+            <span class="slash-icon" style="font-weight: 700;">H1</span>
+            <div class="slash-item-meta">
+                <span class="slash-title">Heading 1</span>
+                <span class="slash-desc">Large section heading</span>
+            </div>
+        </div>
+        <div class="slash-item" data-command="h2">
+            <span class="slash-icon" style="font-weight: 600;">H2</span>
+            <div class="slash-item-meta">
+                <span class="slash-title">Heading 2</span>
+                <span class="slash-desc">Medium section heading</span>
+            </div>
+        </div>
+        <div class="slash-item" data-command="bullet">
+            <span class="slash-icon">•</span>
+            <div class="slash-item-meta">
+                <span class="slash-title">Bulleted list</span>
+                <span class="slash-desc">Create a simple bulleted list</span>
+            </div>
+        </div>
+        <div class="slash-item" data-command="callout">
+            <span class="slash-icon">💡</span>
+            <div class="slash-item-meta">
+                <span class="slash-title">Callout Box</span>
+                <span class="slash-desc">Highlight important info</span>
+            </div>
+        </div>
+        <div class="slash-item" data-command="divider">
+            <span class="slash-icon">―</span>
+            <div class="slash-item-meta">
+                <span class="slash-title">Divider</span>
+                <span class="slash-desc">Visually divide sections</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notion Quick Find (Cmd+K) Command Palette Overlay -->
+    <div class="notion-cmd-palette-overlay" id="cmdPaletteOverlay" style="display: none;">
+        <div class="notion-cmd-palette">
+            <div class="cmd-palette-search-container">
+                <span class="cmd-search-icon">🔍</span>
+                <input type="text" id="cmdPaletteSearch" placeholder="Search pages, items, orders, or run actions..." autocomplete="off">
+                <span class="cmd-esc-badge">ESC</span>
+            </div>
+            <div class="cmd-palette-results" id="cmdPaletteResults">
+                <!-- Grouped results -->
+            </div>
+            <div class="cmd-palette-footer">
+                <span>Use <kbd>↑</kbd> <kbd>↓</kbd> to navigate, <kbd>Enter</kbd> to select</span>
+                <span>Notion Quick Find</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
