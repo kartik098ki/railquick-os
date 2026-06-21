@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             id: "RQ-1082",
             trainNo: "12423",
             trainName: "Rajdhani Express",
-            fromTo: "NDLS ➔ HWH",
+            fromTo: "NDLS → HWH",
             scheduledPlatform: 3,
             actualPlatform: 3,
             etaSeconds: 120,
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             id: "RQ-1085",
             trainNo: "12056",
             trainName: "Jan Shatabdi Express",
-            fromTo: "DDN ➔ NDLS",
+            fromTo: "DDN → NDLS",
             scheduledPlatform: 3,
             actualPlatform: 3,
             etaSeconds: 340,
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
             id: "RQ-1089",
             trainNo: "12952",
             trainName: "Mumbai Rajdhani",
-            fromTo: "NDLS ➔ MMCT",
+            fromTo: "NDLS → MMCT",
             scheduledPlatform: 3,
             actualPlatform: 3,
             etaSeconds: 820,
@@ -194,9 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // TOP NAVIGATION SYSTEM
+    // SIDEBAR NAVIGATION SYSTEM
     // ==========================================================================
-    const navItems = document.querySelectorAll(".top-nav .nav-item");
+    const navItems = document.querySelectorAll(".sidebar-nav .nav-item");
     const tabViews = document.querySelectorAll(".tab-view");
 
     navItems.forEach(item => {
@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (train.platform !== 3) return;
 
             const isRescheduled = train.status === "Rescheduled";
-            const rowClass = isRescheduled ? "train-timetable-row rescheduled-row" : "train-timetable-row";
+            const badgeClass = isRescheduled ? "ticker-train-badge rescheduled-badge" : "ticker-train-badge";
             
             let etaString = "Arrived";
             if (train.eta > 0) {
@@ -239,15 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 etaString = `${min}m ${sec}s`;
             }
 
-            const row = document.createElement("div");
-            row.className = rowClass;
-            row.innerHTML = `
-                <span class="tt-train">${train.no} - ${train.name}</span>
-                <span class="tt-plat">P${train.platform}</span>
-                <span class="tt-eta">${etaString}</span>
-                <span class="tt-status ${train.status.replace(" ", "").toLowerCase()}">${train.status}</span>
+            const badge = document.createElement("div");
+            badge.className = badgeClass;
+            badge.innerHTML = `
+                <span style="font-weight: 700; color: var(--text-main);">${train.no}</span>
+                <span style="color: var(--text-muted); font-size:10px;">ETA ${etaString}</span>
+                <span style="font-size: 8px; font-weight:700; padding: 2px 5px; border-radius:3px; background: ${isRescheduled ? 'var(--accent-orange-soft)' : 'var(--accent-green-soft)'}; color: ${isRescheduled ? 'var(--accent-orange)' : 'var(--accent-green)'}; border: 1px solid ${isRescheduled ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; text-transform: uppercase;">${train.status}</span>
             `;
-            upcomingTrainsList.appendChild(row);
+            upcomingTrainsList.appendChild(badge);
         });
     }
 
@@ -482,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 playSynthSound('warning');
                 speakAlert("AI Alert. Platform rescheduled. Jan Shatabdi shifted to platform 5.");
-                addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 ➔ 5.", "warning");
+                addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 → 5.", "warning");
                 
                 // Auto-relocate Jan Shatabdi order
                 const orderIdx = orders.findIndex(o => o.trainNo === "12056");
@@ -517,14 +516,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 playSynthSound('success');
                 speakAlert("Attention. New order assigned to you from Platform 1 partner.");
-                addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 ➔ 3.", "warning");
+                addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 → 3.", "warning");
                 
                 setTimeout(() => {
                     const newOrder = {
                         id: "RQ-1095",
                         trainNo: "12260",
                         trainName: "Duronto Express",
-                        fromTo: "NDLS ➔ Seat A2-10",
+                        fromTo: "NDLS → Seat A2-10",
                         scheduledPlatform: 1,
                         actualPlatform: 3,
                         etaSeconds: 240, // 4 mins
@@ -566,7 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     id: "RQ-1085",
                     trainNo: "12056",
                     trainName: "Jan Shatabdi Express",
-                    fromTo: "DDN ➔ NDLS",
+                    fromTo: "DDN → NDLS",
                     scheduledPlatform: 3,
                     actualPlatform: 3,
                     etaSeconds: 340,
@@ -675,7 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         html += `
-            <th id="thAddColumn" class="add-column-header">＋ Add Column</th>
+            <th id="thAddColumn" class="add-column-header">+ Add Column</th>
             <th>Actions</th>
         `;
         headerRow.innerHTML = html;
@@ -1120,6 +1119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================================
     // NOTION DAILY SUMMARY REPORT DRAWER
     // ==========================================================================
+    const btnToggleAiDrawer = document.getElementById("btnToggleAiDrawer");
     const btnNotionAI = document.getElementById("btnNotionAI");
     const btnOneTapReport = document.getElementById("btnOneTapReport");
     const aiDrawerOverlay = document.getElementById("aiDrawerOverlay");
@@ -1129,33 +1129,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const editorContent = document.getElementById("editorContent");
     const btnCopyNote = document.getElementById("btnCopyNote");
 
-    if (btnNotionAI) {
-        btnNotionAI.addEventListener("click", () => {
-            playSynthSound('click');
-            if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
-        });
+    function openAiDrawer() {
+        playSynthSound('click');
+        if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
     }
+
+    function closeAiDrawer() {
+        playSynthSound('click');
+        if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
+    }
+
+    if (btnToggleAiDrawer) btnToggleAiDrawer.addEventListener("click", openAiDrawer);
+    if (btnNotionAI) btnNotionAI.addEventListener("click", openAiDrawer);
 
     if (btnOneTapReport) {
         btnOneTapReport.addEventListener("click", () => {
-            playSynthSound('click');
-            if (aiDrawerOverlay) aiDrawerOverlay.classList.add("active");
+            openAiDrawer();
             generateOneTapDailyReport();
         });
     }
 
-    if (btnCloseAiDrawer) {
-        btnCloseAiDrawer.addEventListener("click", () => {
-            playSynthSound('click');
-            if (aiDrawerOverlay) aiDrawerOverlay.classList.remove("active");
-        });
-    }
+    if (btnCloseAiDrawer) btnCloseAiDrawer.addEventListener("click", closeAiDrawer);
 
     if (aiDrawerOverlay) {
         aiDrawerOverlay.addEventListener("click", (e) => {
             if (e.target === aiDrawerOverlay) {
-                playSynthSound('click');
-                aiDrawerOverlay.classList.remove("active");
+                closeAiDrawer();
             }
         });
     }
