@@ -11,10 +11,19 @@ A premium, touch-optimized **Mobile Platform Vendor POS & Dispatch App** designe
 - **AI Relocation Shifts**: When trains get dynamically rescheduled to other platforms by the AI dispatch engine, the system automatically relocates those orders, logs the shift, and updates the local boards.
 - **Dynamic Assignments**: When trains on other tracks (e.g., Platform 1) get rescheduled to Platform 3, the AI auto-router transfers the order to our queue and notifies the stall immediately.
 
+### 🎤 AI Voice Desk (Talk Agent)
+- **Hinglish/English Multilingual Support**: Tap the microphone icon to talk to the AI agent. Ask questions in English or local Hinglish dialects (e.g., *"Which order to prioritize?"* or *"Pehle konsa order banaye?"*).
+- **Web Speech API**: Uses browser Speech Recognition to transcribe commands and Speech Synthesis to talk back with an Indian-accented voice assistant.
+- Supports voice queries for order prioritization, train arrival status updates, and low-stock alerts. Includes a fallback text interface for unsupported environments.
+
+### 🧠 Live Queue Prioritization
+- **Order Prioritize Indicator**: Tapping the **🧠 Prioritize** button or asking the voice assistant triggers a real-time priority sweep. 
+- **Glowing Highlights**: The app automatically identifies the pending order with the lowest train arrival ETA, scrolls it into view, and applies a pulsating glowing indicator (`.prioritized-highlight`).
+
 ### 🤖 Autonomous AI Relocations
 - A background simulation engine runs autonomously.
 - Triggers realistic track shifts (e.g., Jan Shatabdi shifted from Platform 3 to Platform 5).
-- Automatically reallocates orders to partner stalls, adds **AI Relocations Commission (15% / ₹18.00)** to our ledger, and triggers browser Speech Synthesis for voice-over dispatch announcements.
+- Automatically reallocates orders to partner stalls, updates the **AI Rerouted** ledger counters, and triggers speech announcements for platform change operations.
 
 ### 🛒 Tap-to-Checkout Stall POS
 - **Touch Product Tiles**: Tap on Chai, Cutlets, Rolls, or Samosas to load them into the basket.
@@ -22,19 +31,19 @@ A premium, touch-optimized **Mobile Platform Vendor POS & Dispatch App** designe
 - Dispatched orders feed back into the active queue with countdown delivery timers.
 
 ### 📝 Notion AI Assistant & Sync Center
-- **Notion Sync Desk (Tab 4)**: Lets you toggle between **Mock Sync** and **Real API Sync**. Connects to Notion pages and databases (`POST /v1/pages`) to upload live order items and stock records.
+- **Notion Sync Desk (Tab 4)**: Connects to Notion pages and databases (`POST /v1/pages`) to upload live order items and stock records.
 - **API CLI Console**: Shows raw JSON request payloads and auth headers required for Notion integrations.
-- **Notion AI Drawer**: A slide-up companion sheet that scans sales figures and inventory count to draft handovers using markdown blocks (headings, callouts, lists) with typewriter audio chimes.
+- **Notion AI Drawer**: A slide-up companion sheet that drafts handovers using markdown blocks (headings, callouts, lists) with typewriter audio chimes.
 
 ---
 
 ## 🤝 Project Credits & Stack
 
 This application was engineered with code design and implementation help from:
-1. **Notion API & AI**: Provides the structured schema design for inventory/order properties and inspires the AI assistant text-streaming blocks.
-2. **Google DeepMind's Antigravity AI**: Assisted in pair-programming the real-time layout structures, autonomous state timers, and vector dark-mode interface.
-3. **Web Audio API**: Powering the speech synthesis alert announcements and typewriter audio oscillators.
-4. **Vanilla Tech Stack**: Pure HTML5, CSS3 variables, and vanilla JavaScript (no complex bundler setup required).
+1. **Notion API & AI**: Inspires the database schema design and the AI companion note editor.
+2. **Google DeepMind's Antigravity AI**: Assisted in pair-programming the real-time layout structures, autonomous state timers, speech engines, and dark-mode interface.
+3. **Web Speech & Audio APIs**: Powering voice commands, multilingual speech synthesis, and synthesized audio soundscapes.
+4. **Vanilla Tech Stack**: Pure HTML5, CSS3 variables, and vanilla JavaScript (no complex frameworks or bundlers).
 
 ---
 

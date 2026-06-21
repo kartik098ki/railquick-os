@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let statsReallocatedCountVal = 4;
     let customColumns = [];
     let cart = [];
+    let prioritizedOrderId = null;
 
     // ==========================================================================
     // AUDIO SYNTHESIS ENGINE
@@ -190,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderLedger() {
         if (salesTotalRevenue) salesTotalRevenue.textContent = `₹${dailyRevenue.toFixed(2)}`;
         if (salesOrdersFilled) salesOrdersFilled.textContent = ordersFilledCount;
-        if (salesAiCommissions) salesAiCommissions.textContent = `₹${aiCommissions.toFixed(2)}`;
+        if (salesAiCommissions) salesAiCommissions.textContent = statsReallocatedCountVal;
     }
 
     // ==========================================================================
@@ -281,7 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const etaString = `${etaMin}m ${etaSec}s`;
 
             const itemSummary = order.items.map(i => `${i.qty}x ${i.name}`).join(", ");
-            const cardClass = isUrgent ? "critical" : "upcoming";
+            let cardClass = isUrgent ? "critical" : "upcoming";
+            if (prioritizedOrderId === order.id) {
+                cardClass += " prioritized-highlight";
+            }
 
             const card = document.createElement("div");
             card.className = `order-touch-card ${cardClass}`;
@@ -1311,6 +1315,176 @@ document.addEventListener("DOMContentLoaded", () => {
             popover.style.display = "none";
         }
     });
+
+    // ==========================================================================
+    // AI VOICE ASSISTANT & PRIORITIZATION DESK
+    // ==========================================================================
+    const btnAutoPrioritize = document.getElementById("btnAutoPrioritize");
+    const btnVoiceMic = document.getElementById("btnVoiceMic");
+    const voiceStatus = document.getElementById("voiceStatus");
+    const voiceTranscript = document.getElementById("voiceTranscript");
+    const voiceResponseBubble = document.getElementById("voiceResponseBubble");
+    const voiceResponseText = document.getElementById("voiceResponseText");
+
+    // Helper to calculate top priority order based on countdown times
+    function getTopPriorityOrder() {
+        const activeP3Orders = orders.filter(o => o.actualPlatform === 3 && o.status !== "Delivered" && o.status !== "Relocated");
+        if (activeP3Orders.length === 0) return null;
+        
+        activeP3Orders.sort((a, b) => a.etaSeconds - b.etaSeconds);
+        return activeP3Orders[0];
+    }
+
+    // Function to speak AI voice response
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-IN'; // Indian English accent fits Hinglish well
+            utterance.pitch = 1.05;
+            utterance.rate = 0.95;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Trigger prioritization highlight & feedback
+    function triggerPrioritization() {
+        const topOrder = getTopPriorityOrder();
+        if (!topOrder) {
+            prioritizedOrderId = null;
+            renderOrders();
+            const reply = "You have no pending orders on Platform 3. All clear!";
+            voiceResponseText.textContent = reply;
+            voiceResponseBubble.style.display = "block";
+            speakText(reply);
+            showToast("No pending orders on Platform 3.", "info");
+            return;
+        }
+
+        prioritizedOrderId = topOrder.id;
+        renderOrders();
+
+        const etaMin = Math.floor(topOrder.etaSeconds / 60);
+        const englishReply = `Order ${topOrder.id} for ${topOrder.trainName} is your top priority. The train arrives in ${etaMin} minutes. Kripya isey pehle tayyar karein!`;
+        
+        voiceResponseText.textContent = englishReply;
+        voiceResponseBubble.style.display = "block";
+        
+        // Auto scroll to target card if needed
+        setTimeout(() => {
+            const cardElem = document.querySelector(`.order-touch-card.prioritized-highlight`);
+            if (cardElem) {
+                cardElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 100);
+
+        speakText(englishReply);
+        showToast(`Prioritizing ${topOrder.id} (${etaMin}m ETA)`, "success");
+    }
+
+    if (btnAutoPrioritize) {
+        btnAutoPrioritize.addEventListener("click", () => {
+            playSynthSound('click');
+            triggerPrioritization();
+        });
+    }
+
+    // Speech recognition setup
+    let recognition = null;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-IN';
+
+        recognition.onstart = () => {
+            btnVoiceMic.classList.add("listening");
+            voiceStatus.textContent = "Listening to voice command...";
+            voiceTranscript.textContent = "Asking AI...";
+            playSynthSound('click');
+        };
+
+        recognition.onerror = (e) => {
+            console.error("Speech Recognition Error:", e);
+            btnVoiceMic.classList.remove("listening");
+            voiceStatus.textContent = "Voice error or permission denied.";
+        };
+
+        recognition.onend = () => {
+            btnVoiceMic.classList.remove("listening");
+        };
+
+        recognition.onresult = (event) => {
+            const resultText = event.results[0][0].transcript;
+            voiceTranscript.textContent = `"${resultText}"`;
+            processVoiceQuery(resultText);
+        };
+    }
+
+    function processVoiceQuery(query) {
+        const text = query.toLowerCase().trim();
+        
+        if (text.includes("priorit") || text.includes("pehle") || text.includes("urgent") || text.includes("first") || text.includes("taiyar") || text.includes("kon sa") || text.includes("priority")) {
+            triggerPrioritization();
+        } else if (text.includes("train") || text.includes("timetable") || text.includes("gaadi") || text.includes("arriving")) {
+            const p3Trains = activeTrains.filter(t => t.platform === 3);
+            if (p3Trains.length === 0) {
+                const reply = "No upcoming trains scheduled on Platform 3 right now.";
+                voiceResponseText.textContent = reply;
+                voiceResponseBubble.style.display = "block";
+                speakText(reply);
+            } else {
+                const trainNames = p3Trains.map(t => `${t.name} in ${Math.floor(t.eta / 60)} minutes`).join(", and ");
+                const reply = `Platform 3 upcoming schedules are: ${trainNames}.`;
+                voiceResponseText.textContent = reply;
+                voiceResponseBubble.style.display = "block";
+                speakText(reply);
+            }
+        } else if (text.includes("stock") || text.includes("inventory") || text.includes("maal") || text.includes("shortage") || text.includes("kam")) {
+            const lowStockItems = inventory.filter(i => i.stock <= i.minStock);
+            if (lowStockItems.length === 0) {
+                const reply = "All stock levels are optimal. Koee shortage nahi hai.";
+                voiceResponseText.textContent = reply;
+                voiceResponseBubble.style.display = "block";
+                speakText(reply);
+            } else {
+                const itemNames = lowStockItems.map(i => i.name).join(", ");
+                const reply = `Stock alert. Items ${itemNames} are below safety limits. Please restock soon.`;
+                voiceResponseText.textContent = reply;
+                voiceResponseBubble.style.display = "block";
+                speakText(reply);
+            }
+        } else if (text.includes("hello") || text.includes("namaste") || text.includes("hi ") || text.includes("help") || text.includes("sunona")) {
+            const reply = "Hello! Main aapka RailQuick assistant hu. Ask me: 'prioritize orders' or 'stock update'. Main madad ke liye tayyar hu!";
+            voiceResponseText.textContent = reply;
+            voiceResponseBubble.style.display = "block";
+            speakText(reply);
+        } else {
+            const reply = `Heard: "${query}". Try asking "prioritize orders" or "pehle konsa order banaye?" to check train timings.`;
+            voiceResponseText.textContent = reply;
+            voiceResponseBubble.style.display = "block";
+            speakText(reply);
+        }
+    }
+
+    if (btnVoiceMic) {
+        btnVoiceMic.addEventListener("click", () => {
+            if (recognition) {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    console.log("Recognition already running", e);
+                }
+            } else {
+                const query = prompt("Speak to AI Agent (Enter voice command text):\n- 'prioritize orders' (Pehle konsa banaye?)\n- 'check trains' (Timetable update)\n- 'stock status' (Inventory levels)");
+                if (query) {
+                    voiceTranscript.textContent = `"${query}"`;
+                    processVoiceQuery(query);
+                }
+            }
+        });
+    }
 
     // ==========================================================================
     // INITIALIZATION RUNS

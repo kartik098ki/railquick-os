@@ -50,9 +50,35 @@
                                 <span class="ledger-val" id="salesOrdersFilled">18</span>
                             </div>
                             <div class="ledger-stat">
-                                <span class="ledger-lbl">AI Commissions</span>
-                                <span class="ledger-val" id="salesAiCommissions">₹360.00</span>
+                                <span class="ledger-lbl">AI Rerouted</span>
+                                <span class="ledger-val" id="salesAiCommissions">4</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Voice Assistant Desk -->
+                    <div class="ai-voice-card">
+                        <div class="voice-card-header">
+                            <span class="voice-title">🎤 AI Voice Desk</span>
+                            <span class="voice-lang-badge">Hinglish / English</span>
+                        </div>
+                        <div class="voice-card-body">
+                            <div class="voice-status-wrapper">
+                                <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak">
+                                    <span class="mic-icon">🎙️</span>
+                                </button>
+                                <div class="voice-texts">
+                                    <div class="voice-status" id="voiceStatus">Tap microphone to speak (Hinglish/English support)</div>
+                                    <div class="voice-transcript" id="voiceTranscript">"e.g., Which order to prepare first?"</div>
+                                </div>
+                            </div>
+                            <div class="voice-output-bubble" id="voiceResponseBubble" style="display: none;">
+                                <span class="ai-response-lbl">AI Agent:</span>
+                                <span class="ai-response-txt" id="voiceResponseText">...</span>
+                            </div>
+                        </div>
+                        <div class="voice-hints-row">
+                            <span>Ask: <em>"Prioritize orders"</em> or <em>"Pehle konsa order banaye?"</em></span>
                         </div>
                     </div>
 
@@ -70,7 +96,10 @@
                     <!-- Active Orders Touch List -->
                     <div class="orders-section-header">
                         <h2>Platform 3 Queue</h2>
-                        <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px;">🧠 Prioritize</button>
+                            <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                        </div>
                     </div>
                     
                     <div class="orders-touch-list" id="active-orders-container">
