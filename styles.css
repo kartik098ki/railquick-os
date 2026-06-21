@@ -1670,3 +1670,57 @@ input:checked + .toggle-track:before { transform: translateX(20px); background-c
 .scanner-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
 .scanner-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 .scanner-arrow { color: var(--neon-cyan); }
+
+/* =========================================================================
+   RESPONSIVE DESIGN (FIX "DABB GYA" / SQUISHED LAYOUTS)
+   ========================================================================= */
+.custom-svg-logo {
+  width: 140px;
+  height: 36px;
+  background: none;
+  box-shadow: none;
+}
+
+.tagline-wrapper {
+  margin-top: -2px;
+  margin-left: 4px;
+}
+
+@media (max-width: 420px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .custom-svg-logo {
+    width: 110px;
+    height: 30px;
+  }
+  
+  .header-brand-group {
+    gap: 4px;
+  }
+  
+  .tagline-wrapper {
+    display: none; /* Hide tagline on super small screens to save space */
+  }
+
+  .header-right-meta {
+    gap: 6px;
+  }
+  
+  .stall-badge {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+  
+  .app-header-mobile {
+    padding: 0 10px;
+  }
+  
+  .nav-item {
+    width: 55px;
+  }
+}
