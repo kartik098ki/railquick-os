@@ -439,7 +439,7 @@ body {
 
 /* Toast Notifications */
 .toast-container {
-  position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+  position: fixed; bottom: 84px; right: 24px; z-index: 1000;
   display: flex; flex-direction: column; gap: 12px;
 }
 .toast {
@@ -454,3 +454,167 @@ body {
 .toast-content { flex: 1; }
 .toast-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--notion-text); }
 .toast-desc { font-size: 12px; color: var(--notion-text-light); }
+
+/* ==========================================================================
+   HELL DASHBOARD MASTER UPGRADE
+   ========================================================================== */
+
+/* Kanban Board */
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+.kanban-col {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kanban-header {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--notion-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.kanban-count {
+  font-size: 12px;
+  color: var(--notion-text-light);
+  font-weight: 400;
+}
+.kanban-card {
+  background: var(--notion-bg);
+  border: 1px solid var(--notion-border);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kanban-card:active { cursor: grabbing; }
+.kanban-card-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--notion-text);
+}
+.kanban-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--notion-text-light);
+}
+
+/* Calendar Heatmap */
+.heatmap-container {
+  border: 1px solid var(--notion-border);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--notion-bg);
+}
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(30, 1fr);
+  gap: 4px;
+  margin-top: 16px;
+}
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--notion-hover);
+  transition: all 0.2s ease;
+  position: relative;
+}
+.heatmap-cell:hover { transform: scale(1.2); z-index: 2; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+.heat-1 { background: #cce7ff; }
+.heat-2 { background: #66b3ff; }
+.heat-3 { background: #0073e6; }
+.heat-4 { background: #004d99; }
+.dark-mode .heat-1 { background: #0a3a66; }
+.dark-mode .heat-2 { background: #0f5c99; }
+.dark-mode .heat-3 { background: #147ecc; }
+.dark-mode .heat-4 { background: #199fff; }
+
+/* AI Assistant Widget */
+.ai-widget-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 1001;
+  transition: transform 0.2s;
+}
+.ai-widget-btn:hover { transform: scale(1.1); }
+.ai-widget-panel {
+  position: fixed;
+  bottom: 84px;
+  right: 24px;
+  width: 340px;
+  background: var(--notion-bg);
+  border: 1px solid var(--notion-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.ai-widget-panel.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.ai-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--notion-border);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ai-body {
+  height: 250px;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+}
+.ai-msg { padding: 8px 12px; border-radius: 8px; max-width: 85%; }
+.ai-msg.system { background: var(--notion-hover); align-self: flex-start; border-bottom-left-radius: 2px; }
+.ai-msg.user { background: #000; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+.dark-mode .ai-msg.user { background: #fff; color: #000; }
+.ai-input-area {
+  padding: 12px;
+  border-top: 1px solid var(--notion-border);
+  display: flex;
+  gap: 8px;
+}
+.ai-input {
+  flex: 1;
+  background: var(--notion-sidebar);
+  border: 1px solid var(--notion-border);
+  color: var(--notion-text);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  outline: none;
+}
