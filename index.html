@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RailQuick Vendor Mobile OS</title>
+    <title>RailQuick Vendor POS</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,8 +16,8 @@
             <!-- App Header -->
             <header class="app-header">
                 <div class="header-main">
-                    <span class="stall-badge">🏪 NDLS Platform 3</span>
-                    <h1 class="app-brand">RailQuick POS</h1>
+                    <span class="stall-badge">NDLS Platform 3 Express</span>
+                    <h1 class="app-brand">RailQuick</h1>
                     <div class="header-status">
                         <span class="status-indicator online"></span>
                         <span class="status-lbl">Synced</span>
@@ -25,9 +25,9 @@
                 </div>
                 <!-- Live Marquee alert banner -->
                 <div class="live-alert-marquee">
-                    <span class="marquee-icon">⚡</span>
+                    <span class="marquee-icon">SYSTEM SIGNAL</span>
                     <div class="marquee-text-container">
-                        <span class="marquee-text" id="liveMarqueeText">Live: Rajdhani Exp (12423) arriving on P3 in 2 mins. Prioritize order prep!</span>
+                        <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
                     </div>
                 </div>
             </header>
@@ -37,37 +37,51 @@
                 
                 <!-- ================= TAB 1: ACTIVE ORDERS ================= -->
                 <section id="tab-orders" class="tab-view active">
-                    <!-- Quick Stats Row -->
-                    <div class="quick-stats-row">
-                        <div class="q-stat">
-                            <span class="q-lbl">Prep Pending</span>
-                            <span class="q-val" id="statsPendingCount">3</span>
-                        </div>
-                        <div class="q-stat urgent">
-                            <span class="q-lbl">Urgent (5m)</span>
-                            <span class="q-val" id="statsUrgentCount">1</span>
-                        </div>
-                        <div class="q-stat">
-                            <span class="q-lbl">Reallocated</span>
-                            <span class="q-val" id="statsReallocatedCount">4</span>
+                    <!-- Revenue & Analytics Row -->
+                    <div class="ledger-card">
+                        <div class="ledger-header">STALL DAILY LEDGER</div>
+                        <div class="ledger-stats-grid">
+                            <div class="ledger-stat">
+                                <span class="ledger-lbl">Total Sales</span>
+                                <span class="ledger-val" id="salesTotalRevenue">₹2,840.00</span>
+                            </div>
+                            <div class="ledger-stat">
+                                <span class="ledger-lbl">Orders Filled</span>
+                                <span class="ledger-val" id="salesOrdersFilled">18</span>
+                            </div>
+                            <div class="ledger-stat">
+                                <span class="ledger-lbl">AI Commissions</span>
+                                <span class="ledger-val" id="salesAiCommissions">₹360.00</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Touch Order Queue -->
+                    <!-- Upcoming Trains Schedule Monitor -->
+                    <div class="timetable-card">
+                        <div class="timetable-header">
+                            <h3>Upcoming Train Schedules</h3>
+                            <span class="badge live">LIVE FEED</span>
+                        </div>
+                        <div class="timetable-list" id="upcomingTrainsList">
+                            <!-- Dynamic train rows -->
+                        </div>
+                    </div>
+
+                    <!-- Active Orders Touch List -->
                     <div class="orders-section-header">
                         <h2>Order Dispatch Queue</h2>
                         <span class="orders-count-badge" id="activeOrdersBadge">3</span>
                     </div>
                     
                     <div class="orders-touch-list" id="active-orders-container">
-                        <!-- Populated dynamically via JS -->
+                        <!-- Populated dynamically -->
                     </div>
 
                     <!-- Platform Map Schematic (Compact Mobile Version) -->
                     <div class="mobile-map-card">
                         <div class="map-card-header">
-                            <h3>Live Platform Schematic</h3>
-                            <button class="action-btn primary-btn compact-btn" id="btnSimulatePlatChange" style="font-size: 10px;">⚡ Simulate Shift</button>
+                            <h3>Platform Schematic Map</h3>
+                            <span class="status-indicator online"></span>
                         </div>
                         <div class="platforms-mini-grid">
                             <div class="mini-plat-row" id="mini-plat-1">
@@ -138,7 +152,7 @@
                     <!-- Cart Summary panel -->
                     <div class="pos-cart-panel">
                         <div class="cart-header">
-                            <h3>🛒 Passenger Order Basket</h3>
+                            <h3>Passenger Order Basket</h3>
                             <button class="clear-cart-btn" id="btnClearCart">Clear</button>
                         </div>
                         
@@ -174,7 +188,7 @@
                                 <span class="total-lbl">Total Price</span>
                                 <span class="total-val" id="cartTotalVal">₹0</span>
                             </div>
-                            <button class="btn-checkout" id="btnPlaceOrder">🎯 DISPATCH RUNNER</button>
+                            <button class="btn-checkout" id="btnPlaceOrder">DISPATCH RUNNER</button>
                         </div>
                     </div>
                 </section>
@@ -187,14 +201,14 @@
                         <div class="restock-info">
                             <h4>AI Stock Warning</h4>
                             <p id="restockText">Water Bottles and Soda Can stock levels are low. heatwave warning active.</p>
-                            <button class="action-btn secondary-btn compact-btn" id="btnRestockAll" style="margin-top: 8px;">📦 Restock All</button>
+                            <button class="action-btn secondary-btn compact-btn" id="btnRestockAll" style="margin-top: 8px;">Restock All</button>
                         </div>
                     </div>
 
                     <!-- Search and Add controls -->
                     <div class="inventory-toolbar" style="margin-top: 15px;">
                         <input type="text" id="inventorySearch" placeholder="Search stock items...">
-                        <button class="action-btn primary-btn compact-btn" id="btnAddNewItem">➕ Add</button>
+                        <button class="action-btn primary-btn compact-btn" id="btnAddNewItem">Add Item</button>
                     </div>
 
                     <div class="table-instructions">Double-tap cells to edit values directly. Press Enter to save.</div>
@@ -223,7 +237,7 @@
                 <!-- ================= TAB 4: NOTION SYNC DESK ================= -->
                 <section id="tab-sync" class="tab-view">
                     <div class="sync-card">
-                        <h3>🔄 Notion Sync Center</h3>
+                        <h3>Notion Sync Center</h3>
                         <p class="sync-desc">Push live vendor sales, stock indices, and active dispatch logs to your cloud Notion databases.</p>
 
                         <div class="sync-form-group">
@@ -257,14 +271,14 @@
 
                         <div class="sync-actions-mobile">
                             <button class="action-btn primary-btn block-btn" id="saveSettingsBtn">Save Keys</button>
-                            <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">🔄 Push Sync to Notion</button>
+                            <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">Push Sync to Notion</button>
                         </div>
                     </div>
 
                     <!-- Interactive Notion CLI Console -->
                     <div class="mobile-console-card">
                         <div class="console-card-header">
-                            <span class="console-title">📟 Notion Database Logs</span>
+                            <span class="console-title">Notion Database Logs</span>
                             <button class="console-clear-btn" id="btnClearTerminal">Clear</button>
                         </div>
                         <div class="console-body" id="apiTerminalBody">
@@ -286,16 +300,16 @@
                     <div class="ai-drawer-header">
                         <div class="drag-bar"></div>
                         <div class="ai-drawer-title">
-                            <span>✨ Notion AI Assistant</span>
+                            <span>Notion AI Assistant</span>
                             <span class="ai-badge">V2</span>
                         </div>
                         <button class="close-drawer-btn" id="btnCloseAiDrawer">×</button>
                     </div>
                     <div class="ai-drawer-body">
-                        <p class="ai-drawer-intro">Draft operational memos, restock notes, or shift logs directly from platform states.</p>
+                        <p class="ai-drawer-intro">Draft operational handovers or stock alerts directly from platform states.</p>
                         
                         <div class="ai-drawer-input-row">
-                            <input type="text" id="aiCustomPrompt" placeholder="Ask AI to write something...">
+                            <input type="text" id="aiCustomPrompt" placeholder="Ask AI to write note drafts...">
                             <button id="btnSubmitAiPrompt">➔</button>
                         </div>
 
@@ -304,21 +318,21 @@
                                 <span class="p-icon">📝</span>
                                 <div class="p-meta">
                                     <span class="p-title">Draft Shift Handoff Log</span>
-                                    <span class="p-desc">Summarize live prep lists and logs</span>
+                                    <span class="p-desc">Summarize live sales totals and orders</span>
                                 </div>
                             </button>
                             <button class="ai-preset-option" data-action="shortage">
                                 <span class="p-icon">📦</span>
                                 <div class="p-meta">
                                     <span class="p-title">Draft Stock Reorder Form</span>
-                                    <span class="p-desc">Extract low stocks into order templates</span>
+                                    <span class="p-desc">Create restock list from low stock database</span>
                                 </div>
                             </button>
                             <button class="ai-preset-option" data-action="incident">
                                 <span class="p-icon">🚨</span>
                                 <div class="p-meta">
                                     <span class="p-title">Log Platform Shift Memo</span>
-                                    <span class="p-desc">Write alert details for reallocations</span>
+                                    <span class="p-desc">Write detail notes for auto-reallocations</span>
                                 </div>
                             </button>
                         </div>
@@ -326,7 +340,7 @@
                         <!-- Notes Output block inside AI drawer -->
                         <div class="ai-output-container">
                             <div class="output-header">
-                                <span>📝 Active Note Output Draft</span>
+                                <span>Active Note Output Draft</span>
                                 <button class="output-copy-btn" id="btnCopyNote">Copy</button>
                             </div>
                             <div class="output-text-area" id="editorContent" contenteditable="true" placeholder="AI drafts will stream here...">
@@ -345,7 +359,7 @@
                 </button>
                 <button class="nav-item" data-tab="pos">
                     <span class="nav-icon">🛒</span>
-                    <span class="nav-label">POS Stall</span>
+                    <span class="nav-label">Stall POS</span>
                 </button>
                 <button class="nav-item" data-tab="inventory">
                     <span class="nav-icon">📦</span>
@@ -353,7 +367,7 @@
                 </button>
                 <button class="nav-item" data-tab="sync">
                     <span class="nav-icon">🔄</span>
-                    <span class="nav-label">Notion Desk</span>
+                    <span class="nav-label">Notion Sync</span>
                 </button>
             </nav>
         </div>

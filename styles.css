@@ -169,19 +169,26 @@ button, select, input {
 
 /* Live Alert Marquee banner */
 .live-alert-marquee {
-    background: linear-gradient(90deg, #7c2d12 0%, #451a03 100%);
+    background: linear-gradient(90deg, #1e1b4b 0%, #0f172a 100%);
     padding: 6px 12px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-top: 1px solid rgba(249, 115, 22, 0.2);
-    font-size: 11px;
+    border-top: 1px solid rgba(168, 85, 247, 0.2);
+    font-size: 10px;
     overflow: hidden;
 }
 
 .marquee-icon {
-    font-size: 12px;
-    animation: blink 1.2s infinite;
+    background: var(--accent-purple-soft);
+    color: var(--accent-purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .marquee-text-container {
@@ -194,9 +201,9 @@ button, select, input {
 .marquee-text {
     display: inline-block;
     padding-left: 100%;
-    animation: marquee 25s linear infinite;
+    animation: marquee 20s linear infinite;
     font-weight: 500;
-    color: #ffedd5;
+    color: var(--text-secondary);
 }
 
 @keyframes marquee {
@@ -211,7 +218,7 @@ button, select, input {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    padding-bottom: 90px; /* space for tab bar and FAB */
+    padding-bottom: 90px;
     position: relative;
     scrollbar-width: none;
 }
@@ -229,65 +236,171 @@ button, select, input {
 }
 
 /* ==========================================================================
-   TAB 1: ACTIVE ORDERS QUEUE
+   TAB 1: LEDGER CARD & TIMETABLE CARD
    ========================================================================== */
-.quick-stats-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
+.ledger-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #111827 100%);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-md);
 }
 
-.q-stat {
-    flex: 1;
-    background: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: var(--r-md);
-    padding: 10px;
+.ledger-header {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent-purple);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.ledger-stats-grid {
+    display: flex;
+    justify-content: space-between;
+}
+
+.ledger-stat {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
-.q-stat.urgent {
-    border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.05);
-}
-
-.q-lbl {
-    font-size: 10px;
+.ledger-lbl {
+    font-size: 9.5px;
     color: var(--text-muted);
+    font-weight: 500;
     text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.2px;
 }
 
-.q-val {
-    font-size: 18px;
+.ledger-val {
+    font-size: 16px;
     font-family: var(--font-heading);
     font-weight: 700;
     color: #ffffff;
 }
 
+.ledger-stat:first-child .ledger-val {
+    color: var(--accent-green);
+}
+
+/* Timetable style grid */
+.timetable-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--r-md);
+    padding: 12px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.timetable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+}
+
+.timetable-header h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    font-size: 8px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+}
+
+.badge.live {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--accent-green);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.timetable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.train-timetable-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    background: rgba(0,0,0,0.12);
+    padding: 6px 8px;
+    border-radius: var(--r-sm);
+}
+
+.train-timetable-row.rescheduled-row {
+    border-left: 2px solid var(--accent-orange);
+    background: rgba(249, 115, 22, 0.04);
+}
+
+.tt-train {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.tt-plat {
+    background: rgba(255,255,255,0.05);
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.train-timetable-row.rescheduled-row .tt-plat {
+    color: var(--accent-orange);
+    background: var(--accent-orange-soft);
+}
+
+.tt-eta {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.tt-status {
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.tt-status.ontime { color: var(--accent-green); }
+.tt-status.rescheduled { color: var(--accent-orange); }
+
 .orders-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    margin-top: 18px;
 }
 
 .orders-section-header h2 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .orders-count-badge {
     background: var(--accent-purple);
     color: #ffffff;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -313,11 +426,11 @@ button, select, input {
 }
 
 .order-touch-card.critical {
-    border-left: 4px solid var(--accent-red);
+    border-left: 3px solid var(--accent-red);
 }
 
 .order-touch-card.upcoming {
-    border-left: 4px solid var(--accent-orange);
+    border-left: 3px solid var(--accent-orange);
 }
 
 .card-header-row {
@@ -329,7 +442,7 @@ button, select, input {
 
 .order-id-lbl {
     font-family: var(--font-heading);
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #ffffff;
 }
@@ -347,7 +460,7 @@ button, select, input {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
@@ -385,7 +498,7 @@ button, select, input {
     flex: 1;
     padding: 8px 0;
     border-radius: var(--r-sm);
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     text-align: center;
     cursor: pointer;
@@ -424,6 +537,7 @@ button, select, input {
     border: 1px solid var(--border-color);
     border-radius: var(--r-md);
     padding: 12px;
+    margin-top: 14px;
 }
 
 .map-card-header {
@@ -434,9 +548,11 @@ button, select, input {
 }
 
 .map-card-header h3 {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .platforms-mini-grid {
@@ -595,8 +711,10 @@ button, select, input {
 }
 
 .cart-header h3 {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
 }
 
 .clear-cart-btn {
@@ -894,7 +1012,7 @@ button, select, input {
 }
 
 .sync-form-group label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -1029,7 +1147,7 @@ button, select, input {
    ========================================================================== */
 .floating-ai-fab {
     position: absolute;
-    bottom: 64px; /* above bottom navigation */
+    bottom: 64px;
     right: 16px;
     width: 52px;
     height: 52px;
@@ -1108,9 +1226,11 @@ button, select, input {
     align-items: center;
     gap: 8px;
     font-family: var(--font-heading);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--accent-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .ai-badge {
@@ -1135,7 +1255,7 @@ button, select, input {
 }
 
 .ai-drawer-intro {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
@@ -1223,6 +1343,7 @@ button, select, input {
     font-size: 11px;
     font-weight: 600;
     color: var(--text-muted);
+    text-transform: uppercase;
 }
 
 .output-copy-btn {
@@ -1447,7 +1568,6 @@ button, select, input {
     to { opacity: 1; }
 }
 
-/* Custom tag style colors for new attributes */
 .notion-tag.pink { background: rgba(239, 68, 68, 0.12); color: #f87171; }
 .notion-tag.blue { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
 .notion-tag.green { background: rgba(16, 185, 129, 0.12); color: #34d399; }

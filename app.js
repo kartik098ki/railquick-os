@@ -1,10 +1,10 @@
 /* ==========================================================================
-   RAILQUICK VENDOR MOBILE OS - STALL ENGINE LOGIC
+   RAILQUICK VENDOR MOBILE OS - STALL ENGINE LOGIC (AUTONOMOUS AI EDITION)
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================================================
-    // INITIAL MOCK DATA
+    // INITIAL SYSTEM STATES
     // ==========================================================================
 
     let orders = [
@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fromTo: "NDLS ➔ HWH",
             scheduledPlatform: 3,
             actualPlatform: 3,
-            etaSeconds: 154,
+            etaSeconds: 120,
             prepTimeMinutes: 2,
             items: [
                 { name: "Chai (Flask)", qty: 2, packed: false },
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fromTo: "DDN ➔ NDLS",
             scheduledPlatform: 3,
             actualPlatform: 3,
-            etaSeconds: 460,
+            etaSeconds: 340,
             prepTimeMinutes: 4,
             items: [
                 { name: "Paneer Tikka Roll", qty: 1, packed: false },
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fromTo: "NDLS ➔ MMCT",
             scheduledPlatform: 3,
             actualPlatform: 3,
-            etaSeconds: 980,
+            etaSeconds: 820,
             prepTimeMinutes: 3,
             items: [
                 { name: "Samosa Plate", qty: 3, packed: false },
@@ -70,12 +70,17 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let activeTrains = [
-        { no: "12423", name: "Rajdhani Exp", platform: 3, status: "Arriving" },
-        { no: "12056", name: "Jan Shatabdi", platform: 3, status: "Approaching" },
-        { no: "12952", name: "Mumbai Rajdhani", platform: 3, status: "Scheduled" },
-        { no: "12260", name: "Duronto Express", platform: 1, status: "Scheduled" },
-        { no: "22416", name: "Vande Bharat", platform: 4, status: "Scheduled" }
+        { no: "12423", name: "Rajdhani Exp", platform: 3, eta: 120, status: "On Time" },
+        { no: "12260", name: "Duronto Express", platform: 1, eta: 240, status: "On Time" },
+        { no: "12056", name: "Jan Shatabdi", platform: 3, eta: 340, status: "On Time" },
+        { no: "22416", name: "Vande Bharat", platform: 4, eta: 600, status: "On Time" },
+        { no: "12952", name: "Mumbai Rajdhani", platform: 3, eta: 820, status: "On Time" }
     ];
+
+    // Stall Earnings Ledger Model
+    let dailyRevenue = 2840.00;
+    let ordersFilledCount = 18;
+    let aiCommissions = 360.00;
 
     let statsReallocatedCountVal = 4;
     let customColumns = [];
@@ -161,10 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
         
-        let emoji = "ℹ️";
-        if (type === "success") emoji = "✨";
-        if (type === "warning") emoji = "🚨";
-        if (type === "danger") emoji = "🔥";
+        let emoji = "⚡";
+        if (type === "success") emoji = "✓";
+        if (type === "warning") emoji = "⚠️";
+        if (type === "danger") emoji = "🚨";
         
         toast.innerHTML = `<span>${emoji}</span> <span>${message}</span>`;
         toastContainer.appendChild(toast);
@@ -173,6 +178,19 @@ document.addEventListener("DOMContentLoaded", () => {
             toast.style.animation = "toastSlideUp 0.3s ease-in reverse forwards";
             setTimeout(() => { toast.remove(); }, 300);
         }, 4000);
+    }
+
+    // ==========================================================================
+    // STALL LEDGER RENDERER
+    // ==========================================================================
+    const salesTotalRevenue = document.getElementById("salesTotalRevenue");
+    const salesOrdersFilled = document.getElementById("salesOrdersFilled");
+    const salesAiCommissions = document.getElementById("salesAiCommissions");
+
+    function renderLedger() {
+        if (salesTotalRevenue) salesTotalRevenue.textContent = `₹${dailyRevenue.toFixed(2)}`;
+        if (salesOrdersFilled) salesOrdersFilled.textContent = ordersFilledCount;
+        if (salesAiCommissions) salesAiCommissions.textContent = `₹${aiCommissions.toFixed(2)}`;
     }
 
     // ==========================================================================
@@ -199,6 +217,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================================================
+    // TIMETABLE TIMELINES RENDERER
+    // ==========================================================================
+    const upcomingTrainsList = document.getElementById("upcomingTrainsList");
+
+    function renderTimetable() {
+        if (!upcomingTrainsList) return;
+        upcomingTrainsList.innerHTML = "";
+
+        activeTrains.forEach(train => {
+            const isRescheduled = train.status === "Rescheduled";
+            const rowClass = isRescheduled ? "train-timetable-row rescheduled-row" : "train-timetable-row";
+            
+            let etaString = "Arrived";
+            if (train.eta > 0) {
+                const min = Math.floor(train.eta / 60);
+                const sec = train.eta % 60;
+                etaString = `${min}m ${sec}s`;
+            }
+
+            const row = document.createElement("div");
+            row.className = rowClass;
+            row.innerHTML = `
+                <span class="tt-train">${train.no} - ${train.name}</span>
+                <span class="tt-plat">P${train.platform}</span>
+                <span class="tt-eta">${etaString}</span>
+                <span class="tt-status ${train.status.replace(" ", "").toLowerCase()}">${train.status}</span>
+            `;
+            upcomingTrainsList.appendChild(row);
+        });
+    }
+
+    // ==========================================================================
     // ORDERS QUEUE LOGIC
     // ==========================================================================
     const statsPendingCount = document.getElementById("statsPendingCount");
@@ -218,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (order.status === "Delivered" || order.status === "Relocated") return;
             
             pendingCount++;
-            const isUrgent = order.etaSeconds <= 300; // Under 5 mins
+            const isUrgent = order.etaSeconds <= 300; 
             if (isUrgent) urgentCount++;
 
             const etaMin = Math.floor(order.etaSeconds / 60);
@@ -238,31 +288,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="card-details-block">
                     <div class="card-items-summary">${itemSummary}</div>
                     <div class="runner-meta-row">
-                        <span>📍 Platform ${order.actualPlatform}</span>
-                        <span>⏱️ ETA: ${etaString}</span>
+                        <span>Platform ${order.actualPlatform}</span>
+                        <span>ETA: ${etaString}</span>
                     </div>
                 </div>
                 <div class="card-actions-row">
-                    <button class="card-btn pack" data-id="${order.id}">📦 PACK</button>
-                    <button class="card-btn ready" data-id="${order.id}">✅ READY</button>
-                    <button class="card-btn reallocate" data-id="${order.id}">🔄 REALLOCATE</button>
+                    <button class="card-btn pack" data-id="${order.id}">PACK</button>
+                    <button class="card-btn ready" data-id="${order.id}">READY</button>
+                    <button class="card-btn reallocate" data-id="${order.id}">REALLOCATE</button>
                 </div>
             `;
             activeOrdersContainer.appendChild(card);
         });
 
-        // Update stats counters
-        statsPendingCount.textContent = pendingCount;
-        statsUrgentCount.textContent = urgentCount;
-        statsReallocatedCount.textContent = statsReallocatedCountVal;
-        activeOrdersBadge.textContent = pendingCount;
+        // Update stats
+        if (statsPendingCount) statsPendingCount.textContent = pendingCount;
+        if (statsUrgentCount) statsUrgentCount.textContent = urgentCount;
+        if (statsReallocatedCount) statsReallocatedCount.textContent = statsReallocatedCountVal;
+        if (activeOrdersBadge) activeOrdersBadge.textContent = pendingCount;
 
-        // Hook click actions on touch cards
+        // Card button actions
         document.querySelectorAll(".card-btn.pack").forEach(btn => {
             btn.addEventListener("click", () => {
                 playSynthSound('click');
                 const id = btn.getAttribute("data-id");
-                showToast(`Order ${id} is now packing`, "info");
+                showToast(`Order ${id} packaging started`, "info");
             });
         });
 
@@ -270,8 +320,23 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener("click", () => {
                 playSynthSound('success');
                 const id = btn.getAttribute("data-id");
+                const order = orders.find(o => o.id === id);
                 orders = orders.filter(o => o.id !== id);
-                showToast(`Order ${id} marked READY and dispatched to runner!`, "success");
+                
+                // Add order values to Daily Sales Ledger
+                if (order) {
+                    let orderSum = 0;
+                    order.items.forEach(item => {
+                        const invItem = inventory.find(i => i.name === item.name);
+                        if (invItem) orderSum += invItem.price * item.qty;
+                    });
+                    if (orderSum === 0) orderSum = 120; // default minimum
+                    dailyRevenue += orderSum;
+                    ordersFilledCount++;
+                    renderLedger();
+                }
+
+                showToast(`Order ${id} is ready for dispatch!`, "success");
                 renderOrders();
             });
         });
@@ -282,15 +347,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 const id = btn.getAttribute("data-id");
                 orders = orders.filter(o => o.id !== id);
                 statsReallocatedCountVal++;
+                
+                // Earn reallocated commission refund
+                dailyRevenue += 120.00;
+                aiCommissions += 18.00;
+                renderLedger();
+
                 showToast(`AI REALLOCATION: Order ${id} shifted to partner stall.`, "warning");
                 renderOrders();
             });
         });
     }
 
-    // ETA Countdown Loop
+    // Active counts loops
     setInterval(() => {
         let rerender = false;
+        
+        // Countdown train arrivals
+        activeTrains.forEach(train => {
+            if (train.eta > 0) {
+                train.eta--;
+                rerender = true;
+            }
+        });
+
+        // Countdown orders ETA
         orders.forEach(order => {
             if (order.status !== "Delivered" && order.status !== "Relocated" && order.etaSeconds > 0) {
                 order.etaSeconds--;
@@ -298,19 +379,155 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (order.etaSeconds === 300) {
                     playSynthSound('critical');
-                    speakAlert(`Critical prep warning. Order ${order.id} train arriving in 5 minutes.`);
-                    showToast(`🚨 URGENT PREP: Train ${order.trainNo} arriving in 5 mins!`, "danger");
+                    speakAlert(`Train ${order.trainNo} arriving in 5 minutes.`);
+                    showToast(`🚨 Urgent: Train ${order.trainNo} arriving in 5 mins!`, "danger");
                 }
                 
                 if (order.etaSeconds === 0) {
                     order.status = "Relocated";
                     playSynthSound('warning');
-                    showToast(`⚠️ Order ${order.id} expired. departed.`, "danger");
+                    showToast(`Order ${order.id} expired.`, "danger");
                 }
             }
         });
-        if (rerender) renderOrders();
+
+        if (rerender) {
+            renderOrders();
+            renderTimetable();
+        }
     }, 1000);
+
+    // ==========================================================================
+    // AUTONOMOUS AI RELOCATION SIMULATOR
+    // ==========================================================================
+    // AI autonomously reschedules platforms and reallocates orders every 32 seconds!
+    let simulationState = 0;
+    
+    setInterval(() => {
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        if (simulationState === 0) {
+            // Shift train Jan Shatabdi (12056) from Platform 3 to Platform 5
+            const janShatabdi = activeTrains.find(t => t.no === "12056");
+            if (janShatabdi) {
+                janShatabdi.platform = 5;
+                janShatabdi.status = "Rescheduled";
+                
+                playSynthSound('warning');
+                speakAlert("AI Alert. Platform rescheduled. Jan Shatabdi shifted to platform 5.");
+                addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 ➔ 5.", "warning");
+                
+                // Auto-relocate Jan Shatabdi order
+                const orderIdx = orders.findIndex(o => o.trainNo === "12056");
+                if (orderIdx !== -1) {
+                    const order = orders[orderIdx];
+                    order.status = "Relocated";
+                    
+                    setTimeout(() => {
+                        addLogEntry(time, `AI AUTO-ROUTER: Order ${order.id} reallocated to Platform 5 partner vendor due to proximity delay risk.`, "danger");
+                        showToast(`AI ROUTING: Order ${order.id} transferred to P5 partner.`, "warning");
+                        
+                        statsReallocatedCountVal++;
+                        // Credit commission to ledger
+                        dailyRevenue += 120.00;
+                        aiCommissions += 18.00;
+                        renderLedger();
+
+                        orders.splice(orderIdx, 1);
+                        renderOrders();
+                        renderPlatformMap();
+                        renderTimetable();
+                    }, 1500);
+                }
+            }
+            simulationState = 1;
+        } else if (simulationState === 1) {
+            // Shift train Duronto Express (12260) from Platform 1 to Platform 3 (Us!)
+            const duronto = activeTrains.find(t => t.no === "12260");
+            if (duronto) {
+                duronto.platform = 3;
+                duronto.status = "Rescheduled";
+                
+                playSynthSound('success');
+                speakAlert("Attention. New order assigned to you from Platform 1 partner.");
+                addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 ➔ 3.", "warning");
+                
+                setTimeout(() => {
+                    const newOrder = {
+                        id: "RQ-1095",
+                        trainNo: "12260",
+                        trainName: "Duronto Express",
+                        fromTo: "NDLS ➔ Seat A2-10",
+                        scheduledPlatform: 1,
+                        actualPlatform: 3,
+                        etaSeconds: 240, // 4 mins
+                        prepTimeMinutes: 2,
+                        items: [{ name: "Veg Cutlet", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 2, packed: false }],
+                        status: "Pending",
+                        source: "Platform 1 Partner",
+                        reallocated: true
+                    };
+                    orders.push(newOrder);
+                    
+                    addLogEntry(time, `AI AUTO-ROUTER: Order ${newOrder.id} reallocated TO Platform 3 Express (Us) from Platform 1 partner.`, "success");
+                    showToast(`✨ AI ASSIGNMENT: Order ${newOrder.id} transferred to you!`, "success");
+                    
+                    renderOrders();
+                    renderPlatformMap();
+                    renderTimetable();
+                }, 1500);
+            }
+            simulationState = 2;
+        } else {
+            // Reset simulation states back to default schedules
+            const janShatabdi = activeTrains.find(t => t.no === "12056");
+            if (janShatabdi) {
+                janShatabdi.platform = 3;
+                janShatabdi.status = "On Time";
+                janShatabdi.eta = 340;
+            }
+            const duronto = activeTrains.find(t => t.no === "12260");
+            if (duronto) {
+                duronto.platform = 1;
+                duronto.status = "On Time";
+                duronto.eta = 240;
+            }
+            
+            orders = orders.filter(o => o.id !== "RQ-1095");
+            if (!orders.some(o => o.trainNo === "12056")) {
+                orders.push({
+                    id: "RQ-1085",
+                    trainNo: "12056",
+                    trainName: "Jan Shatabdi Express",
+                    fromTo: "DDN ➔ NDLS",
+                    scheduledPlatform: 3,
+                    actualPlatform: 3,
+                    etaSeconds: 340,
+                    prepTimeMinutes: 4,
+                    items: [{ name: "Paneer Tikka Roll", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 1, packed: false }],
+                    status: "Pending",
+                    source: "Platform 3 Express (Us)",
+                    reallocated: false
+                });
+            }
+
+            playSynthSound('click');
+            addLogEntry(time, "Simulator loop restarted. Tracks reset to initial schedule.", "system");
+            
+            renderOrders();
+            renderPlatformMap();
+            renderTimetable();
+            simulationState = 0;
+        }
+    }, 32000);
+
+    // Helper trigger simulator button link mapping (leaves click triggers mapping)
+    if (btnSimulatePlatChange) {
+        btnSimulatePlatChange.addEventListener("click", () => {
+            playSynthSound('click');
+            showToast("Force triggering next AI relocation event...", "info");
+        });
+    }
 
     // ==========================================================================
     // POS CHECKOUT CART MOTOR
@@ -425,6 +642,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const runner = cartRunnerSelect.value;
             const seat = cartSeatInput.value.trim() || "Gen coach";
 
+            let orderPrice = 0;
+            cart.forEach(i => { orderPrice += i.price * i.qty; });
+
             const newOrder = {
                 id: "RQ-" + Math.floor(1000 + Math.random() * 9000),
                 trainNo: train,
@@ -449,7 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
             speakAlert(`Order ${newOrder.id} dispatched to runner ${runner}`);
             showToast(`Order ${newOrder.id} generated! Runner ${runner} alerted.`, "success");
 
-            // Redirect bottom navigation back to active orders tab
+            // Redirect nav
             const ordersTabBtn = document.querySelector('[data-tab="orders"]');
             if (ordersTabBtn) ordersTabBtn.click();
             renderOrders();
@@ -457,10 +677,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // PLATFORM MAP SCHEMATIC & TRAINS
+    // PLATFORM MAP SCHEMATIC
     // ==========================================================================
-    const btnSimulatePlatChange = document.getElementById("btnSimulatePlatChange");
-    
     function renderPlatformMap() {
         for (let i = 1; i <= 5; i++) {
             const slot = document.getElementById(`train-slot-${i}`);
@@ -488,97 +706,8 @@ document.addEventListener("DOMContentLoaded", () => {
         logsBox.prepend(entry);
     }
 
-    if (btnSimulatePlatChange) {
-        btnSimulatePlatChange.addEventListener("click", () => {
-            const janShatabdi = activeTrains.find(t => t.no === "12056");
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-            if (janShatabdi && janShatabdi.platform === 3) {
-                janShatabdi.platform = 5;
-                playSynthSound('warning');
-                speakAlert("AI Alert. Platform rescheduled. Jan Shatabdi rescheduled to Platform 5.");
-                addLogEntry(time, "Rescheduled: Jan Shatabdi platform shifted 3 ➔ 5.", "warning");
-
-                // Auto-relocate Jan Shatabdi order
-                const orderIdx = orders.findIndex(o => o.trainNo === "12056");
-                if (orderIdx !== -1) {
-                    const order = orders[orderIdx];
-                    order.status = "Relocated";
-                    
-                    setTimeout(() => {
-                        addLogEntry(time, `AI ROUTER: Order ${order.id} reallocated to Platform 5 partner vendor.`, "danger");
-                        showToast(`AI ROUTING: Order ${order.id} transferred to P5 vendor.`, "warning");
-                        statsReallocatedCountVal++;
-                        orders.splice(orderIdx, 1);
-                        renderOrders();
-                        renderPlatformMap();
-                    }, 1000);
-                }
-
-                // Simulate reverse incoming assignment
-                setTimeout(() => {
-                    const duronto = activeTrains.find(t => t.no === "12260");
-                    if (duronto) {
-                        duronto.platform = 3;
-                        addLogEntry(time, "Rescheduled: Duronto Express platform shifted 1 ➔ 3.", "warning");
-                        
-                        setTimeout(() => {
-                            playSynthSound('success');
-                            speakAlert("Attention. New order assigned to you from Platform 1 partner.");
-                            const newOrder = {
-                                id: "RQ-1095",
-                                trainNo: "12260",
-                                trainName: "Duronto Express",
-                                fromTo: "NDLS ➔ Seat A2-10",
-                                scheduledPlatform: 1,
-                                actualPlatform: 3,
-                                etaSeconds: 240,
-                                prepTimeMinutes: 2,
-                                items: [{ name: "Veg Cutlet", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 2, packed: false }],
-                                status: "Pending",
-                                source: "Platform 1 Partner",
-                                reallocated: true
-                            };
-                            orders.push(newOrder);
-                            addLogEntry(time, `AI ROUTER: Order ${newOrder.id} reallocated TO Platform 3 (Us) from Platform 1.`, "success");
-                            showToast(`✨ AI ASSIGNMENT: Order ${newOrder.id} transferred to you!`, "success");
-                            renderOrders();
-                            renderPlatformMap();
-                        }, 1200);
-                    }
-                }, 2000);
-            } else {
-                // Reset state
-                janShatabdi.platform = 3;
-                const duronto = activeTrains.find(t => t.no === "12260");
-                if (duronto) duronto.platform = 1;
-                
-                orders = orders.filter(o => o.id !== "RQ-1095");
-                orders.push({
-                    id: "RQ-1085",
-                    trainNo: "12056",
-                    trainName: "Jan Shatabdi Express",
-                    fromTo: "DDN ➔ NDLS",
-                    scheduledPlatform: 3,
-                    actualPlatform: 3,
-                    etaSeconds: 460,
-                    prepTimeMinutes: 4,
-                    items: [{ name: "Paneer Tikka Roll", qty: 1, packed: false }, { name: "Water Bottle 1L", qty: 1, packed: false }],
-                    status: "Pending",
-                    source: "Platform 3 Express (Us)",
-                    reallocated: false
-                });
-
-                playSynthSound('click');
-                addLogEntry(time, "Simulator reset. Platform tracks back to initial schedule.", "system");
-                renderOrders();
-                renderPlatformMap();
-            }
-        });
-    }
-
     // ==========================================================================
-    // STALL INVENTORY LOGIC (DOUBLE TAP CELLS)
+    // STALL INVENTORY LOGIC
     // ==========================================================================
     const inventoryTableBody = document.getElementById("inventoryTableBody");
     const inventorySearchInput = document.getElementById("inventorySearch");
@@ -618,7 +747,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         headerRow.innerHTML = html;
         
-        // Add Column popover positioner
         const thAddCol = document.getElementById("thAddColumn");
         if (thAddCol) {
             thAddCol.addEventListener("click", (e) => {
@@ -632,7 +760,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         
-        // Remove Column handler
         headerRow.querySelectorAll(".delete-col-btn").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 e.stopPropagation();
@@ -708,7 +835,6 @@ document.addEventListener("DOMContentLoaded", () => {
             inventoryTableBody.appendChild(tr);
         });
 
-        // AI recommendation
         if (lowStockCount > 0) {
             restockRecommendation.style.display = "flex";
             const lowItems = inventory.filter(i => i.stock <= i.minStock).map(i => i.name).join(", ");
@@ -717,7 +843,6 @@ document.addEventListener("DOMContentLoaded", () => {
             restockRecommendation.style.display = "none";
         }
 
-        // Action Restock up button
         document.querySelectorAll(".btn-stock-up").forEach(btn => {
             btn.addEventListener("click", () => {
                 playSynthSound('click');
@@ -1101,7 +1226,7 @@ document.addEventListener("DOMContentLoaded", () => {
             htmlBlock = `
                 <h2>Operational Shift Handover summary</h2>
                 <hr>
-                <p><strong>Notion AI Summary:</strong> We managed ${orders.length} orders on Platform 3 Express.</p>
+                <p><strong>Notion AI Summary:</strong> Daily Sales Total: ₹${dailyRevenue.toFixed(2)} across ${ordersFilledCount} deliveries. AI Commissions: ₹${aiCommissions.toFixed(2)}.</p>
                 <ul>
                     ${itemsSummary || "<li>No active orders currently.</li>"}
                 </ul>
@@ -1126,7 +1251,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (action === "custom") {
             htmlBlock = `
                 <p><strong>AI Draft output for prompt: "${customPrompt}"</strong></p>
-                <p>Platform stall 3 is running at peak capacity. Inventory checks matched successfully. All runners online.</p>
+                <p>Platform stall 3 is running at peak capacity. Daily Sales: ₹${dailyRevenue.toFixed(2)}. Inventory checks matched successfully. All runners online.</p>
             `;
         }
 
@@ -1189,4 +1314,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPlatformMap();
     renderInventoryHeader();
     renderInventory();
+    renderTimetable();
+    renderLedger();
 });
