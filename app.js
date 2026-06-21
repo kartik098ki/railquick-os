@@ -84,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let statsReallocatedCountVal = 4;
     let customColumns = [];
-    let cart = [];
     let prioritizedOrderId = null;
 
     // ==========================================================================
@@ -167,12 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
         
-        let emoji = "⚡";
-        if (type === "success") emoji = "✓";
-        if (type === "warning") emoji = "⚠️";
-        if (type === "danger") emoji = "🚨";
+        let label = "INFO";
+        if (type === "success") label = "OK";
+        if (type === "warning") label = "WARN";
+        if (type === "danger") label = "ALERT";
         
-        toast.innerHTML = `<span>${emoji}</span> <span>${message}</span>`;
+        toast.innerHTML = `<span class="toast-label">${label}</span> <span>${message}</span>`;
         toastContainer.appendChild(toast);
         
         setTimeout(() => {
@@ -195,9 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================================================
-    // BOTTOM NAVIGATION SYSTEM
+    // TOP NAVIGATION SYSTEM
     // ==========================================================================
-    const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+    const navItems = document.querySelectorAll(".top-nav .nav-item");
     const tabViews = document.querySelectorAll(".tab-view");
 
     navItems.forEach(item => {
@@ -310,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const isCritical = order.etaSeconds <= 480; // 8 minutes threshold
             const priorityText = isCritical ? "Critical" : "Normal";
             const priorityClass = isCritical ? "critical" : "normal";
-            const priorityString = `<span class="priority-badge ${priorityClass}">${isCritical ? "🔴" : "🟡"} ${priorityText}</span>`;
+            const priorityString = `<span class="priority-badge ${priorityClass}">${priorityText}</span>`;
 
             const card = document.createElement("div");
             card.className = `order-touch-card ${cardClass}`;
@@ -432,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (order.etaSeconds === 300) {
                     playSynthSound('critical');
                     speakAlert(`Train ${order.trainNo} arriving in 5 minutes.`);
-                    showToast(`🚨 Urgent: Train ${order.trainNo} arriving in 5 mins!`, "danger");
+                    showToast(`Urgent: Train ${order.trainNo} arriving in 5 mins!`, "danger");
                 }
                 
                 if (order.etaSeconds === 0) {
@@ -538,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     orders.push(newOrder);
                     
                     addLogEntry(time, `AI AUTO-ROUTER: Order ${newOrder.id} reallocated TO Platform 3 Express (Us) from Platform 1 partner.`, "success");
-                    showToast(`✨ AI ASSIGNMENT: Order ${newOrder.id} transferred to you!`, "success");
+                    showToast(`AI ASSIGNMENT: Order ${newOrder.id} transferred to you!`, "success");
                     
                     renderOrders();
                     renderPlatformMap();
@@ -610,154 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================================================
-    // POS CHECKOUT CART MOTOR
-    // ==========================================================================
-    const productTiles = document.querySelectorAll(".product-tile");
-    const cartItemsList = document.getElementById("cartItemsList");
-    const cartTotalVal = document.getElementById("cartTotalVal");
-    const btnClearCart = document.getElementById("btnClearCart");
-    const btnPlaceOrder = document.getElementById("btnPlaceOrder");
-    const cartTrainSelect = document.getElementById("cartTrainSelect");
-    const cartRunnerSelect = document.getElementById("cartRunnerSelect");
-    const cartSeatInput = document.getElementById("cartSeatInput");
 
-    productTiles.forEach(tile => {
-        tile.addEventListener("click", () => {
-            playSynthSound('click');
-            const name = tile.getAttribute("data-name");
-            const price = parseFloat(tile.getAttribute("data-price"));
-            const emoji = tile.getAttribute("data-emoji");
-            
-            const existing = cart.find(i => i.name === name);
-            if (existing) {
-                existing.qty++;
-            } else {
-                cart.push({ name, price, qty: 1, emoji });
-            }
-            renderCart();
-        });
-    });
-
-    function renderCart() {
-        if (!cartItemsList) return;
-        cartItemsList.innerHTML = "";
-        
-        if (cart.length === 0) {
-            cartItemsList.innerHTML = '<div class="cart-empty-text">Basket is empty. Tap products to add.</div>';
-            cartTotalVal.textContent = "₹0";
-            return;
-        }
-
-        let total = 0;
-        cart.forEach(item => {
-            const itemTotal = item.price * item.qty;
-            total += itemTotal;
-            
-            const row = document.createElement("div");
-            row.className = "cart-item-row";
-            row.innerHTML = `
-                <div class="cart-item-info">
-                    <span>${item.emoji}</span>
-                    <span>${item.name}</span>
-                </div>
-                <div class="cart-item-qty-actions">
-                    <span class="qty-btn dec-qty" data-name="${item.name}">-</span>
-                    <span>${item.qty}</span>
-                    <span class="qty-btn inc-qty" data-name="${item.name}">+</span>
-                    <span class="cart-item-total">₹${itemTotal}</span>
-                </div>
-            `;
-            cartItemsList.appendChild(row);
-        });
-
-        cartTotalVal.textContent = `₹${total}`;
-
-        // Bind incremental actions
-        document.querySelectorAll(".dec-qty").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                playSynthSound('click');
-                const name = btn.getAttribute("data-name");
-                const item = cart.find(i => i.name === name);
-                if (item) {
-                    item.qty--;
-                    if (item.qty === 0) {
-                        cart = cart.filter(i => i.name !== name);
-                    }
-                    renderCart();
-                }
-            });
-        });
-
-        document.querySelectorAll(".inc-qty").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                playSynthSound('click');
-                const name = btn.getAttribute("data-name");
-                const item = cart.find(i => i.name === name);
-                if (item) {
-                    item.qty++;
-                    renderCart();
-                }
-            });
-        });
-    }
-
-    if (btnClearCart) {
-        btnClearCart.addEventListener("click", () => {
-            playSynthSound('click');
-            cart = [];
-            renderCart();
-        });
-    }
-
-    if (btnPlaceOrder) {
-        btnPlaceOrder.addEventListener("click", () => {
-            if (cart.length === 0) {
-                showToast("Your cart is empty!", "warning");
-                return;
-            }
-
-            const train = cartTrainSelect.value;
-            const runner = cartRunnerSelect.value;
-            const seat = cartSeatInput.value.trim() || "Gen coach";
-
-            let orderPrice = 0;
-            cart.forEach(i => { orderPrice += i.price * i.qty; });
-
-            const newOrder = {
-                id: "RQ-" + Math.floor(1000 + Math.random() * 9000),
-                trainNo: train,
-                trainName: activeTrains.find(t => t.no === train)?.name || "Express",
-                fromTo: `NDLS ➔ Seat ${seat}`,
-                scheduledPlatform: 3,
-                actualPlatform: 3,
-                etaSeconds: 300, // 5 mins
-                prepTimeMinutes: 2,
-                items: cart.map(i => ({ name: i.name, qty: i.qty, packed: false })),
-                status: "Pending",
-                source: "Stall POS Checkout",
-                reallocated: false
-            };
-
-            orders.push(newOrder);
-            cart = [];
-            cartSeatInput.value = "";
-            renderCart();
-            
-            playSynthSound('success');
-            speakAlert(`Order ${newOrder.id} dispatched to runner ${runner}`);
-            showToast(`Order ${newOrder.id} generated! Runner ${runner} alerted.`, "success");
-
-            // Redirect nav
-            const ordersTabBtn = document.querySelector('[data-tab="orders"]');
-            if (ordersTabBtn) ordersTabBtn.click();
-            renderOrders();
-        });
-    }
-
-    // ==========================================================================
     // PLATFORM MAP SCHEMATIC
     // ==========================================================================
     function renderPlatformMap() {
@@ -773,7 +625,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const slot = document.getElementById(`train-slot-${train.platform}`);
             if (slot) {
                 slot.className = "mini-train-slot active";
-                slot.innerHTML = `<span style="color:#ffffff; font-size:8px; display:block; padding:1px 4px;">🚆 ${train.no}</span>`;
+                slot.innerHTML = `<span style="color:#ffffff; font-size:8px; display:block; padding:1px 4px;">${train.no}</span>`;
             }
         });
     }
@@ -816,7 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
         customColumns.forEach((col, idx) => {
             html += `
                 <th data-prop="${col.name}" class="custom-column-th" style="position: relative;">
-                    ${col.type === 'number' ? '🔢' : col.type === 'select' ? '🏷️' : '🔤'} ${col.name}
+                    ${col.name}
                     <span class="delete-col-btn" style="margin-left: 6px; cursor: pointer; opacity: 0.6;" data-index="${idx}">×</span>
                 </th>
             `;
@@ -895,7 +747,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td class="editable-cell" data-item-id="${item.id}" data-prop="name" data-type="text" style="font-weight: 600;">📦 ${item.name}</td>
+                <td class="editable-cell" data-item-id="${item.id}" data-prop="name" data-type="text" style="font-weight: 600;">${item.name}</td>
                 <td class="editable-cell" data-item-id="${item.id}" data-prop="category" data-type="text" style="color: var(--text-muted);">${item.category}</td>
                 <td>
                     <div class="stock-indicator-wrapper">
@@ -910,7 +762,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 ${customColsHtml}
                 <td>
-                    <button class="table-action-btn btn-stock-up" data-item-id="${item.id}" title="Restock +10">➕</button>
+                    <button class="action-btn secondary-btn compact-btn btn-stock-up" data-item-id="${item.id}" style="font-size:10px; padding:2px 8px; font-weight:700;" title="Restock +10">+10</button>
                 </td>
             `;
             inventoryTableBody.appendChild(tr);
@@ -1022,7 +874,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnAiRefill.style.display = "none";
                 const cardParagraph = document.querySelector("#aiStockManagerAlert p");
                 if (cardParagraph) {
-                    cardParagraph.innerHTML = "✨ Stock levels are now optimal. Refill completed successfully!";
+                    cardParagraph.innerHTML = "Stock levels are now optimal. Refill completed successfully!";
                 }
                 
                 speakText("Stock warning resolved. Refilled 50 bottles of water.");
@@ -1319,7 +1171,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Notion AI compiling daily summary...", "info");
         
         const htmlBlock = `
-            <h2>📈 Daily Operations Summary - Platform 3</h2>
+            <h2>Daily Operations Summary - Platform 3</h2>
             <hr style="border:0; border-top:1px solid var(--border-color); margin:8px 0;">
             <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
             <p><strong>Shift Audit:</strong> Active Vendor Queue Sync</p>

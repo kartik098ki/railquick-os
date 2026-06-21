@@ -11,225 +11,173 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="device-wrapper">
-        <div class="mobile-frame">
-            <!-- App Header -->
-            <header class="app-header">
-                <div class="header-main">
-                    <span class="stall-badge">NDLS Platform 3 Express</span>
-                    <h1 class="app-brand">RailQuick</h1>
-                    <div class="header-status">
-                        <span class="status-indicator online"></span>
-                        <span class="status-lbl">Synced</span>
-                    </div>
-                </div>
-                <!-- Live Marquee alert banner -->
-                <div class="live-alert-marquee">
-                    <span class="marquee-icon">SYSTEM SIGNAL</span>
-                    <div class="marquee-text-container">
-                        <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dynamic Rush Hour Mode Banner -->
-            <div class="rush-hour-banner" id="rushHourBanner">
-                <span>🚨 RUSH MODE ACTIVATED</span>
-                <span>•</span>
-                <span id="rushModeOrders">Pending: 3 orders</span>
-                <span>•</span>
-                <span>Avg Pack: 32 sec</span>
-                <span>•</span>
-                <span>Staff Required: 3</span>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-main">
+            <div class="header-left">
+                <h1 class="app-brand">RailQuick</h1>
+                <span class="stall-badge">NDLS Platform 3 Express</span>
             </div>
+            <!-- Desktop Top Navigation Menu -->
+            <nav class="top-nav">
+                <button class="nav-item active" data-tab="orders">
+                    <span class="nav-label">Orders</span>
+                </button>
+                <button class="nav-item" data-tab="inventory">
+                    <span class="nav-label">Inventory</span>
+                </button>
+                <button class="nav-item" data-tab="sync">
+                    <span class="nav-label">Notion Sync</span>
+                </button>
+            </nav>
+            <div class="header-status">
+                <span class="status-indicator online"></span>
+                <span class="status-lbl">Synced</span>
+            </div>
+        </div>
+        <!-- Live Marquee alert banner -->
+        <div class="live-alert-marquee">
+            <span class="marquee-icon">SYSTEM SIGNAL</span>
+            <div class="marquee-text-container">
+                <span class="marquee-text" id="liveMarqueeText">AI dispatcher scanning schedule master... Platform transfers will auto-reallocate dynamically.</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dynamic Rush Hour Mode Banner -->
+    <div class="rush-hour-banner" id="rushHourBanner">
+        <span>RUSH MODE ACTIVATED</span>
+        <span>•</span>
+        <span id="rushModeOrders">Pending: 3 orders</span>
+        <span>•</span>
+        <span>Avg Pack: 32 sec</span>
+        <span>•</span>
+        <span>Staff Required: 3</span>
+    </div>
 
             <!-- Main Content Scroll Area -->
             <main class="app-viewport">
                 
                 <!-- ================= TAB 1: ACTIVE ORDERS ================= -->
                 <section id="tab-orders" class="tab-view active">
-                    <!-- Revenue & Analytics Row -->
-                    <div class="ledger-card">
-                        <div class="ledger-header">STALL DAILY LEDGER</div>
-                        <div class="ledger-stats-grid">
-                            <div class="ledger-stat">
-                                <span class="ledger-lbl">Total Sales</span>
-                                <span class="ledger-val" id="salesTotalRevenue">₹2,840.00</span>
-                            </div>
-                            <div class="ledger-stat">
-                                <span class="ledger-lbl">Orders Filled</span>
-                                <span class="ledger-val" id="salesOrdersFilled">18</span>
-                            </div>
-                            <div class="ledger-stat">
-                                <span class="ledger-lbl">AI Rerouted</span>
-                                <span class="ledger-val" id="salesAiCommissions">4</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI Voice Assistant Desk -->
-                    <div class="ai-voice-card">
-                        <div class="voice-card-header">
-                            <span class="voice-title">🎤 AI Voice Desk</span>
-                            <span class="voice-lang-badge">Hinglish / English</span>
-                        </div>
-                        <div class="voice-card-body">
-                            <div class="voice-status-wrapper">
-                                <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak">
-                                    <span class="mic-icon">🎙️</span>
-                                </button>
-                                <div class="voice-texts">
-                                    <div class="voice-status" id="voiceStatus">Tap microphone to speak (Hinglish/English support)</div>
-                                    <div class="voice-transcript" id="voiceTranscript">"e.g., Which order to prepare first?"</div>
+                    <div class="dashboard-grid">
+                        
+                        <!-- Left Panel: Ledger Card & Schematic Map -->
+                        <div class="dashboard-panel-left">
+                            <!-- Revenue & Analytics Row -->
+                            <div class="ledger-card">
+                                <div class="ledger-header">STALL DAILY LEDGER</div>
+                                <div class="ledger-stats-grid">
+                                    <div class="ledger-stat">
+                                        <span class="ledger-lbl">Total Sales</span>
+                                        <span class="ledger-val" id="salesTotalRevenue">₹2,840.00</span>
+                                    </div>
+                                    <div class="ledger-stat">
+                                        <span class="ledger-lbl">Orders Filled</span>
+                                        <span class="ledger-val" id="salesOrdersFilled">18</span>
+                                    </div>
+                                    <div class="ledger-stat">
+                                        <span class="ledger-lbl">AI Rerouted</span>
+                                        <span class="ledger-val" id="salesAiCommissions">4</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="voice-output-bubble" id="voiceResponseBubble" style="display: none;">
-                                <span class="ai-response-lbl">AI Agent:</span>
-                                <span class="ai-response-txt" id="voiceResponseText">...</span>
-                            </div>
-                        </div>
-                        <div class="voice-hints-row">
-                            <span>Ask: <em>"Prioritize orders"</em> or <em>"Pehle konsa order banaye?"</em></span>
-                        </div>
-                    </div>
 
-                    <!-- Upcoming Trains Schedule Monitor -->
-                    <div class="timetable-card">
-                        <div class="timetable-header">
-                            <h3>Platform 3 Trains</h3>
-                            <span class="badge live">P3 MONITOR</span>
-                        </div>
-                        <div class="timetable-list" id="upcomingTrainsList">
-                            <!-- Dynamic train rows -->
-                        </div>
-                    </div>
-
-                    <!-- Active Orders Touch List -->
-                    <div class="orders-section-header">
-                        <h2>Platform 3 Queue</h2>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px;">🧠 Prioritize</button>
-                            <span class="orders-count-badge" id="activeOrdersBadge">3</span>
-                        </div>
-                    </div>
-                    
-                    <div class="orders-touch-list" id="active-orders-container">
-                        <!-- Populated dynamically -->
-                    </div>
-
-                    <!-- Platform Map Schematic (Compact Mobile Version) -->
-                    <div class="mobile-map-card">
-                        <div class="map-card-header">
-                            <h3>Platform Schematic Map</h3>
-                            <span class="status-indicator online"></span>
-                        </div>
-                        <div class="platforms-mini-grid">
-                            <div class="mini-plat-row" id="mini-plat-1">
-                                <span class="p-num">P1</span>
-                                <div class="p-track"><div class="mini-train-slot" id="train-slot-1"></div></div>
-                                <span class="p-vend">Partner</span>
-                            </div>
-                            <div class="mini-plat-row" id="mini-plat-2">
-                                <span class="p-num">P2</span>
-                                <div class="p-track"><div class="mini-train-slot" id="train-slot-2"></div></div>
-                                <span class="p-vend">Partner</span>
-                            </div>
-                            <div class="mini-plat-row active-stall" id="mini-plat-3">
-                                <span class="p-num">P3</span>
-                                <div class="p-track"><div class="mini-train-slot" id="train-slot-3"></div></div>
-                                <span class="p-vend">Us</span>
-                            </div>
-                            <div class="mini-plat-row" id="mini-plat-4">
-                                <span class="p-num">P4</span>
-                                <div class="p-track"><div class="mini-train-slot" id="train-slot-4"></div></div>
-                                <span class="p-vend">Partner</span>
-                            </div>
-                            <div class="mini-plat-row" id="mini-plat-5">
-                                <span class="p-num">P5</span>
-                                <div class="p-track"><div class="mini-train-slot" id="train-slot-5"></div></div>
-                                <span class="p-vend">Partner</span>
-                            </div>
-                        </div>
-                        <!-- Mini Logs -->
-                        <div class="mini-logs-box" id="relocationLogs">
-                            <div class="mini-log system">Router ready. Listening to Station master...</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ================= TAB 2: STALL POS CHECKOUT ================= -->
-                <section id="tab-pos" class="tab-view">
-                    <div class="pos-instructions">Tap items to add to passenger checkout card:</div>
-                    
-                    <div class="products-grid">
-                        <div class="product-tile" data-name="Chai (Flask)" data-price="30" data-emoji="☕">
-                            <span class="prod-emoji">☕</span>
-                            <span class="prod-name">Chai (Flask)</span>
-                            <span class="prod-price">₹30</span>
-                        </div>
-                        <div class="product-tile" data-name="Veg Cutlet" data-price="40" data-emoji="🍛">
-                            <span class="prod-emoji">🍛</span>
-                            <span class="prod-name">Veg Cutlet</span>
-                            <span class="prod-price">₹40</span>
-                        </div>
-                        <div class="product-tile" data-name="Paneer Tikka Roll" data-price="120" data-emoji="🌯">
-                            <span class="prod-emoji">🌯</span>
-                            <span class="prod-name">Paneer Tikka Roll</span>
-                            <span class="prod-price">₹120</span>
-                        </div>
-                        <div class="product-tile" data-name="Samosa Plate" data-price="35" data-emoji="🥟">
-                            <span class="prod-emoji">🥟</span>
-                            <span class="prod-name">Samosa Plate</span>
-                            <span class="prod-price">₹35</span>
-                        </div>
-                        <div class="product-tile" data-name="Water Bottle 1L" data-price="20" data-emoji="🥤">
-                            <span class="prod-emoji">🥤</span>
-                            <span class="prod-name">Water Bottle 1L</span>
-                            <span class="prod-price">₹20</span>
-                        </div>
-                    </div>
-
-                    <!-- Cart Summary panel -->
-                    <div class="pos-cart-panel">
-                        <div class="cart-header">
-                            <h3>Passenger Order Basket</h3>
-                            <button class="clear-cart-btn" id="btnClearCart">Clear</button>
-                        </div>
-                        
-                        <div class="cart-items-list" id="cartItemsList">
-                            <div class="cart-empty-text">Basket is empty. Tap products to add.</div>
-                        </div>
-
-                        <div class="cart-dispatch-settings">
-                            <div class="dispatch-setting-row">
-                                <label for="cartTrainSelect">Target Train</label>
-                                <select id="cartTrainSelect">
-                                    <option value="12423">12423 - Rajdhani Exp (P3)</option>
-                                    <option value="12056">12056 - Jan Shatabdi (P3)</option>
-                                    <option value="12952">12952 - Mumbai Rajdhani (P3)</option>
-                                </select>
-                            </div>
-                            <div class="dispatch-setting-row">
-                                <label for="cartRunnerSelect">Assign Runner</label>
-                                <select id="cartRunnerSelect">
-                                    <option value="Raj Kumar">🏃 Raj Kumar (Online)</option>
-                                    <option value="Amit Singh">🏃 Amit Singh (Online)</option>
-                                    <option value="Vikram Patel">🏃 Vikram Patel (Online)</option>
-                                </select>
-                            </div>
-                            <div class="dispatch-setting-row">
-                                <label for="cartSeatInput">Coach / Seat</label>
-                                <input type="text" id="cartSeatInput" placeholder="e.g. B2-46" style="width: 120px;">
+                            <!-- Platform Map Schematic -->
+                            <div class="mobile-map-card">
+                                <div class="map-card-header">
+                                    <h3>Platform Schematic Map</h3>
+                                    <span class="status-indicator online"></span>
+                                </div>
+                                <div class="platforms-mini-grid">
+                                    <div class="mini-plat-row" id="mini-plat-1">
+                                        <span class="p-num">P1</span>
+                                        <div class="p-track"><div class="mini-train-slot" id="train-slot-1"></div></div>
+                                        <span class="p-vend">Partner</span>
+                                    </div>
+                                    <div class="mini-plat-row" id="mini-plat-2">
+                                        <span class="p-num">P2</span>
+                                        <div class="p-track"><div class="mini-train-slot" id="train-slot-2"></div></div>
+                                        <span class="p-vend">Partner</span>
+                                    </div>
+                                    <div class="mini-plat-row active-stall" id="mini-plat-3">
+                                        <span class="p-num">P3</span>
+                                        <div class="p-track"><div class="mini-train-slot" id="train-slot-3"></div></div>
+                                        <span class="p-vend">Us</span>
+                                    </div>
+                                    <div class="mini-plat-row" id="mini-plat-4">
+                                        <span class="p-num">P4</span>
+                                        <div class="p-track"><div class="mini-train-slot" id="train-slot-4"></div></div>
+                                        <span class="p-vend">Partner</span>
+                                    </div>
+                                    <div class="mini-plat-row" id="mini-plat-5">
+                                        <span class="p-num">P5</span>
+                                        <div class="p-track"><div class="mini-train-slot" id="train-slot-5"></div></div>
+                                        <span class="p-vend">Partner</span>
+                                    </div>
+                                </div>
+                                <!-- Mini Logs -->
+                                <div class="mini-logs-box" id="relocationLogs">
+                                    <div class="mini-log system">Router ready. Listening to Station master...</div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="cart-checkout-action">
-                            <div class="cart-total-block">
-                                <span class="total-lbl">Total Price</span>
-                                <span class="total-val" id="cartTotalVal">₹0</span>
+                        <!-- Center Panel: Active Queue -->
+                        <div class="dashboard-panel-center">
+                            <div class="orders-section-header">
+                                <h2>Platform 3 Queue</h2>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button class="action-btn primary-btn compact-btn" id="btnAutoPrioritize" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; background: var(--accent-purple); color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 4px;">Prioritize Queue</button>
+                                    <span class="orders-count-badge" id="activeOrdersBadge">3</span>
+                                </div>
                             </div>
-                            <button class="btn-checkout" id="btnPlaceOrder">DISPATCH RUNNER</button>
+                            
+                            <div class="orders-touch-list" id="active-orders-container">
+                                <!-- Populated dynamically -->
+                            </div>
                         </div>
+
+                        <!-- Right Panel: AI Voice Assistant & Trains -->
+                        <div class="dashboard-panel-right">
+                            <!-- AI Voice Assistant Desk -->
+                            <div class="ai-voice-card">
+                                <div class="voice-card-header">
+                                    <span class="voice-title">AI Voice Desk</span>
+                                    <span class="voice-lang-badge">Hinglish / English</span>
+                                </div>
+                                <div class="voice-card-body">
+                                    <div class="voice-status-wrapper">
+                                        <button class="voice-mic-btn" id="btnVoiceMic" title="Tap to speak">
+                                            <span class="mic-icon" style="font-weight: 700; font-size: 11px;">TALK</span>
+                                        </button>
+                                        <div class="voice-texts">
+                                            <div class="voice-status" id="voiceStatus">Tap button to speak (Hinglish/English support)</div>
+                                            <div class="voice-transcript" id="voiceTranscript">"e.g., Which order to prepare first?"</div>
+                                        </div>
+                                    </div>
+                                    <div class="voice-output-bubble" id="voiceResponseBubble" style="display: none;">
+                                        <span class="ai-response-lbl">AI Agent:</span>
+                                        <span class="ai-response-txt" id="voiceResponseText">...</span>
+                                    </div>
+                                </div>
+                                <div class="voice-hints-row">
+                                    <span>Ask: <em>"Prioritize orders"</em> or <em>"Pehle konsa order banaye?"</em></span>
+                                </div>
+                            </div>
+
+                            <!-- Upcoming Trains Schedule Monitor -->
+                            <div class="timetable-card">
+                                <div class="timetable-header">
+                                    <h3>Platform 3 Trains</h3>
+                                    <span class="badge live">P3 MONITOR</span>
+                                </div>
+                                <div class="timetable-list" id="upcomingTrainsList">
+                                    <!-- Dynamic train rows -->
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
@@ -237,7 +185,7 @@
                 <section id="tab-inventory" class="tab-view">
                     <!-- AI Stock Manager Alert Card -->
                     <div class="ai-stock-manager-card" id="aiStockManagerAlert">
-                        <h4>🚨 AI Stock Alert: Expected Shortage</h4>
+                        <h4>AI Stock Alert: Expected Shortage</h4>
                         <p>Water Bottles stock is low. High demand is expected due to upcoming train arrivals.</p>
                         <div class="stock-stats-row">
                             <span>Current Stock: <strong id="aiCurrentBottlesStock">18</strong></span>
@@ -276,56 +224,62 @@
                     </div>
                 </section>
 
-                <!-- ================= TAB 4: NOTION SYNC DESK ================= -->
+                                <!-- ================= TAB 4: NOTION SYNC DESK ================= -->
                 <section id="tab-sync" class="tab-view">
-                    <div class="sync-card">
-                        <h3>Notion Sync Center</h3>
-                        <p class="sync-desc">Push live vendor sales, stock indices, and active dispatch logs to your cloud Notion databases.</p>
+                    <div class="sync-grid">
+                        <div class="sync-panel-left">
+                            <div class="sync-card">
+                                <h3>Notion Sync Center</h3>
+                                <p class="sync-desc">Push live vendor sales, stock indices, and active dispatch logs to your cloud Notion databases.</p>
 
-                        <div class="sync-form-group">
-                            <label>Sync Configuration</label>
-                            <div class="sync-toggle-row">
-                                <span class="toggle-lbl">Real Notion API Sync</span>
-                                <input type="checkbox" id="notionIntegrationMode">
+                                <div class="sync-form-group">
+                                    <label>Sync Configuration</label>
+                                    <div class="sync-toggle-row">
+                                        <span class="toggle-lbl">Real Notion API Sync</span>
+                                        <input type="checkbox" id="notionIntegrationMode">
+                                    </div>
+                                    <span class="mode-descriptor-lbl" id="integrationModeLabel">Mock Sync (Interactive Console)</span>
+                                </div>
+
+                                <!-- Real API fields -->
+                                <div id="realNotionFields" style="display: none;">
+                                    <div class="form-group-mobile">
+                                        <label for="notionApiKey">Integration Token</label>
+                                        <input type="password" id="notionApiKey" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxx">
+                                    </div>
+                                    <div class="form-group-mobile">
+                                        <label for="notionOrdersDbId">Orders Database ID</label>
+                                        <input type="text" id="notionOrdersDbId" placeholder="32-character ID">
+                                    </div>
+                                    <div class="form-group-mobile">
+                                        <label for="notionInventoryDbId">Inventory Database ID</label>
+                                        <input type="text" id="notionInventoryDbId" placeholder="32-character ID">
+                                    </div>
+                                    <div class="form-group-mobile">
+                                        <label for="notionParentPageId">Notes Parent ID</label>
+                                        <input type="text" id="notionParentPageId" placeholder="32-character ID">
+                                    </div>
+                                </div>
+
+                                <div class="sync-actions-mobile">
+                                    <button class="action-btn primary-btn block-btn" id="saveSettingsBtn">Save Keys</button>
+                                    <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">Push Sync to Notion</button>
+                                    <button class="action-btn block-btn" id="btnOneTapReport" style="margin-top: 10px; background: #10b981; color: #ffffff; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 6px;">One-Tap Daily Report</button>
+                                </div>
                             </div>
-                            <span class="mode-descriptor-lbl" id="integrationModeLabel">Mock Sync (Interactive Console)</span>
                         </div>
 
-                        <!-- Real API fields -->
-                        <div id="realNotionFields" style="display: none;">
-                            <div class="form-group-mobile">
-                                <label for="notionApiKey">Integration Token</label>
-                                <input type="password" id="notionApiKey" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxx">
+                        <div class="sync-panel-right">
+                            <!-- Interactive Notion CLI Console -->
+                            <div class="mobile-console-card">
+                                <div class="console-card-header">
+                                    <span class="console-title">Notion Database Logs</span>
+                                    <button class="console-clear-btn" id="btnClearTerminal">Clear</button>
+                                </div>
+                                <div class="console-body" id="apiTerminalBody">
+                                    <div class="terminal-line system">Console ready. Sync databases to inspect raw JSON payloads.</div>
+                                </div>
                             </div>
-                            <div class="form-group-mobile">
-                                <label for="notionOrdersDbId">Orders Database ID</label>
-                                <input type="text" id="notionOrdersDbId" placeholder="32-character ID">
-                            </div>
-                            <div class="form-group-mobile">
-                                <label for="notionInventoryDbId">Inventory Database ID</label>
-                                <input type="text" id="notionInventoryDbId" placeholder="32-character ID">
-                            </div>
-                            <div class="form-group-mobile">
-                                <label for="notionParentPageId">Notes Parent ID</label>
-                                <input type="text" id="notionParentPageId" placeholder="32-character ID">
-                            </div>
-                        </div>
-
-                        <div class="sync-actions-mobile">
-                            <button class="action-btn primary-btn block-btn" id="saveSettingsBtn">Save Keys</button>
-                            <button class="action-btn secondary-btn block-btn" id="notionSyncBtn" style="margin-top: 10px;">Push Sync to Notion</button>
-                            <button class="action-btn block-btn" id="btnOneTapReport" style="margin-top: 10px; background: #10b981; color: #ffffff; cursor: pointer; font-weight: 700; border: 1px solid rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 6px;">📈 One-Tap Daily Report</button>
-                        </div>
-                    </div>
-
-                    <!-- Interactive Notion CLI Console -->
-                    <div class="mobile-console-card">
-                        <div class="console-card-header">
-                            <span class="console-title">Notion Database Logs</span>
-                            <button class="console-clear-btn" id="btnClearTerminal">Clear</button>
-                        </div>
-                        <div class="console-body" id="apiTerminalBody">
-                            <div class="terminal-line system">Console ready. Sync databases to inspect raw JSON payloads.</div>
                         </div>
                     </div>
                 </section>
@@ -334,7 +288,7 @@
 
             <!-- Floating AI Action Button (FAB) -->
             <button class="floating-ai-fab" id="btnNotionAI" title="Notion AI Assistant">
-                <span>✨</span>
+                <span>AI</span>
             </button>
 
             <!-- Slide-up Notion AI Drawer Sheet (One-Tap Report) -->
@@ -343,7 +297,7 @@
                     <div class="ai-drawer-header">
                         <div class="drag-bar"></div>
                         <div class="ai-drawer-title">
-                            <span>📈 Notion Daily Report</span>
+                            <span>Notion Daily Report</span>
                             <span class="ai-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">NOTION AI</span>
                         </div>
                         <button class="close-drawer-btn" id="btnCloseAiDrawer">×</button>
@@ -353,7 +307,7 @@
                         
                         <div class="ai-presets-grid" style="margin-bottom: 12px; grid-template-columns: 1fr;">
                             <button class="ai-preset-option" id="btnTriggerDailyReport" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); padding: 10px; display: flex; text-align: left; width: 100%;">
-                                <span class="p-icon" style="color:#10b981; font-size: 20px; margin-right: 10px;">📊</span>
+                                <span class="p-icon" style="color:#10b981; font-weight: bold; margin-right: 10px;">[REPORT]</span>
                                 <div class="p-meta">
                                     <span class="p-title" style="color:#10b981; font-weight: 700; display: block; font-size: 13px;">Generate One-Tap Daily Summary</span>
                                     <span class="p-desc" style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">Aggregates orders, sales total, lost revenues, and tomorrow's demand forecast</span>
@@ -377,28 +331,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Navigation Bar -->
-            <nav class="bottom-nav">
-                <button class="nav-item active" data-tab="orders">
-                    <span class="nav-icon">📥</span>
-                    <span class="nav-label">Orders</span>
-                </button>
-                <button class="nav-item" data-tab="pos">
-                    <span class="nav-icon">🛒</span>
-                    <span class="nav-label">Stall POS</span>
-                </button>
-                <button class="nav-item" data-tab="inventory">
-                    <span class="nav-icon">📦</span>
-                    <span class="nav-label">Inventory</span>
-                </button>
-                <button class="nav-item" data-tab="sync">
-                    <span class="nav-icon">🔄</span>
-                    <span class="nav-label">Notion Sync</span>
-                </button>
-            </nav>
-        </div>
-    </div>
 
     <!-- Notification Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
@@ -469,9 +401,9 @@
         <div class="form-group-mobile" style="margin-bottom: 12px;">
             <label style="font-size: 10px; color: #a1a1aa;">Property Type</label>
             <select id="newColType" style="font-size: 12px; padding: 6px; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; background: #121212; color: #ffffff; width: 100%;">
-                <option value="text">🔤 Text</option>
-                <option value="number">🔢 Number</option>
-                <option value="select">🏷️ Select</option>
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="select">Select</option>
             </select>
         </div>
         <button class="action-btn primary-btn compact-btn block-btn" id="btnCreateColumn" style="width: 100%; font-size: 11px; padding: 6px 0; justify-content: center;">Create Property</button>
